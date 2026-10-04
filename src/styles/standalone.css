@@ -1,0 +1,10 @@
+/*
+ * Precompiled stylesheet entry (dist/styles.css) for projects that do NOT use Tailwind.
+ * Only classes used by momi-ui components are generated.
+ */
+@import 'tailwindcss' source(none);
+@import './theme.css';
+
+@source '../';
+@source not '../test';
+@source not '../**/*.test.tsx';

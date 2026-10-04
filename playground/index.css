@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+@import '../src/styles/theme.css';
+
+/* Playground-only helpers */
+@utility bg-dots {
+  background-image: radial-gradient(
+    color-mix(in oklch, var(--color-foreground) 12%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 16px 16px;
+}
+
+html {
+  scroll-padding-top: 5rem;
+}
