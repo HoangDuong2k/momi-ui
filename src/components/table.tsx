@@ -56,9 +56,9 @@ export function Table({
           variant === 'card' &&
             '[&_td:first-child]:ps-4 [&_td:last-child]:pe-4 [&_th:first-child]:ps-4 [&_th:last-child]:pe-4 [&_thead]:bg-muted/40',
           stickyHeader &&
-            '[&_thead]:sticky [&_thead]:top-0 [&_thead]:z-10 [&_thead_th]:bg-background [&_thead_th]:shadow-[inset_0_-1px_0_var(--color-border)]',
+            '[&_thead]:sticky [&_thead]:top-0 [&_thead]:z-10 [&_thead_th]:bg-background [&_thead_th]:shadow-[inset_0_-1px_0_var(--border)]',
           stickyFooter &&
-            '[&_tfoot]:sticky [&_tfoot]:bottom-0 [&_tfoot]:z-10 [&_tfoot_td]:bg-[color-mix(in_oklab,var(--color-muted)_40%,var(--color-background))] [&_tfoot_td]:shadow-[inset_0_1px_0_var(--color-border)]',
+            '[&_tfoot]:sticky [&_tfoot]:bottom-0 [&_tfoot]:z-10 [&_tfoot_td]:bg-[color-mix(in_oklab,var(--muted)_40%,var(--background))] [&_tfoot_td]:shadow-[inset_0_1px_0_var(--border)]',
           bordered && '[&_td]:border [&_th]:border',
           className,
         )}

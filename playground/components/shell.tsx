@@ -1,11 +1,83 @@
-import { Menu, Monitor, Moon, Sun, X } from 'lucide-react'
-import { Badge, cn, IconButton, NativeSelect, useTheme, type Theme } from '../../src'
+import { ArrowUpRight, Menu, Monitor, Moon, Search, Sun, X } from 'lucide-react'
+import { useState } from 'react'
+import {
+  Badge,
+  cn,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  IconButton,
+  Kbd,
+  NativeSelect,
+  useCommandShortcut,
+  useTheme,
+  type Theme,
+} from '../../src'
 import { useCustomizer } from '../lib/customizer-context'
 import { accents, radii } from '../lib/customizer-presets'
-import { demos, groups, upcoming } from '../registry'
+import { demos, groups } from '../registry'
 
 const themeOrder: Theme[] = ['light', 'dark', 'system']
 const themeIcon = { light: Sun, dark: Moon, system: Monitor }
+
+/** ⌘K search over every demo page — built with momi-ui's own CommandDialog. */
+function SearchCommand() {
+  const [open, setOpen] = useState(false)
+  useCommandShortcut(() => setOpen((o) => !o))
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="ms-2 hidden h-8 w-56 items-center gap-2 rounded-md border bg-muted/40 px-2.5 text-sm text-muted-foreground transition-colors outline-none hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring/40 md:flex"
+      >
+        <Search className="size-4" />
+        Search components…
+        <span className="ms-auto flex gap-0.5">
+          <Kbd>⌘</Kbd>
+          <Kbd>K</Kbd>
+        </span>
+      </button>
+      <IconButton
+        aria-label="Search components"
+        className="md:hidden"
+        onClick={() => setOpen(true)}
+      >
+        <Search />
+      </IconButton>
+      <CommandDialog open={open} onOpenChange={setOpen} title="Search components">
+        <CommandInput placeholder="Search components and blocks…" />
+        <CommandList>
+          <CommandEmpty />
+          {groups.map((group) => (
+            <CommandGroup key={group} heading={group}>
+              {demos
+                .filter((d) => d.group === group)
+                .map((d) => (
+                  <CommandItem
+                    key={d.id}
+                    value={d.title}
+                    keywords={[d.id, ...(d.imports ?? [])]}
+                    onSelect={() => {
+                      setOpen(false)
+                      window.location.hash = `#/${d.id}`
+                    }}
+                  >
+                    <span className="truncate">{d.title}</span>
+                    <span className="ms-auto truncate text-xs text-muted-foreground">{group}</span>
+                  </CommandItem>
+                ))}
+            </CommandGroup>
+          ))}
+        </CommandList>
+      </CommandDialog>
+    </>
+  )
+}
 
 export function Header({ navOpen, onToggleNav }: { navOpen: boolean; onToggleNav: () => void }) {
   const { theme, setTheme } = useTheme()
@@ -38,6 +110,7 @@ export function Header({ navOpen, onToggleNav }: { navOpen: boolean; onToggleNav
         <Badge size="sm" variant="outline" shape="rounded" className="hidden sm:inline-flex">
           v0.1.0
         </Badge>
+        <SearchCommand />
 
         <div className="ms-auto flex items-center gap-2">
           <div
@@ -125,7 +198,10 @@ export function Sidebar({
                         active === d.id && 'bg-accent font-medium text-foreground',
                       )}
                     >
-                      {d.title}
+                      <span className="flex items-center gap-1">
+                        {d.title}
+                        {d.standalone && <ArrowUpRight className="size-3.5 opacity-60" />}
+                      </span>
                       {d.isNew && (
                         <Badge
                           size="sm"
@@ -139,24 +215,6 @@ export function Sidebar({
                     </a>
                   </li>
                 ))}
-            </ul>
-          </div>
-        ))}
-
-        {upcoming.map((u) => (
-          <div key={u.group}>
-            <p className="mb-2 flex items-center gap-2 px-2 text-xs font-medium text-muted-foreground">
-              {u.group}
-              <Badge size="sm" shape="rounded">
-                soon
-              </Badge>
-            </p>
-            <ul className="space-y-0.5">
-              {u.items.map((item) => (
-                <li key={item} className="px-2 py-1 text-sm text-muted-foreground/50">
-                  {item}
-                </li>
-              ))}
             </ul>
           </div>
         ))}

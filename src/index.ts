@@ -265,6 +265,111 @@ export {
   type PaginationRangeItem,
 } from './components/pagination'
 
+// Advanced inputs
+export { Slider, type SliderProps } from './components/slider'
+export { InputOTP, type InputOTPProps } from './components/input-otp'
+export {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+  defaultCommandFilter,
+  useCommandShortcut,
+  type CommandDialogProps,
+  type CommandFilter,
+  type CommandGroupProps,
+  type CommandItemProps,
+  type CommandProps,
+} from './components/command'
+export {
+  Combobox,
+  type ComboboxMultipleProps,
+  type ComboboxOption,
+  type ComboboxProps,
+  type ComboboxSingleProps,
+} from './components/combobox'
+export {
+  Calendar,
+  type CalendarProps,
+  type CalendarRangeProps,
+  type CalendarSingleProps,
+  type DateRange,
+} from './components/calendar'
+export {
+  DatePicker,
+  DateRangePicker,
+  type DatePickerProps,
+  type DateRangePickerProps,
+} from './components/date-picker'
+export {
+  FileUpload,
+  formatBytes,
+  type FileRejection,
+  type FileRejectionReason,
+  type FileUploadProps,
+} from './components/file-upload'
+
+// Landing blocks
+export { AnnouncementBar, type AnnouncementBarProps } from './blocks/announcement-bar'
+export {
+  BackgroundPattern,
+  type BackgroundFade,
+  type BackgroundPatternProps,
+  type BackgroundVariant,
+} from './blocks/background-pattern'
+export { BentoCard, BentoGrid, type BentoCardProps, type BentoGridProps } from './blocks/bento'
+export { BrowserFrame, type BrowserFrameProps } from './blocks/browser-frame'
+export { Cta, type CtaProps } from './blocks/cta'
+export { Faq, type FaqItem, type FaqProps } from './blocks/faq'
+export {
+  FeatureGrid,
+  FeatureSplit,
+  type FeatureGridProps,
+  type FeatureItem,
+  type FeatureSplitProps,
+} from './blocks/features'
+export { Footer, type FooterColumn, type FooterLink, type FooterProps } from './blocks/footer'
+export { Hero, HeroBadge, type HeroBadgeProps, type HeroProps } from './blocks/hero'
+export { LogoCloud, type LogoCloudProps, type LogoItem } from './blocks/logo-cloud'
+export { Marquee, type MarqueeProps } from './blocks/marquee'
+export { Navbar, type NavbarLink, type NavbarProps } from './blocks/navbar'
+export { NewsletterForm, type NewsletterFormProps } from './blocks/newsletter'
+export { NumberTicker, type NumberTickerProps } from './blocks/number-ticker'
+export {
+  BillingToggle,
+  PricingCard,
+  PricingComparison,
+  PricingTable,
+  type Billing,
+  type BillingToggleProps,
+  type PricingCardProps,
+  type PricingComparisonProps,
+  type PricingComparisonSection,
+  type PricingFeature,
+  type PricingPlan,
+  type PricingTableProps,
+} from './blocks/pricing'
+export { Reveal, useInView, type RevealProps, type UseInViewOptions } from './blocks/reveal'
+export { SectionHeader, type SectionHeaderProps } from './blocks/section-header'
+export { Stats, type StatItem, type StatsProps } from './blocks/stats'
+export { Steps, type StepItem, type StepsProps } from './blocks/steps'
+export { TeamGrid, type TeamGridProps, type TeamMember } from './blocks/team'
+export {
+  FeaturedTestimonial,
+  StarRating,
+  TestimonialCard,
+  TestimonialGrid,
+  type FeaturedTestimonialProps,
+  type Testimonial,
+  type TestimonialCardProps,
+  type TestimonialGridProps,
+} from './blocks/testimonials'
+
 // Disclosure
 export {
   Accordion,

@@ -103,7 +103,7 @@ function MiniHero() {
       <div className="pointer-events-none absolute inset-0 bg-radial from-transparent to-background/90" />
       <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-6">
         <Badge variant="outline" dot tone="success">
-          momi-ui 0.2 · Phase 2
+          momi-ui 0.1 · all phases complete
         </Badge>
         <Heading as="h2" size="display">
           Build calm interfaces, faster.
@@ -121,7 +121,7 @@ function MiniHero() {
           </Button>
         </HStack>
         <Text size="sm" tone="muted">
-          Press <Kbd>⌘</Kbd> <Kbd>K</Kbd> to search — coming in Phase 4
+          Press <Kbd>⌘</Kbd> <Kbd>K</Kbd> to search every component
         </Text>
       </div>
     </div>
@@ -494,7 +494,14 @@ function NewInvoiceDialog() {
   )
 }
 
-const roadmap = [
+interface RoadmapItem {
+  phase: string
+  title: string
+  items: string
+  status: 'done' | 'next' | 'planned'
+}
+
+const roadmap: RoadmapItem[] = [
   {
     phase: 'Phase 0',
     title: 'Setup',
@@ -516,16 +523,18 @@ const roadmap = [
   {
     phase: 'Phase 3',
     title: 'Landing blocks',
-    items: 'Navbar, Hero, Features, Pricing, Testimonials, FAQ, CTA, Footer…',
-    status: 'next',
+    items:
+      'Navbar, Hero, Features, Bento, Pricing, Testimonials, FAQ, CTA, Footer, full landing page',
+    status: 'done',
   },
   {
     phase: 'Phase 4',
     title: 'Advanced',
-    items: 'Combobox, Command, DatePicker, Slider, OTP, FileUpload, docs & publish',
-    status: 'planned',
+    items:
+      'Combobox, Command, Calendar & DatePicker, Slider, OTP, FileUpload, docs & publish setup',
+    status: 'done',
   },
-] as const
+]
 
 function Roadmap() {
   return (

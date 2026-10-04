@@ -3,12 +3,24 @@
   "version": "0.1.0",
   "description": "Modern Minimal React UI library built on Tailwind CSS v4 — core components and landing page blocks.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HoangDuong2k/momi-ui.git"
+  },
+  "homepage": "https://github.com/HoangDuong2k/momi-ui#readme",
+  "bugs": {
+    "url": "https://github.com/HoangDuong2k/momi-ui/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "sideEffects": [
     "**/*.css"
   ],
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -35,7 +47,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm test",
+    "prepublishOnly": "npm run check && npm run build"
   },
   "keywords": [
     "react",
@@ -44,7 +58,11 @@
     "tailwindcss",
     "design-system",
     "landing-page",
-    "minimal"
+    "minimal",
+    "radix-ui",
+    "data-table",
+    "date-picker",
+    "command-palette"
   ],
   "peerDependencies": {
     "react": ">=19",

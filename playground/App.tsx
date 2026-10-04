@@ -1,16 +1,23 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { createElement, useEffect, useState } from 'react'
-import { Button, Heading, Text } from '../src'
+import { Button, cn, Heading, Text } from '../src'
 import { CodeBlock, SourceView } from './components/demo'
 import { Header, Sidebar } from './components/shell'
+import LandingPage from './demos/landing-page'
 import { useHashRoute } from './lib/use-hash-route'
 import { demos, sources } from './registry'
 
 export function App() {
-  const route = useHashRoute()
+  // Routes look like `#/button` or `#/landing-page/pricing`.
+  const [page = '', anchor] = useHashRoute().split('/')
+  if (page === 'landing-page') return <LandingPage anchor={anchor} />
+  return <Docs page={page} />
+}
+
+function Docs({ page }: { page: string }) {
   const index = Math.max(
     0,
-    demos.findIndex((d) => d.id === route),
+    demos.findIndex((d) => d.id === page),
   )
   const entry = demos[index]
   const prev = demos[index - 1]
@@ -28,7 +35,7 @@ export function App() {
       <div className="mx-auto flex max-w-[90rem]">
         <Sidebar active={entry.id} open={navOpen} onNavigate={() => setNavOpen(false)} />
         <main className="min-w-0 flex-1 px-4 pt-10 pb-24 sm:px-8 lg:px-14">
-          <div className="mx-auto max-w-4xl">
+          <div className={cn('mx-auto', entry.wide ? 'max-w-6xl' : 'max-w-4xl')}>
             <header className="mb-12 space-y-4 border-b pb-10">
               <Text size="sm" tone="muted" weight="medium">
                 {entry.group}

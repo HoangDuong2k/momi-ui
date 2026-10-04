@@ -720,7 +720,7 @@ export function DataTable<T>({
             pinned && '[--dt-row-bg:var(--dt-pinned-bg)]',
             hoverable && 'hover:[--dt-row-bg:var(--dt-hover-bg)]',
             'data-[dragging]:opacity-50 data-[state=expanded]:[&>td]:border-b-transparent',
-            'data-[drop=after]:[&>td]:shadow-[inset_0_-2px_0_var(--color-primary)] data-[drop=before]:[&>td]:shadow-[inset_0_2px_0_var(--color-primary)]',
+            'data-[drop=after]:[&>td]:shadow-[inset_0_-2px_0_var(--primary)] data-[drop=before]:[&>td]:shadow-[inset_0_2px_0_var(--primary)]',
             isLast && !isExpanded && '[&>td]:border-b-0',
             rowClassName?.(entry.row, entry.index),
           )}
@@ -787,11 +787,11 @@ export function DataTable<T>({
       onScroll={(e) => syncScrollEdges(e.currentTarget)}
       className={cn(
         'group/dt relative w-full overflow-auto rounded-[inherit] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40',
-        '[--dt-bg:var(--color-background)] [--dt-header-bg:var(--dt-bg)]',
-        '[--dt-hover-bg:color-mix(in_oklab,var(--color-muted)_60%,var(--dt-bg))] [--dt-stripe-bg:color-mix(in_oklab,var(--color-muted)_35%,var(--dt-bg))]',
-        '[--dt-expanded-bg:color-mix(in_oklab,var(--color-muted)_30%,var(--dt-bg))] [--dt-pinned-bg:color-mix(in_oklab,var(--color-primary)_5%,var(--dt-bg))]',
+        '[--dt-bg:var(--background)] [--dt-header-bg:var(--dt-bg)]',
+        '[--dt-hover-bg:color-mix(in_oklab,var(--muted)_60%,var(--dt-bg))] [--dt-stripe-bg:color-mix(in_oklab,var(--muted)_35%,var(--dt-bg))]',
+        '[--dt-expanded-bg:color-mix(in_oklab,var(--muted)_30%,var(--dt-bg))] [--dt-pinned-bg:color-mix(in_oklab,var(--primary)_5%,var(--dt-bg))]',
         variant === 'card' &&
-          'rounded-xl border bg-card shadow-xs [--dt-bg:var(--color-card)] [--dt-header-bg:color-mix(in_oklab,var(--color-muted)_45%,var(--dt-bg))]',
+          'rounded-xl border bg-card shadow-xs [--dt-bg:var(--card)] [--dt-header-bg:color-mix(in_oklab,var(--muted)_45%,var(--dt-bg))]',
         'data-[resizing]:cursor-col-resize data-[resizing]:select-none',
         containerClassName,
       )}
@@ -861,7 +861,7 @@ export function DataTable<T>({
             ref={tfootRef}
             className={cn(
               stickyFooter && 'sticky bottom-0 z-20',
-              '[&>tr:first-child>td]:shadow-[inset_0_1px_0_var(--color-border)]',
+              '[&>tr:first-child>td]:shadow-[inset_0_1px_0_var(--border)]',
             )}
           >
             {bottomRows.map((entry, i) =>

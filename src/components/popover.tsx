@@ -53,7 +53,7 @@ export function PopoverContent({
           <PopoverPrimitive.Arrow
             width={12}
             height={6}
-            className="fill-popover drop-shadow-[0_1px_0_var(--color-border)]"
+            className="fill-popover drop-shadow-[0_1px_0_var(--border)]"
           />
         )}
       </PopoverPrimitive.Content>

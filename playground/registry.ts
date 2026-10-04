@@ -39,6 +39,26 @@ import ToastDemo from './demos/toast'
 import TokensDemo from './demos/tokens'
 import TooltipDemo from './demos/tooltip'
 import TypographyDemo from './demos/typography'
+import ComboboxDemo from './demos/combobox'
+import CommandDemo from './demos/command'
+import DatePickerDemo from './demos/date-picker'
+import FileUploadDemo from './demos/file-upload'
+import InputOTPDemo from './demos/input-otp'
+import InstallationDemo from './demos/installation'
+import SliderDemo from './demos/slider'
+import CtaDemo from './demos/cta'
+import EffectsDemo from './demos/effects'
+import FaqDemo from './demos/faq'
+import FeaturesDemo from './demos/features'
+import FooterDemo from './demos/footer'
+import HeroDemo from './demos/hero'
+import LandingPageDemo from './demos/landing-page'
+import LogoCloudDemo from './demos/logo-cloud'
+import NavbarDemo from './demos/navbar'
+import PricingDemo from './demos/pricing'
+import StatsDemo from './demos/stats'
+import TeamDemo from './demos/team'
+import TestimonialsDemo from './demos/testimonials'
 
 export interface DemoEntry {
   id: string
@@ -49,6 +69,10 @@ export interface DemoEntry {
   imports?: string[]
   /** Highlight in the sidebar as recently added. */
   isNew?: boolean
+  /** Use a wider content column (landing blocks). */
+  wide?: boolean
+  /** Opens as a full page outside the docs shell. */
+  standalone?: boolean
   component: ComponentType
 }
 
@@ -60,6 +84,14 @@ export const demos: DemoEntry[] = [
     group: 'Getting started',
     description: 'A quick tour of momi-ui: real compositions built from the library.',
     component: OverviewDemo,
+  },
+  {
+    id: 'installation',
+    title: 'Installation',
+    group: 'Getting started',
+    description: 'Install the package, add the styles, wire up providers and start theming.',
+    isNew: true,
+    component: InstallationDemo,
   },
   {
     id: 'tokens',
@@ -163,7 +195,6 @@ export const demos: DemoEntry[] = [
     group: 'Forms',
     description: 'A custom-styled select with groups, keyboard navigation and typeahead.',
     imports: ['Select', 'SelectTrigger', 'SelectValue', 'SelectContent', 'SelectItem'],
-    isNew: true,
     component: SelectDemo,
   },
   {
@@ -198,6 +229,52 @@ export const demos: DemoEntry[] = [
     imports: ['Switch'],
     component: SwitchDemo,
   },
+  {
+    id: 'slider',
+    title: 'Slider',
+    group: 'Forms',
+    description:
+      'Pick a value or a range by dragging — with value labels, marks and vertical mode.',
+    imports: ['Slider'],
+    isNew: true,
+    component: SliderDemo,
+  },
+  {
+    id: 'combobox',
+    title: 'Combobox',
+    group: 'Forms',
+    description: 'Searchable select with groups, descriptions and multiple selection.',
+    imports: ['Combobox'],
+    isNew: true,
+    component: ComboboxDemo,
+  },
+  {
+    id: 'date-picker',
+    title: 'Calendar & Date Picker',
+    group: 'Forms',
+    description: 'Accessible calendar with ranges, min/max, disabled days and any locale.',
+    imports: ['Calendar', 'DatePicker', 'DateRangePicker'],
+    isNew: true,
+    component: DatePickerDemo,
+  },
+  {
+    id: 'input-otp',
+    title: 'OTP Input',
+    group: 'Forms',
+    description: 'One-time codes and PINs with paste and SMS autofill support.',
+    imports: ['InputOTP'],
+    isNew: true,
+    component: InputOTPDemo,
+  },
+  {
+    id: 'file-upload',
+    title: 'File Upload',
+    group: 'Forms',
+    description: 'Drag-and-drop or browse, with type/size/count validation, previews and progress.',
+    imports: ['FileUpload'],
+    isNew: true,
+    component: FileUploadDemo,
+  },
 
   // Data display
   {
@@ -223,7 +300,6 @@ export const demos: DemoEntry[] = [
     description:
       'Semantic tables with card, striped, compact and sticky-header styles, plus sortable headers.',
     imports: ['Table', 'TableHeader', 'TableBody', 'TableRow', 'TableHead', 'TableCell'],
-    isNew: true,
     component: TableDemo,
   },
   {
@@ -233,7 +309,6 @@ export const demos: DemoEntry[] = [
     description:
       'Columns + data in, everything else built in: sorting, resizable and pinned columns, pinned rows, sticky header/footer, grouped headers, cell spans, expandable rows, drag-to-reorder and virtual scrolling.',
     imports: ['DataTable', 'type DataTableColumnDef'],
-    isNew: true,
     component: DataTableDemo,
   },
   {
@@ -260,7 +335,6 @@ export const demos: DemoEntry[] = [
     group: 'Navigation',
     description: 'Switch between views — segmented, underline or pills, horizontal or vertical.',
     imports: ['Tabs', 'TabsList', 'TabsTrigger', 'TabsContent'],
-    isNew: true,
     component: TabsDemo,
   },
   {
@@ -269,7 +343,6 @@ export const demos: DemoEntry[] = [
     group: 'Navigation',
     description: 'Show where the current page sits in the hierarchy.',
     imports: ['Breadcrumb', 'BreadcrumbList', 'BreadcrumbItem', 'BreadcrumbLink', 'BreadcrumbPage'],
-    isNew: true,
     component: BreadcrumbDemo,
   },
   {
@@ -278,7 +351,6 @@ export const demos: DemoEntry[] = [
     group: 'Navigation',
     description: 'Page through long lists. Controlled or uncontrolled, with a stable layout.',
     imports: ['Pagination'],
-    isNew: true,
     component: PaginationDemo,
   },
 
@@ -289,7 +361,6 @@ export const demos: DemoEntry[] = [
     group: 'Disclosure',
     description: 'Stacked sections that expand and collapse — great for FAQs.',
     imports: ['Accordion', 'AccordionItem', 'AccordionTrigger', 'AccordionContent'],
-    isNew: true,
     component: AccordionDemo,
   },
   {
@@ -298,7 +369,6 @@ export const demos: DemoEntry[] = [
     group: 'Disclosure',
     description: 'Show and hide a region with an animated height.',
     imports: ['Collapsible', 'CollapsibleTrigger', 'CollapsibleContent'],
-    isNew: true,
     component: CollapsibleDemo,
   },
 
@@ -316,7 +386,6 @@ export const demos: DemoEntry[] = [
       'DialogTitle',
       'DialogFooter',
     ],
-    isNew: true,
     component: DialogDemo,
   },
   {
@@ -325,7 +394,6 @@ export const demos: DemoEntry[] = [
     group: 'Overlay',
     description: 'Interrupts the user to confirm an important or destructive action.',
     imports: ['AlertDialog', 'AlertDialogContent', 'AlertDialogAction', 'AlertDialogCancel'],
-    isNew: true,
     component: AlertDialogDemo,
   },
   {
@@ -341,7 +409,6 @@ export const demos: DemoEntry[] = [
       'DrawerBody',
       'DrawerFooter',
     ],
-    isNew: true,
     component: DrawerDemo,
   },
   {
@@ -350,7 +417,6 @@ export const demos: DemoEntry[] = [
     group: 'Overlay',
     description: 'Rich content in a floating panel anchored to a trigger.',
     imports: ['Popover', 'PopoverTrigger', 'PopoverContent'],
-    isNew: true,
     component: PopoverDemo,
   },
   {
@@ -359,7 +425,6 @@ export const demos: DemoEntry[] = [
     group: 'Overlay',
     description: 'A short label on hover or focus, with one-line usage.',
     imports: ['Tooltip', 'TooltipProvider'],
-    isNew: true,
     component: TooltipDemo,
   },
   {
@@ -368,7 +433,6 @@ export const demos: DemoEntry[] = [
     group: 'Overlay',
     description: 'Preview content behind a link on hover.',
     imports: ['HoverCard', 'HoverCardTrigger', 'HoverCardContent'],
-    isNew: true,
     component: HoverCardDemo,
   },
   {
@@ -378,7 +442,6 @@ export const demos: DemoEntry[] = [
     description:
       'Actions and options in a menu: icons, shortcuts, checkboxes, radios and submenus.',
     imports: ['DropdownMenu', 'DropdownMenuTrigger', 'DropdownMenuContent', 'DropdownMenuItem'],
-    isNew: true,
     component: DropdownMenuDemo,
   },
   {
@@ -387,8 +450,16 @@ export const demos: DemoEntry[] = [
     group: 'Overlay',
     description: 'A menu opened with right-click or long-press. Same API as Dropdown Menu.',
     imports: ['ContextMenu', 'ContextMenuTrigger', 'ContextMenuContent', 'ContextMenuItem'],
-    isNew: true,
     component: ContextMenuDemo,
+  },
+  {
+    id: 'command',
+    title: 'Command',
+    group: 'Overlay',
+    description: 'Searchable command palette — inline or in a ⌘K dialog.',
+    imports: ['Command', 'CommandDialog', 'CommandInput', 'CommandItem', 'useCommandShortcut'],
+    isNew: true,
+    component: CommandDemo,
   },
 
   // Feedback
@@ -398,7 +469,6 @@ export const demos: DemoEntry[] = [
     group: 'Feedback',
     description: 'A static callout for important messages, in six tones.',
     imports: ['Alert'],
-    isNew: true,
     component: AlertDemo,
   },
   {
@@ -408,7 +478,6 @@ export const demos: DemoEntry[] = [
     description:
       'Brief notifications from anywhere with toast() — promise, action and swipe to dismiss.',
     imports: ['Toaster', 'toast'],
-    isNew: true,
     component: ToastDemo,
   },
   {
@@ -417,7 +486,6 @@ export const demos: DemoEntry[] = [
     group: 'Feedback',
     description: 'Show completion of a task, or an indeterminate wait.',
     imports: ['Progress'],
-    isNew: true,
     component: ProgressDemo,
   },
   {
@@ -426,7 +494,6 @@ export const demos: DemoEntry[] = [
     group: 'Feedback',
     description: 'Placeholder shapes while content loads.',
     imports: ['Skeleton', 'SkeletonText'],
-    isNew: true,
     component: SkeletonDemo,
   },
   {
@@ -437,32 +504,142 @@ export const demos: DemoEntry[] = [
     imports: ['Spinner'],
     component: SpinnerDemo,
   },
+
+  // Landing blocks
+  {
+    id: 'landing-page',
+    title: 'Full landing page',
+    group: 'Landing blocks',
+    description: 'A complete landing page built only from momi-ui blocks.',
+    isNew: true,
+    standalone: true,
+    component: LandingPageDemo,
+  },
+  {
+    id: 'navbar',
+    title: 'Navbar',
+    group: 'Landing blocks',
+    description:
+      'Responsive site header with a mobile menu, plus an announcement bar for launches and news.',
+    imports: ['Navbar', 'AnnouncementBar'],
+    isNew: true,
+    wide: true,
+    component: NavbarDemo,
+  },
+  {
+    id: 'hero',
+    title: 'Hero',
+    group: 'Landing blocks',
+    description:
+      'The opening section: badge, display title, actions and media — centered or split, with background patterns.',
+    imports: ['Hero', 'HeroBadge', 'BrowserFrame'],
+    isNew: true,
+    wide: true,
+    component: HeroDemo,
+  },
+  {
+    id: 'logo-cloud',
+    title: 'Logo Cloud & Marquee',
+    group: 'Landing blocks',
+    description: 'Customer logos as a grid or an endless marquee — and a marquee for any content.',
+    imports: ['LogoCloud', 'Marquee'],
+    isNew: true,
+    wide: true,
+    component: LogoCloudDemo,
+  },
+  {
+    id: 'features',
+    title: 'Features',
+    group: 'Landing blocks',
+    description: 'Feature grids, split rows with media, and an asymmetric bento grid.',
+    imports: ['SectionHeader', 'FeatureGrid', 'FeatureSplit', 'BentoGrid', 'BentoCard'],
+    isNew: true,
+    wide: true,
+    component: FeaturesDemo,
+  },
+  {
+    id: 'stats',
+    title: 'Stats & Steps',
+    group: 'Landing blocks',
+    description: 'Count-up numbers and "how it works" sequences.',
+    imports: ['Stats', 'Steps', 'NumberTicker'],
+    isNew: true,
+    wide: true,
+    component: StatsDemo,
+  },
+  {
+    id: 'testimonials',
+    title: 'Testimonials',
+    group: 'Landing blocks',
+    description: 'Masonry wall, featured quote and individual testimonial cards.',
+    imports: ['TestimonialGrid', 'TestimonialCard', 'FeaturedTestimonial'],
+    isNew: true,
+    wide: true,
+    component: TestimonialsDemo,
+  },
+  {
+    id: 'pricing',
+    title: 'Pricing',
+    group: 'Landing blocks',
+    description: 'Plan cards with a monthly/yearly toggle, and a feature comparison matrix.',
+    imports: ['PricingTable', 'PricingCard', 'BillingToggle', 'PricingComparison'],
+    isNew: true,
+    wide: true,
+    component: PricingDemo,
+  },
+  {
+    id: 'faq',
+    title: 'FAQ',
+    group: 'Landing blocks',
+    description: 'Questions and answers, stacked or side-by-side with the header.',
+    imports: ['Faq'],
+    isNew: true,
+    wide: true,
+    component: FaqDemo,
+  },
+  {
+    id: 'cta',
+    title: 'CTA & Newsletter',
+    group: 'Landing blocks',
+    description: 'Closing calls-to-action and an email capture form with all its states.',
+    imports: ['Cta', 'NewsletterForm'],
+    isNew: true,
+    wide: true,
+    component: CtaDemo,
+  },
+  {
+    id: 'team',
+    title: 'Team',
+    group: 'Landing blocks',
+    description: 'People with avatar, role, bio and links.',
+    imports: ['TeamGrid'],
+    isNew: true,
+    wide: true,
+    component: TeamDemo,
+  },
+  {
+    id: 'footer',
+    title: 'Footer',
+    group: 'Landing blocks',
+    description: 'Brand, link columns, newsletter, legal and social links.',
+    imports: ['Footer'],
+    isNew: true,
+    wide: true,
+    component: FooterDemo,
+  },
+  {
+    id: 'effects',
+    title: 'Backgrounds & Motion',
+    group: 'Landing blocks',
+    description: 'Background patterns, browser frame, reveal-on-scroll and number ticker.',
+    imports: ['BackgroundPattern', 'BrowserFrame', 'Reveal', 'NumberTicker', 'useInView'],
+    isNew: true,
+    wide: true,
+    component: EffectsDemo,
+  },
 ]
 
 export const groups = [...new Set(demos.map((d) => d.group))]
-
-/** Planned components, shown greyed out in the sidebar. */
-export const upcoming: { group: string; items: string[] }[] = [
-  {
-    group: 'Phase 3 · Landing',
-    items: [
-      'Navbar',
-      'Hero',
-      'Logo Cloud',
-      'Features',
-      'Stats',
-      'Testimonials',
-      'Pricing',
-      'FAQ',
-      'CTA',
-      'Footer',
-    ],
-  },
-  {
-    group: 'Phase 4',
-    items: ['Combobox', 'Command', 'Date Picker', 'Slider', 'OTP Input', 'File Upload'],
-  },
-]
 
 export const sources = import.meta.glob<string>('./demos/*.tsx', {
   query: '?raw',

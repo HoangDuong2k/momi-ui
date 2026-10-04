@@ -3,7 +3,7 @@
 Thư viện component React theo phong cách **Modern Minimal**, xây trên **Tailwind CSS v4** và **Radix UI**:
 nhiều khoảng trắng, typography rõ ràng, một màu accent, bo góc vừa phải, bóng đổ nhẹ, hỗ trợ dark mode.
 
-> Trạng thái: **Phase 0 → 2** (setup, component nền tảng, component tương tác & overlay). Xem [Lộ trình](#lộ-trình).
+> Trạng thái: **v0.1.0 — đủ 4 phase**: component nền tảng, tương tác & overlay, DataTable, block landing page và các input nâng cao. Xem [Lộ trình](#lộ-trình) và [CHANGELOG](CHANGELOG.md).
 
 ## Chạy playground
 
@@ -12,7 +12,7 @@ npm install
 npm run dev        # http://localhost:5173 — App test toàn bộ component
 ```
 
-Playground (`playground/App.tsx`) có sidebar theo nhóm, chuyển light/dark/system, đổi màu accent và radius trực tiếp, xem source của từng demo.
+Playground (`playground/App.tsx`) có sidebar theo nhóm, tìm kiếm <kbd>⌘</kbd> <kbd>K</kbd>, chuyển light/dark/system, đổi màu accent và radius trực tiếp, xem source của từng demo, và một trang **landing page hoàn chỉnh** (`#/landing-page`) ghép từ các block.
 
 ## Scripts
 
@@ -24,6 +24,7 @@ Playground (`playground/App.tsx`) có sidebar theo nhóm, chuyển light/dark/sy
 | `npm test`                        | Unit test (Vitest + Testing Library)           |
 | `npm run typecheck`               | Kiểm tra TypeScript                            |
 | `npm run lint` / `npm run format` | ESLint / Prettier (tự sắp xếp class Tailwind)  |
+| `npm run check`                   | typecheck + lint + format check + test (CI)    |
 
 ## Cách dùng trong dự án khác
 
@@ -98,18 +99,19 @@ Animation (overlay, accordion, toast…) dùng chung một bộ keyframes trong 
 
 ## Component
 
-| Nhóm         | Component                                                                                                                                                          |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Theme        | `ThemeProvider`, `useTheme`                                                                                                                                        |
-| Layout       | `Container`, `Stack`, `HStack`, `VStack`, `Grid`, `Section`, `Separator`, `AspectRatio`                                                                            |
-| Typography   | `Heading`, `Text`, `Link`, `Code`, `Kbd`, `Blockquote`                                                                                                             |
-| Buttons      | `Button`, `IconButton`, `ButtonGroup`                                                                                                                              |
-| Forms        | `FormField`, `Label`, `Input`, `InputGroup`, `InputAddon`, `Textarea`, `Select`, `NativeSelect`, `Checkbox`, `RadioGroup`, `RadioGroupItem`, `Switch`              |
-| Data display | `Card` (+ `Header/Title/Description/Action/Content/Footer`), `Table` (row/col span, bordered, sticky header/footer), `DataTable`, `Badge`, `Avatar`, `AvatarGroup` |
-| Navigation   | `Tabs` (segmented · underline · pills, ngang/dọc), `Breadcrumb`, `Pagination` (+ `getPaginationRange`)                                                             |
-| Disclosure   | `Accordion` (default · bordered · separated, chevron/plus), `Collapsible`                                                                                          |
-| Overlay      | `Dialog`, `AlertDialog`, `Drawer` (4 cạnh), `Popover`, `Tooltip`, `HoverCard`, `DropdownMenu`, `ContextMenu`                                                       |
-| Feedback     | `Alert`, `Toast` (`toast()` + `<Toaster />`, có promise/action/swipe, nút "Clear all" khi có từ 2 toast), `Progress`, `Skeleton`, `SkeletonText`, `Spinner`        |
+| Nhóm         | Component                                                                                                                                                                                                                                  |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Theme        | `ThemeProvider`, `useTheme`                                                                                                                                                                                                                |
+| Layout       | `Container`, `Stack`, `HStack`, `VStack`, `Grid`, `Section`, `Separator`, `AspectRatio`                                                                                                                                                    |
+| Typography   | `Heading`, `Text`, `Link`, `Code`, `Kbd`, `Blockquote`                                                                                                                                                                                     |
+| Buttons      | `Button`, `IconButton`, `ButtonGroup`                                                                                                                                                                                                      |
+| Forms        | `FormField`, `Label`, `Input`, `InputGroup`, `InputAddon`, `Textarea`, `Select`, `NativeSelect`, `Checkbox`, `RadioGroup`, `RadioGroupItem`, `Switch`                                                                                      |
+| Advanced     | `Slider` (range, marks), `Combobox` (single/multiple, tìm không dấu), `Calendar`, `DatePicker`, `DateRangePicker` (mọi locale), `InputOTP`, `FileUpload` (validate, preview, progress), `Command` / `CommandDialog` + `useCommandShortcut` |
+| Data display | `Card` (+ `Header/Title/Description/Action/Content/Footer`), `Table` (row/col span, bordered, sticky header/footer), `DataTable`, `Badge`, `Avatar`, `AvatarGroup`                                                                         |
+| Navigation   | `Tabs` (segmented · underline · pills, ngang/dọc), `Breadcrumb`, `Pagination` (+ `getPaginationRange`)                                                                                                                                     |
+| Disclosure   | `Accordion` (default · bordered · separated, chevron/plus), `Collapsible`                                                                                                                                                                  |
+| Overlay      | `Dialog`, `AlertDialog`, `Drawer` (4 cạnh), `Popover`, `Tooltip`, `HoverCard`, `DropdownMenu`, `ContextMenu`                                                                                                                               |
+| Feedback     | `Alert`, `Toast` (`toast()` + `<Toaster />`, có promise/action/swipe, nút "Clear all" khi có từ 2 toast), `Progress`, `Skeleton`, `SkeletonText`, `Spinner`                                                                                |
 
 ### DataTable
 
@@ -141,6 +143,38 @@ const columns: DataTableColumnDef<User>[] = [
 
 `getRowId` mặc định lấy `row.id` (nếu có), nên đặt id ổn định khi dùng expand / pin / reorder.
 
+### Landing blocks
+
+Ghép bằng `Section` + `Container` + block. Block dùng chung token với component nên trang marketing luôn khớp với sản phẩm.
+
+| Block                                                                    | Ghi chú                                                                |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| `AnnouncementBar`, `Navbar`                                              | Navbar có menu mobile, biến thể `blur` · `solid` · `transparent`       |
+| `Hero`, `HeroBadge`, `BrowserFrame`                                      | Layout `centered` / `split`, nền `grid` · `dots` · `glow` · `gradient` |
+| `LogoCloud`, `Marquee`                                                   | Lưới hoặc chạy vô tận, dừng khi hover / reduced motion                 |
+| `SectionHeader`, `FeatureGrid`, `FeatureSplit`, `BentoGrid`, `BentoCard` | Tính năng dạng lưới, xen kẽ ảnh, bento                                 |
+| `Stats`, `NumberTicker`, `Steps`                                         | Số đếm lên khi cuộn tới, các bước "how it works"                       |
+| `TestimonialGrid`, `TestimonialCard`, `FeaturedTestimonial`              | Masonry, trích dẫn nổi bật                                             |
+| `PricingTable`, `PricingCard`, `BillingToggle`, `PricingComparison`      | Bảng giá theo tháng/năm, ma trận so sánh                               |
+| `Faq`, `Cta`, `NewsletterForm`, `TeamGrid`, `Footer`                     | CTA `primary` tự đảo màu nút bên trong                                 |
+| `BackgroundPattern`, `Reveal`, `useInView`                               | Hiệu ứng nền, hiện dần khi cuộn                                        |
+
+```tsx
+<Hero
+  eyebrow={<HeroBadge label="New" href="/changelog">Landing blocks are here</HeroBadge>}
+  title="Build calm interfaces, faster."
+  description="Modern Minimal components for React."
+  actions={<Button size="lg">Get started</Button>}
+  media={<BrowserFrame url="app.momi.dev"><img src="/screenshot.png" alt="" /></BrowserFrame>}
+/>
+<Section>
+  <Container>
+    <SectionHeader eyebrow="Pricing" title="Simple pricing" />
+    <PricingTable plans={plans} yearlyBadge="−20%" />
+  </Container>
+</Section>
+```
+
 ### Quy ước API
 
 - `variant` cho kiểu hiển thị (`solid · soft · outline · ghost · link`), `tone` cho màu ngữ nghĩa (`primary · neutral · danger`, Badge có thêm `success · warning · info`), `size` (`sm · md · lg`).
@@ -154,8 +188,9 @@ const columns: DataTableColumnDef<User>[] = [
 
 ```
 src/
-  components/      # mỗi component một file; __tests__/ chứa unit test
-  lib/             # cn(), tones, responsive helpers, icons nội bộ
+  components/      # mỗi component một file; data-table/ là thư mục riêng; __tests__/ chứa unit test
+  blocks/          # block cho landing page (+ __tests__/)
+  lib/             # cn(), tones, responsive, date, icons nội bộ
   styles/          # theme.css (tokens + base), standalone.css (entry cho styles.css)
   theme/           # ThemeProvider
   index.ts         # public API
@@ -172,5 +207,14 @@ scripts/           # build-css.mjs
 - [x] **Phase 0** — Setup: Vite 8 library mode, TypeScript, Tailwind v4, tokens, dark mode, playground, test, lint
 - [x] **Phase 1** — Nền tảng: layout, typography, buttons, forms, card, badge, avatar, spinner
 - [x] **Phase 2** — Tương tác & overlay: Dialog, AlertDialog, Drawer, Popover, Tooltip, HoverCard, DropdownMenu, ContextMenu, Select, Tabs, Accordion, Collapsible, Toast, Alert, Progress, Skeleton, Table, Pagination, Breadcrumb
-- [ ] **Phase 3** — Landing page: Navbar, Hero, LogoCloud, Features/Bento, Stats, Testimonials, Pricing, FAQ, CTA, Newsletter, Footer, Marquee, Reveal + trang Landing Demo
-- [ ] **Phase 4** — Nâng cao: Combobox, Command, DatePicker, Slider, OTP, FileUpload; tài liệu & publish npm
+- [x] **Phase 3** — Landing page: Navbar, Hero, LogoCloud, Features/Bento, Stats, Steps, Testimonials, Pricing, FAQ, CTA, Newsletter, Team, Footer, Marquee, Reveal + trang landing hoàn chỉnh
+- [x] **Phase 4** — Nâng cao: Combobox, Command, Calendar/DatePicker, Slider, OTP, FileUpload; trang Installation, CI, LICENSE, CHANGELOG, sẵn sàng publish
+
+## Publish lên npm
+
+```bash
+npm login
+npm publish        # prepublishOnly tự chạy check + build
+```
+
+`npm pack --dry-run` để xem trước các file sẽ được publish (chỉ `dist/`, `README.md`, `LICENSE`, `CHANGELOG.md`, `package.json`).
