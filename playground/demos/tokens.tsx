@@ -1,4 +1,4 @@
-﻿import { Check } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { cn, Heading, Text } from '../../src'
 import { Example } from '../components/demo'
 import { useCustomizer } from '../lib/customizer-context'
@@ -26,7 +26,7 @@ export default function TokensDemo() {
 
       <Example
         title="Colors"
-        description="Semantic tokens â€” override them on :root and .dark."
+        description="Semantic tokens — override them on :root and .dark."
         layout="stack"
       >
         <div className="grid gap-3 sm:grid-cols-2">
@@ -74,7 +74,7 @@ export default function TokensDemo() {
 
       <Example
         title="Type scale"
-        description="Geist Variable Â· tight tracking on headings."
+        description="Geist Variable · tight tracking on headings."
         layout="stack"
       >
         {(['display', '4xl', '3xl', '2xl', 'xl', 'lg', 'md', 'sm', 'xs'] as const).map((size) => (
@@ -86,7 +86,7 @@ export default function TokensDemo() {
           </div>
         ))}
         <Text tone="muted" className="max-w-prose pt-2">
-          Body text uses the same family at 14â€“16px with relaxed line height. Secondary copy uses
+          Body text uses the same family at 14–16px with relaxed line height. Secondary copy uses
           the muted foreground token for a quiet hierarchy.
         </Text>
       </Example>

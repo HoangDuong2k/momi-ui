@@ -89,6 +89,113 @@
     monospace;
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Motion — durations scale with --momi-motion (0.01 under prefers-reduced-motion). */
+  --animate-fade-in: momi-fade-in calc(150ms * var(--momi-motion, 1)) var(--ease-out-soft) both;
+  --animate-fade-out: momi-fade-out calc(120ms * var(--momi-motion, 1)) ease-in both;
+  --animate-pop-in: momi-pop-in calc(160ms * var(--momi-motion, 1)) var(--ease-out-soft) both;
+  --animate-pop-out: momi-pop-out calc(110ms * var(--momi-motion, 1)) ease-in both;
+  --animate-dialog-in: momi-dialog-in calc(220ms * var(--momi-motion, 1)) var(--ease-out-soft) both;
+  --animate-dialog-out: momi-dialog-out calc(130ms * var(--momi-motion, 1)) ease-in both;
+  --animate-slide-in: momi-slide-in calc(300ms * var(--momi-motion, 1)) var(--ease-out-soft) both;
+  --animate-slide-out: momi-slide-out calc(200ms * var(--momi-motion, 1)) ease-in both;
+  --animate-collapse-down: momi-collapse-down calc(220ms * var(--momi-motion, 1))
+    var(--ease-out-soft);
+  --animate-collapse-up: momi-collapse-up calc(180ms * var(--momi-motion, 1)) var(--ease-out-soft);
+  --animate-swipe-out: momi-swipe-out calc(150ms * var(--momi-motion, 1)) ease-out both;
+  --animate-progress: momi-progress 1.4s ease-in-out infinite;
+
+  @keyframes momi-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes momi-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes momi-pop-in {
+    from {
+      opacity: 0;
+      transform: translate(var(--momi-pop-x, 0), var(--momi-pop-y, 0)) scale(0.96);
+    }
+  }
+  @keyframes momi-pop-out {
+    to {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+  @keyframes momi-dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.97);
+    }
+  }
+  @keyframes momi-dialog-out {
+    to {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
+  @keyframes momi-slide-in {
+    from {
+      transform: translate(var(--momi-slide-x, 0), var(--momi-slide-y, 0));
+    }
+  }
+  @keyframes momi-slide-out {
+    to {
+      transform: translate(var(--momi-slide-x, 0), var(--momi-slide-y, 0));
+    }
+  }
+  @keyframes momi-collapse-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--momi-collapse-height);
+    }
+  }
+  @keyframes momi-collapse-up {
+    from {
+      height: var(--momi-collapse-height);
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+  @keyframes momi-swipe-out {
+    from {
+      transform: translate(
+        var(--radix-toast-swipe-end-x, 0px),
+        var(--radix-toast-swipe-end-y, 0px)
+      );
+    }
+    to {
+      opacity: 0;
+      transform: translate(
+        calc(var(--radix-toast-swipe-end-x, 0px) * 2),
+        calc(var(--radix-toast-swipe-end-y, 0px) * 2)
+      );
+    }
+  }
+  @keyframes momi-progress {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(250%);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --momi-motion: 0.01;
+  }
 }
 
 @theme inline {

@@ -31,6 +31,25 @@ export const toneOutline: Record<Tone, string> = {
   info: 'border-info/30 text-info',
 }
 
+/** Soft background + matching hairline border (Alert). */
+export const toneSoftBordered: Record<Tone, string> = {
+  neutral: 'border-border bg-secondary text-secondary-foreground',
+  primary: 'border-primary/20 bg-primary/5 text-primary',
+  success: 'border-success/20 bg-success/5 text-success',
+  warning: 'border-warning/25 bg-warning/5 text-warning',
+  danger: 'border-destructive/20 bg-destructive/5 text-destructive',
+  info: 'border-info/20 bg-info/5 text-info',
+}
+
+export const toneBg: Record<Tone, string> = {
+  neutral: 'bg-foreground',
+  primary: 'bg-primary',
+  success: 'bg-success',
+  warning: 'bg-warning',
+  danger: 'bg-destructive',
+  info: 'bg-info',
+}
+
 export const toneText: Record<Tone, string> = {
   neutral: 'text-foreground',
   primary: 'text-primary',

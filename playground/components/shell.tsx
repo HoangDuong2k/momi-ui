@@ -1,4 +1,4 @@
-﻿import { Menu, Monitor, Moon, Sun, X } from 'lucide-react'
+import { Menu, Monitor, Moon, Sun, X } from 'lucide-react'
 import { Badge, cn, IconButton, NativeSelect, useTheme, type Theme } from '../../src'
 import { useCustomizer } from '../lib/customizer-context'
 import { accents, radii } from '../lib/customizer-presets'
@@ -120,12 +120,22 @@ export function Sidebar({
                       onClick={onNavigate}
                       aria-current={active === d.id ? 'page' : undefined}
                       className={cn(
-                        'block rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors outline-none',
+                        'flex items-center justify-between gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors outline-none',
                         'hover:bg-accent/60 hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/40',
                         active === d.id && 'bg-accent font-medium text-foreground',
                       )}
                     >
                       {d.title}
+                      {d.isNew && (
+                        <Badge
+                          size="sm"
+                          tone="primary"
+                          shape="rounded"
+                          className="h-4 px-1 text-[10px]"
+                        >
+                          new
+                        </Badge>
+                      )}
                     </a>
                   </li>
                 ))}

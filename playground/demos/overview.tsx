@@ -1,4 +1,15 @@
-import { ArrowRight, Eye, EyeOff, KeyRound, Mail, Sparkles, UserPlus } from 'lucide-react'
+import {
+  ArrowRight,
+  Download,
+  Ellipsis,
+  Eye,
+  EyeOff,
+  KeyRound,
+  Mail,
+  Plus,
+  Sparkles,
+  UserPlus,
+} from 'lucide-react'
 import { useState } from 'react'
 import {
   Avatar,
@@ -27,6 +38,45 @@ import {
   Separator,
   Switch,
   Text,
+  Alert,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Pagination,
+  Progress,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  toast,
+  Tooltip,
 } from '../../src'
 
 export default function OverviewDemo() {
@@ -40,6 +90,7 @@ export default function OverviewDemo() {
           <NotificationsCard />
         </div>
         <PlanCard />
+        <WorkspaceCard />
       </Grid>
       <Roadmap />
     </div>
@@ -52,7 +103,7 @@ function MiniHero() {
       <div className="pointer-events-none absolute inset-0 bg-radial from-transparent to-background/90" />
       <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-6">
         <Badge variant="outline" dot tone="success">
-          momi-ui 0.1 · Phase 1
+          momi-ui 0.2 · Phase 2
         </Badge>
         <Heading as="h2" size="display">
           Build calm interfaces, faster.
@@ -70,7 +121,7 @@ function MiniHero() {
           </Button>
         </HStack>
         <Text size="sm" tone="muted">
-          Press <Kbd>⌘</Kbd> <Kbd>K</Kbd> to search — coming in Phase 2
+          Press <Kbd>⌘</Kbd> <Kbd>K</Kbd> to search — coming in Phase 4
         </Text>
       </div>
     </div>
@@ -255,6 +306,194 @@ function PlanCard() {
   )
 }
 
+const invoices = [
+  { id: 'INV-024', customer: 'Linh Tran', status: 'Paid', tone: 'success', amount: '$250.00' },
+  { id: 'INV-023', customer: 'Minh Nguyen', status: 'Pending', tone: 'warning', amount: '$150.00' },
+  { id: 'INV-022', customer: 'Bao Le', status: 'Failed', tone: 'danger', amount: '$450.00' },
+] as const
+
+const activity = [
+  ['Linh Tran', 'paid invoice INV-024', '2m ago'],
+  ['Minh Nguyen', 'was sent a reminder', '1h ago'],
+  ['Bao Le', 'card was declined', '3h ago'],
+] as const
+
+function WorkspaceCard() {
+  return (
+    <Card className="lg:col-span-2">
+      <CardHeader>
+        <Breadcrumb>
+          <BreadcrumbList className="text-xs">
+            <BreadcrumbItem>
+              <BreadcrumbLink href="#/overview">Workspace</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="#/overview">Aurora</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Billing</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <CardTitle className="text-lg">Billing</CardTitle>
+        <CardAction className="flex gap-2">
+          <Tooltip content="Export CSV">
+            <IconButton aria-label="Export CSV" variant="outline" size="sm">
+              <Download />
+            </IconButton>
+          </Tooltip>
+          <NewInvoiceDialog />
+        </CardAction>
+      </CardHeader>
+      <CardContent className="grid gap-6">
+        <Alert
+          tone="warning"
+          title="Usage at 85%"
+          action={
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => toast.success('Plan upgraded to Pro')}
+            >
+              Upgrade
+            </Button>
+          }
+        >
+          You&apos;re close to this month&apos;s limit.
+        </Alert>
+        <Progress value={85} tone="warning" label="Monthly usage" showValue size="sm" />
+        <Tabs defaultValue="invoices">
+          <TabsList variant="underline">
+            <TabsTrigger value="invoices">Invoices</TabsTrigger>
+            <TabsTrigger value="activity">Activity</TabsTrigger>
+          </TabsList>
+          <TabsContent value="invoices">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Invoice</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead align="end">Amount</TableHead>
+                  <TableHead className="w-10">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {invoices.map((inv) => (
+                  <TableRow key={inv.id}>
+                    <TableCell className="font-medium">{inv.id}</TableCell>
+                    <TableCell>{inv.customer}</TableCell>
+                    <TableCell>
+                      <Badge size="sm" tone={inv.tone} dot>
+                        {inv.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell align="end" className="tabular-nums">
+                      {inv.amount}
+                    </TableCell>
+                    <TableCell align="end">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <IconButton aria-label={`Actions for ${inv.id}`} size="sm">
+                            <Ellipsis />
+                          </IconButton>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>View</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => toast(`Reminder sent for ${inv.id}`)}>
+                            Send reminder
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem variant="danger">Void</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TabsContent>
+          <TabsContent value="activity" className="grid gap-4 pt-2">
+            {activity.map(([who, what, when]) => (
+              <div key={who} className="flex items-center gap-3">
+                <Avatar name={who} size="sm" />
+                <Text size="sm" className="flex-1">
+                  <span className="font-medium">{who}</span>{' '}
+                  <span className="text-muted-foreground">{what}</span>
+                </Text>
+                <Text size="xs" tone="muted">
+                  {when}
+                </Text>
+              </div>
+            ))}
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+      <CardFooter className="flex-col gap-3 border-t sm:flex-row sm:justify-between">
+        <Text size="sm" tone="muted">
+          Showing 3 of 24 invoices
+        </Text>
+        <Pagination pageCount={8} size="sm" compact />
+      </CardFooter>
+    </Card>
+  )
+}
+
+function NewInvoiceDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button size="sm" leftIcon={<Plus />}>
+          New invoice
+        </Button>
+      </DialogTrigger>
+      <DialogContent size="sm">
+        <DialogHeader>
+          <DialogTitle>New invoice</DialogTitle>
+          <DialogDescription>Bill a customer for a one-off charge.</DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4">
+          <FormField label="Customer">
+            <Select defaultValue="linh">
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="linh">Linh Tran</SelectItem>
+                <SelectItem value="minh">Minh Nguyen</SelectItem>
+                <SelectItem value="bao">Bao Le</SelectItem>
+              </SelectContent>
+            </Select>
+          </FormField>
+          <FormField label="Amount">
+            <Input
+              type="number"
+              placeholder="0.00"
+              leftSection={<span className="text-sm">$</span>}
+            />
+          </FormField>
+        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button
+              onClick={() => toast.success('Invoice created', { description: 'INV-025 · $0.00' })}
+            >
+              Create
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 const roadmap = [
   {
     phase: 'Phase 0',
@@ -271,14 +510,14 @@ const roadmap = [
   {
     phase: 'Phase 2',
     title: 'Interactive',
-    items: 'Dialog, Drawer, Popover, Tooltip, Dropdown, Tabs, Accordion, Toast, Table…',
-    status: 'next',
+    items: 'Dialog, Drawer, Popover, Tooltip, menus, Select, Tabs, Accordion, Toast, Table…',
+    status: 'done',
   },
   {
     phase: 'Phase 3',
     title: 'Landing blocks',
     items: 'Navbar, Hero, Features, Pricing, Testimonials, FAQ, CTA, Footer…',
-    status: 'planned',
+    status: 'next',
   },
   {
     phase: 'Phase 4',
