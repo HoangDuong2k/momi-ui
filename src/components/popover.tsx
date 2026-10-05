@@ -1,6 +1,7 @@
 import { Popover as PopoverPrimitive } from 'radix-ui'
 import type * as React from 'react'
 import { cn } from '../lib/cn'
+import { useCollisionProps, usePortalContainer } from './portal-provider'
 import { popAnimationClass, surfaceClass } from './internal/overlay-styles'
 
 export function Popover(props: React.ComponentProps<typeof PopoverPrimitive.Root>) {
@@ -22,24 +23,30 @@ export function PopoverClose(props: React.ComponentProps<typeof PopoverPrimitive
 export interface PopoverContentProps extends React.ComponentProps<typeof PopoverPrimitive.Content> {
   /** Render a small arrow pointing at the trigger. */
   showArrow?: boolean
+  /** Mount it here instead of `PortalProvider`'s container (or `document.body`). */
+  container?: Element | DocumentFragment | null
 }
 
 export function PopoverContent({
   align = 'center',
   sideOffset = 6,
-  collisionPadding = 8,
+  collisionBoundary,
+  collisionPadding,
   showArrow = false,
+  container,
   className,
   children,
   ...props
 }: PopoverContentProps) {
+  const portalContainer = usePortalContainer(container)
+  const collision = useCollisionProps({ collisionBoundary, collisionPadding })
   return (
-    <PopoverPrimitive.Portal>
+    <PopoverPrimitive.Portal container={portalContainer}>
       <PopoverPrimitive.Content
         data-slot="popover-content"
         align={align}
         sideOffset={sideOffset}
-        collisionPadding={collisionPadding}
+        {...collision}
         className={cn(
           surfaceClass,
           popAnimationClass,

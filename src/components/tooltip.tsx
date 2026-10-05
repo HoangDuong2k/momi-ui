@@ -1,6 +1,7 @@
 import { Tooltip as TooltipPrimitive } from 'radix-ui'
 import * as React from 'react'
 import { cn } from '../lib/cn'
+import { useCollisionProps, usePortalContainer } from './portal-provider'
 import type { Shortcut } from '../lib/shortcut'
 import { Kbd } from './typography'
 
@@ -46,6 +47,12 @@ export interface TooltipProps extends Omit<
   showArrow?: boolean
   disabled?: boolean
   contentClassName?: string
+  /** Keep the tooltip inside this element (defaults to `PortalProvider`'s boundary). */
+  collisionBoundary?: React.ComponentProps<typeof TooltipPrimitive.Content>['collisionBoundary']
+  /** @default 8 */
+  collisionPadding?: React.ComponentProps<typeof TooltipPrimitive.Content>['collisionPadding']
+  /** Mount it here instead of `PortalProvider`'s container (or `document.body`). */
+  container?: Element | DocumentFragment | null
 }
 
 /** A short label shown on hover/focus: `<Tooltip content="Copy"><IconButton … /></Tooltip>`. */
@@ -59,22 +66,27 @@ export function Tooltip({
   showArrow = false,
   disabled = false,
   contentClassName,
+  collisionBoundary,
+  collisionPadding,
+  container,
   delayDuration,
   ...rootProps
 }: TooltipProps) {
   const insideProvider = React.useContext(InsideProviderContext)
+  const portalContainer = usePortalContainer(container)
+  const collision = useCollisionProps({ collisionBoundary, collisionPadding })
   if (disabled || content == null || content === '') return children
 
   const tooltip = (
     <TooltipPrimitive.Root data-slot="tooltip" delayDuration={delayDuration} {...rootProps}>
       <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
-      <TooltipPrimitive.Portal>
+      <TooltipPrimitive.Portal container={portalContainer}>
         <TooltipPrimitive.Content
           data-slot="tooltip-content"
           side={side}
           align={align}
           sideOffset={sideOffset}
-          collisionPadding={8}
+          {...collision}
           className={cn(
             'z-50 max-w-xs origin-(--radix-tooltip-content-transform-origin) rounded-md bg-foreground px-2.5 py-1.5 text-xs font-medium text-balance text-background shadow-md',
             'data-[state=closed]:animate-pop-out data-[state=delayed-open]:animate-pop-in data-[state=instant-open]:animate-pop-in',

@@ -12,6 +12,7 @@ import {
   popAnimationClass,
   surfaceClass,
 } from './internal/overlay-styles'
+import { useCollisionProps, usePortalContainer } from './portal-provider'
 
 /** Custom-styled select with keyboard support. For long lists on mobile, prefer NativeSelect. */
 export function Select(props: React.ComponentProps<typeof SelectPrimitive.Root>) {
@@ -55,20 +56,31 @@ export function SelectTrigger(props: SelectTriggerProps) {
   )
 }
 
+export interface SelectContentProps extends React.ComponentProps<typeof SelectPrimitive.Content> {
+  /** Mount it here instead of `PortalProvider`'s container (or `document.body`). */
+  container?: Element | DocumentFragment | null
+}
+
 export function SelectContent({
   position = 'popper',
   sideOffset = 6,
+  collisionBoundary,
+  collisionPadding,
+  container,
   className,
   children,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Content>) {
+}: SelectContentProps) {
   const popper = position === 'popper'
+  const portalContainer = usePortalContainer(container)
+  const collision = useCollisionProps({ collisionBoundary, collisionPadding }, 10)
   return (
-    <SelectPrimitive.Portal>
+    <SelectPrimitive.Portal container={portalContainer}>
       <SelectPrimitive.Content
         data-slot="select-content"
         position={position}
         sideOffset={popper ? sideOffset : undefined}
+        {...(popper ? collision : {})}
         className={cn(
           surfaceClass,
           popAnimationClass,

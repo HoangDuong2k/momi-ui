@@ -67,12 +67,53 @@ export interface MomiMessages {
     placeholder: string
     rangePlaceholder: string
     clear: string
+    /** Name of the group of preset buttons. */
+    presets: string
+  }
+  dateTimePicker: {
+    placeholder: string
+    clear: string
+    /** Name of the time input. */
+    time: string
+    timePlaceholder: string
+    allDay: string
+    presets: string
+    /** Name of the group of suggested times. */
+    suggestions: string
+  }
+  eventCalendar: {
+    /** Default accessible name of the calendar. */
+    calendar: string
+    today: string
+    previous: string
+    next: string
+    /** Name of the view switcher. */
+    views: string
+    month: string
+    week: string
+    day: string
+    agenda: string
+    allDay: string
+    /** Button for the events that don't fit in a day. */
+    more: (count: number) => string
+    noEvents: string
+    /** Announced instead of "button" for each event that can be moved. */
+    eventRole: string
+    instructions: string
+    pickedUp: (event: string, when: string) => string
+    moved: (event: string, when: string) => string
+    dropped: (event: string, when: string) => string
+    cancelled: (event: string) => string
+    /** Appended to the announcement when the event can't go there. */
+    notAllowed: string
   }
   combobox: {
     placeholder: string
     searchPlaceholder: string
     empty: string
     clear: string
+    /** Item that creates a new option from the search text (`onCreate`). */
+    create: (query: string) => string
   }
   command: {
     empty: string

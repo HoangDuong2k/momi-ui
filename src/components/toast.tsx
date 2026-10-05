@@ -261,7 +261,7 @@ export function Toaster({
       <div
         data-slot="toaster"
         className={cn(
-          'pointer-events-none fixed z-[100] flex max-h-dvh w-full flex-col gap-2 p-4 sm:max-w-sm',
+          'pointer-events-none fixed z-[100] flex max-h-full w-full flex-col gap-2 p-4 sm:max-w-sm',
           // Radix's region wrapper around the list would otherwise shrink to its content.
           '[&>[role=region]]:w-full',
           positionClasses[position],

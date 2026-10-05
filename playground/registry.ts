@@ -44,6 +44,8 @@ import TextareaDemo from './demos/textarea'
 import ToastDemo from './demos/toast'
 import TokensDemo from './demos/tokens'
 import DensityDemo from './demos/density'
+import EventCalendarDemo from './demos/event-calendar'
+import EmbeddedDemo from './demos/embedded'
 import TooltipDemo from './demos/tooltip'
 import TypographyDemo from './demos/typography'
 import ComboboxDemo from './demos/combobox'
@@ -121,6 +123,17 @@ export const demos: DemoEntry[] = [
     imports: ['DensityProvider'],
     isNew: true,
     component: DensityDemo,
+  },
+  {
+    id: 'embedded',
+    title: 'Embedded in a container',
+    group: 'Getting started',
+    description:
+      'UI that lives in part of the page — a panel, a device frame, a widget: PortalProvider keeps every overlay and drag preview inside it.',
+    imports: ['PortalProvider'],
+    isNew: true,
+    wide: true,
+    component: EmbeddedDemo,
   },
   {
     id: 'i18n',
@@ -335,8 +348,9 @@ export const demos: DemoEntry[] = [
     id: 'date-picker',
     title: 'Calendar & Date Picker',
     group: 'Forms',
-    description: 'Accessible calendar with ranges, min/max, disabled days and any locale.',
-    imports: ['Calendar', 'DatePicker', 'DateRangePicker'],
+    description:
+      'Accessible calendar with ranges, min/max, disabled days and any locale — plus quick picks, a date & time picker and panels to place inline.',
+    imports: ['Calendar', 'DatePicker', 'DateRangePicker', 'DateTimePicker', 'DateTimePickerPanel'],
     isNew: true,
     component: DatePickerDemo,
   },
@@ -393,6 +407,17 @@ export const demos: DemoEntry[] = [
       'Columns + data in, everything else built in: sorting, resizable and pinned columns, pinned rows, sticky header/footer, grouped headers, cell spans, expandable rows, drag-to-reorder and virtual scrolling.',
     imports: ['DataTable', 'type DataTableColumnDef'],
     component: DataTableDemo,
+  },
+  {
+    id: 'event-calendar',
+    title: 'Event Calendar',
+    group: 'Data display',
+    description:
+      'Month, week, day and agenda views: drag and resize events, move them with the keyboard, select empty time to add one, any locale and 12/24-hour times.',
+    imports: ['EventCalendar', 'type CalendarEvent', 'type EventCalendarChange'],
+    isNew: true,
+    wide: true,
+    component: EventCalendarDemo,
   },
   {
     id: 'kanban',

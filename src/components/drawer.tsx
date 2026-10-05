@@ -2,11 +2,15 @@ import { Dialog as DialogPrimitive } from 'radix-ui'
 import type * as React from 'react'
 import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
+import { usePortalContainer } from './portal-provider'
 import { XIcon } from '../lib/icons'
 import { IconButton } from './icon-button'
 import { modalDescriptionClass, modalTitleClass, overlayClass } from './internal/overlay-styles'
 
-/** A panel that slides in from an edge of the screen (a.k.a. sheet). */
+/**
+ * A panel that slides in from an edge of the screen (a.k.a. sheet). `modal={false}` keeps the page
+ * usable: no overlay, no focus trap, no blocked pointer events.
+ */
 export function Drawer(props: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="drawer" {...props} />
 }
@@ -21,10 +25,10 @@ export function DrawerClose(props: React.ComponentProps<typeof DialogPrimitive.C
 
 const drawerSides = {
   right:
-    'inset-y-0 end-0 h-full w-[min(calc(100%-2.5rem),var(--drawer-size))] border-s [--momi-slide-x:100%] rtl:[--momi-slide-x:-100%]',
-  left: 'inset-y-0 start-0 h-full w-[min(calc(100%-2.5rem),var(--drawer-size))] border-e [--momi-slide-x:-100%] rtl:[--momi-slide-x:100%]',
-  top: 'inset-x-0 top-0 max-h-[85dvh] rounded-b-2xl border-b [--momi-slide-y:-100%]',
-  bottom: 'inset-x-0 bottom-0 max-h-[85dvh] rounded-t-2xl border-t [--momi-slide-y:100%]',
+    'inset-y-0 end-0 w-[min(calc(100%-2.5rem),var(--drawer-size))] border-s [--momi-slide-x:100%] rtl:[--momi-slide-x:-100%]',
+  left: 'inset-y-0 start-0 w-[min(calc(100%-2.5rem),var(--drawer-size))] border-e [--momi-slide-x:-100%] rtl:[--momi-slide-x:100%]',
+  top: 'inset-x-0 top-0 max-h-[85%] rounded-b-2xl border-b [--momi-slide-y:-100%]',
+  bottom: 'inset-x-0 bottom-0 max-h-[85%] rounded-t-2xl border-t [--momi-slide-y:100%]',
 } as const
 
 const drawerSizes = {
@@ -43,20 +47,35 @@ export interface DrawerContentProps extends React.ComponentProps<typeof DialogPr
   showClose?: boolean
   /** Accessible label of the close button. @default messages.common.close */
   closeLabel?: string
+  /**
+   * Close when the user presses or moves focus outside the drawer. Turn it off for a non-modal
+   * drawer that should stay open while people work next to it. @default true
+   */
+  closeOnInteractOutside?: boolean
+  /** Mount it here instead of `PortalProvider`'s container (or `document.body`). */
+  container?: Element | DocumentFragment | null
 }
 
+/**
+ * The panel. To leave room for an app bar, offset its edge with `style`, e.g.
+ * `style={{ top: 48 }}` on a right drawer.
+ */
 export function DrawerContent({
   side = 'right',
   size = 'md',
   showClose = true,
   closeLabel,
+  closeOnInteractOutside = true,
+  onInteractOutside,
+  container,
   className,
   children,
   ...props
 }: DrawerContentProps) {
   const t = useMessages('common')
+  const portalContainer = usePortalContainer(container)
   return (
-    <DialogPrimitive.Portal>
+    <DialogPrimitive.Portal container={portalContainer}>
       <DialogPrimitive.Overlay data-slot="drawer-overlay" className={overlayClass} />
       <DialogPrimitive.Content
         data-slot="drawer-content"
@@ -68,6 +87,10 @@ export function DrawerContent({
           drawerSizes[size],
           className,
         )}
+        onInteractOutside={(event) => {
+          onInteractOutside?.(event)
+          if (!closeOnInteractOutside) event.preventDefault()
+        }}
         {...props}
       >
         {side === 'bottom' && (

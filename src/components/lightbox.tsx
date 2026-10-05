@@ -3,6 +3,7 @@ import * as React from 'react'
 import { useMessages } from '../i18n/locale-provider'
 import type { MomiMessages } from '../i18n/messages'
 import { cn } from '../lib/cn'
+import { usePortalContainer } from './portal-provider'
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from '../lib/icons'
 import { useControllableState } from '../lib/use-controllable-state'
 
@@ -32,6 +33,8 @@ export interface LightboxProps {
   loop?: boolean
   /** Override built-in text for this instance. */
   labels?: Partial<MomiMessages['lightbox']>
+  /** Mount it here instead of `PortalProvider`'s container (or `document.body`). */
+  container?: Element | DocumentFragment | null
   className?: string
 }
 
@@ -77,9 +80,11 @@ export function Lightbox({
   onIndexChange,
   loop = false,
   labels,
+  container,
   className,
 }: LightboxProps) {
   const t = useMessages('lightbox', labels)
+  const portalContainer = usePortalContainer(container)
   const common = useMessages('common')
   const [index, setIndex] = useControllableState<number | null>({
     value: indexProp,
@@ -184,7 +189,7 @@ export function Lightbox({
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={(next) => !next && setIndex(null)}>
-      <DialogPrimitive.Portal>
+      <DialogPrimitive.Portal container={portalContainer}>
         <DialogPrimitive.Overlay
           data-slot="lightbox-overlay"
           className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in"

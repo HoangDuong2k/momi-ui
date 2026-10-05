@@ -1,6 +1,6 @@
 {
   "name": "momi-ui",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Modern Minimal React UI library built on Tailwind CSS v4 — core components and landing page blocks.",
   "license": "MIT",
   "repository": {

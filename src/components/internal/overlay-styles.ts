@@ -16,7 +16,7 @@ export const popAnimationClass =
 
 /** Centered modal panel (Dialog, AlertDialog). */
 export const modalContentClass =
-  'fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-y-auto rounded-xl border border-border-strong bg-surface-modal p-6 shadow-xl outline-none data-[state=open]:animate-dialog-in data-[state=closed]:animate-dialog-out'
+  'fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-y-auto rounded-xl border border-border-strong bg-surface-modal p-6 shadow-xl outline-none data-[state=open]:animate-dialog-in data-[state=closed]:animate-dialog-out'
 
 export const modalHeaderClass = 'flex flex-col gap-1.5 text-start'
 export const modalTitleClass = 'text-lg leading-tight font-semibold tracking-tight'

@@ -16,6 +16,7 @@ import { useControllableState } from '../lib/use-controllable-state'
 import { useEscapeGuard } from '../lib/use-escape-guard'
 import { usePointerDrag } from '../lib/use-pointer-drag'
 import { useDefaultSize } from './density-provider'
+import { useOverlayPlacement, type OverlayPlacementProps } from './portal-provider'
 import { useFormControlProps } from './form-field'
 import { controlSizeDefaults, Input, inputVariants, type InputSize } from './input'
 import { popAnimationClass, surfaceClass } from './internal/overlay-styles'
@@ -445,7 +446,8 @@ export function ColorPickerPanel({
  * ColorPicker
  * -----------------------------------------------------------------------------------------------*/
 
-export interface ColorPickerProps extends Omit<ColorPickerPanelProps, 'className' | 'id'> {
+export interface ColorPickerProps
+  extends Omit<ColorPickerPanelProps, 'className' | 'id'>, OverlayPlacementProps {
   /** `field`: swatch + value like an input · `swatch`: a square color button. @default 'field' */
   variant?: 'field' | 'swatch'
   /** @default 'md' (`xs` inside a compact `DensityProvider`) */
@@ -502,8 +504,12 @@ export function ColorPicker(props: ColorPickerProps) {
     'aria-invalid': ariaInvalid,
     'aria-describedby': ariaDescribedBy,
     required,
+    container,
+    collisionBoundary,
+    collisionPadding,
     ...panelProps
   } = useFormControlProps(props)
+  const placement = useOverlayPlacement({ container, collisionBoundary, collisionPadding })
   const t = useMessages('colorPicker', labels)
   const size = useDefaultSize<InputSize>(sizeProp, controlSizeDefaults)
   const [color, setColor] = useControllableState<string>({
@@ -576,16 +582,16 @@ export function ColorPicker(props: ColorPickerProps) {
           </button>
         )}
       </PopoverPrimitive.Trigger>
-      <PopoverPrimitive.Portal>
+      <PopoverPrimitive.Portal container={placement.container}>
         <PopoverPrimitive.Content
           align="start"
           sideOffset={6}
-          collisionPadding={8}
+          {...placement.collision}
           data-slot="color-picker-content"
           className={cn(
             surfaceClass,
             popAnimationClass,
-            'origin-(--radix-popover-content-transform-origin) p-3',
+            'max-h-(--radix-popover-content-available-height) origin-(--radix-popover-content-transform-origin) overflow-y-auto p-3',
             contentClassName,
           )}
         >

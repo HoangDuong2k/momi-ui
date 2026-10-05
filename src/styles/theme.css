@@ -290,6 +290,15 @@
   ::selection {
     background-color: color-mix(in oklch, var(--primary) 18%, transparent);
   }
+
+  /* Instant changes: no transitions anywhere inside (see suspendTransitions()). Being !important in
+     the earliest layer, it beats transition utilities in every later layer. */
+  .momi-instant,
+  .momi-instant *,
+  .momi-instant *::before,
+  .momi-instant *::after {
+    transition: none !important;
+  }
 }
 
 /*

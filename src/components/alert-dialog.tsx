@@ -1,6 +1,7 @@
 import { AlertDialog as AlertDialogPrimitive } from 'radix-ui'
 import type * as React from 'react'
 import { cn } from '../lib/cn'
+import { usePortalContainer } from './portal-provider'
 import {
   buttonVariants,
   defaultTone,
@@ -39,11 +40,19 @@ export interface AlertDialogContentProps extends React.ComponentProps<
 > {
   /** @default 'md' */
   size?: keyof typeof alertDialogSizes
+  /** Mount it here instead of `PortalProvider`'s container (or `document.body`). */
+  container?: Element | DocumentFragment | null
 }
 
-export function AlertDialogContent({ size = 'md', className, ...props }: AlertDialogContentProps) {
+export function AlertDialogContent({
+  size = 'md',
+  container,
+  className,
+  ...props
+}: AlertDialogContentProps) {
+  const portalContainer = usePortalContainer(container)
   return (
-    <AlertDialogPrimitive.Portal>
+    <AlertDialogPrimitive.Portal container={portalContainer}>
       <AlertDialogPrimitive.Overlay data-slot="alert-dialog-overlay" className={overlayClass} />
       <AlertDialogPrimitive.Content
         data-slot="alert-dialog-content"

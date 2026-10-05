@@ -81,7 +81,8 @@ interface Handlers {
   onPointerUp: (event: PointerEvent) => void
   onPointerCancel: () => void
   updateTarget: () => void
-  positionOverlay: () => void
+  /** `remeasure`: the portal container may have moved (a scroll) since the last call. */
+  positionOverlay: (remeasure?: boolean) => void
   cancel: () => void
 }
 
@@ -254,15 +255,29 @@ export function useSortableDrag<T, P>(options: SortableDragOptions<T, P>) {
     setDrag({ ...d, to, blocked })
   }
 
-  function positionOverlay() {
+  // Where the overlay's `fixed; top: 0; left: 0` actually lands, and at what scale. (0, 0) and 1
+  // in <body>; inside a portal container that is a containing block (transform, filter, contain…)
+  // it is that container's corner — which moves when the container scrolls — and its scale.
+  const overlayOriginRef = React.useRef<{ x: number; y: number; scale: number } | null>(null)
+
+  function positionOverlay(remeasure = false) {
     const s = sessionRef.current
     const el = overlayRef.current
-    if (s && el) el.style.transform = `translate3d(${s.x - s.offsetX}px, ${s.y - s.offsetY}px, 0)`
+    if (!s || !el) return
+    if (!overlayOriginRef.current || remeasure) {
+      el.style.transform = 'none'
+      const rect = el.getBoundingClientRect()
+      const scale = el.offsetWidth > 0 && rect.width > 0 ? rect.width / el.offsetWidth : 1
+      overlayOriginRef.current = { x: rect.left, y: rect.top, scale }
+    }
+    const { x, y, scale } = overlayOriginRef.current
+    el.style.transform = `translate3d(${(s.x - s.offsetX - x) / scale}px, ${(s.y - s.offsetY - y) / scale}px, 0)`
   }
 
   function activate() {
     const s = sessionRef.current
     if (!s || s.active) return
+    overlayOriginRef.current = null
     s.active = true
     window.clearTimeout(s.timer)
     const d: SortableDragState<T, P> = {
@@ -327,7 +342,10 @@ export function useSortableDrag<T, P>(options: SortableDragOptions<T, P>) {
       event.currentTarget.contains(interactive)
     )
       return
-    const rect = (start.element ?? event.currentTarget).getBoundingClientRect()
+    const source = start.element ?? event.currentTarget
+    const rect = source.getBoundingClientRect()
+    // Layout size, not the on-screen one: inside a scaled container the preview is scaled too.
+    const size = source instanceof HTMLElement && source.offsetWidth > 0 ? source : null
     const touch = event.pointerType === 'touch' && !start.touchImmediate
     sessionRef.current = {
       item: start.item,
@@ -341,8 +359,8 @@ export function useSortableDrag<T, P>(options: SortableDragOptions<T, P>) {
       y: event.clientY,
       offsetX: event.clientX - rect.left,
       offsetY: event.clientY - rect.top,
-      width: rect.width,
-      height: rect.height,
+      width: size ? size.offsetWidth : rect.width,
+      height: size ? size.offsetHeight : rect.height,
       active: false,
       timer: touch ? window.setTimeout(activate, TOUCH_DELAY) : 0,
     }
@@ -373,6 +391,9 @@ export function useSortableDrag<T, P>(options: SortableDragOptions<T, P>) {
     const previous = { cursor: body.style.cursor, userSelect: body.style.userSelect }
     body.style.cursor = 'grabbing'
     body.style.userSelect = 'none'
+    // Auto-scroll, the wheel or a moving container shift where the overlay's origin is.
+    const onScroll = () => handlers.current?.positionOverlay(true)
+    window.addEventListener('scroll', onScroll, true)
     let frame = 0
     const tick = () => {
       const s = sessionRef.current
@@ -384,6 +405,7 @@ export function useSortableDrag<T, P>(options: SortableDragOptions<T, P>) {
     }
     frame = requestAnimationFrame(tick)
     return () => {
+      window.removeEventListener('scroll', onScroll, true)
       cancelAnimationFrame(frame)
       body.style.cursor = previous.cursor
       body.style.userSelect = previous.userSelect

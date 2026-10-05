@@ -2,6 +2,7 @@ import { Dialog as DialogPrimitive } from 'radix-ui'
 import type * as React from 'react'
 import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
+import { usePortalContainer } from './portal-provider'
 import { XIcon } from '../lib/icons'
 import { IconButton } from './icon-button'
 import {
@@ -43,7 +44,7 @@ const dialogSizes = {
   md: 'max-w-lg',
   lg: 'max-w-2xl',
   xl: 'max-w-4xl',
-  full: 'h-[calc(100dvh-2rem)] max-w-[calc(100%-2rem)]',
+  full: 'h-[calc(100%-2rem)] max-w-[calc(100%-2rem)]',
 } as const
 
 export interface DialogContentProps extends React.ComponentProps<typeof DialogPrimitive.Content> {
@@ -55,6 +56,8 @@ export interface DialogContentProps extends React.ComponentProps<typeof DialogPr
   closeLabel?: string
   /** Props for the portal (e.g. a custom `container`). */
   portalProps?: React.ComponentProps<typeof DialogPrimitive.Portal>
+  /** Mount it here instead of `PortalProvider`'s container (or `document.body`). */
+  container?: Element | DocumentFragment | null
 }
 
 export function DialogContent({
@@ -62,13 +65,17 @@ export function DialogContent({
   showClose = true,
   closeLabel,
   portalProps,
+  container,
   className,
   children,
   ...props
 }: DialogContentProps) {
   const t = useMessages('common')
+  const portalContainer = usePortalContainer(
+    container !== undefined ? container : portalProps?.container,
+  )
   return (
-    <DialogPrimitive.Portal {...portalProps}>
+    <DialogPrimitive.Portal {...portalProps} container={portalContainer}>
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"

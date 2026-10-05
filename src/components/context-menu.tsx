@@ -14,6 +14,7 @@ import {
   popAnimationClass,
   surfaceClass,
 } from './internal/overlay-styles'
+import { useCollisionProps, usePortalContainer } from './portal-provider'
 
 /**
  * Menu opened with right-click / long-press on its trigger area. Same API as DropdownMenu.
@@ -31,16 +32,27 @@ export function ContextMenuGroup(props: React.ComponentProps<typeof MenuPrimitiv
   return <MenuPrimitive.Group data-slot="context-menu-group" {...props} />
 }
 
+export interface ContextMenuContentProps extends React.ComponentProps<
+  typeof MenuPrimitive.Content
+> {
+  /** Mount it here instead of `PortalProvider`'s container (or `document.body`). */
+  container?: Element | DocumentFragment | null
+}
+
 export function ContextMenuContent({
-  collisionPadding = 8,
+  collisionBoundary,
+  collisionPadding,
+  container,
   className,
   ...props
-}: React.ComponentProps<typeof MenuPrimitive.Content>) {
+}: ContextMenuContentProps) {
+  const portalContainer = usePortalContainer(container)
+  const collision = useCollisionProps({ collisionBoundary, collisionPadding })
   return (
-    <MenuPrimitive.Portal>
+    <MenuPrimitive.Portal container={portalContainer}>
       <MenuPrimitive.Content
         data-slot="context-menu-content"
-        collisionPadding={collisionPadding}
+        {...collision}
         className={cn(
           surfaceClass,
           popAnimationClass,
@@ -181,13 +193,21 @@ export function ContextMenuSubTrigger({
 }
 
 export function ContextMenuSubContent({
+  collisionBoundary,
+  collisionPadding,
+  container,
   className,
   ...props
-}: React.ComponentProps<typeof MenuPrimitive.SubContent>) {
+}: React.ComponentProps<typeof MenuPrimitive.SubContent> & {
+  container?: Element | DocumentFragment | null
+}) {
+  const portalContainer = usePortalContainer(container)
+  const collision = useCollisionProps({ collisionBoundary, collisionPadding }, 0)
   return (
-    <MenuPrimitive.Portal>
+    <MenuPrimitive.Portal container={portalContainer}>
       <MenuPrimitive.SubContent
         data-slot="context-menu-sub-content"
+        {...collision}
         className={cn(
           surfaceClass,
           popAnimationClass,

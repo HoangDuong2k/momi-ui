@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.3.0 — 2026-10-05
+
+### Added
+
+- **PortalProvider**: one place to set where overlays mount (`container`, a shadow root works too) and what they must stay inside (`collisionBoundary`, `collisionPadding`) — for UIs embedded in part of a page. Every overlay follows it: Popover, DropdownMenu and ContextMenu (and submenus), Select, HoverCard, Tooltip, Combobox, DatePicker, ColorPicker, Dialog, AlertDialog, Drawer, Lightbox, CommandDialog and the Kanban / SortableList drag previews. Components take `container` / `collisionBoundary` / `collisionPadding` props that win over the provider; nested providers override only what they set. New playground page "Embedded in a container".
+- **suspendTransitions()** / **withoutTransitions(fn)** and the `momi-instant` class: switch colors instantly when the theme changes outside `ThemeProvider`.
+- **Kanban** `columnWidth="fill"` (columns share the width) with `minColumnWidth`.
+- **Drawer** `closeOnInteractOutside` for non-modal drawers (`<Drawer modal={false}>`: no overlay, no focus trap) and a `container` prop.
+- **EventCalendar**: month, week, day and agenda views of events. Drag to move, drag an edge to resize, or move with the keyboard (with screen-reader announcements); `canChange` and per-event `editable` rules; click or drag over empty time to create (`onSelectRange`); timed events dropped on the all-day lane become all-day and back; overlapping events share columns; "+N more" when a day is full; `onRangeChange` for loading; `renderEvent`, `toolbarActions`, `renderToolbar`; any locale with 12/24-hour times, `weekStartsOn`, working hours (`dayStartHour` / `dayEndHour`).
+- **DateTimePicker** and **DateTimePickerPanel**: date plus optional time (`{ date, time }`, `time: null` = all day), app-defined presets, free-typed times, suggested times, an all-day toggle and locale-aware 12/24-hour display.
+- **DatePickerPanel** and **DateRangePickerPanel** (the calendar body without a trigger) and `presets` on `DatePicker` / `DateRangePicker`.
+- **parseTime(text, locale?)** reads "830", "8h30", "20.00", "8 pm", "12am", "8:30 CH" — and whatever **formatTime(time, locale?)** shows in that locale (day periods before or after the time, native digits) — into "HH:mm".
+- **Combobox**: `onCreate` adds options that aren't in the list (diacritics-insensitive exact match, async-safe, selected right away); `renderOption` and `renderChip` customize rows and chips; Backspace in an empty search removes the last selected value (ignoring key auto-repeat). Values picked while an async `onCreate` is pending are kept.
+
+### Changed
+
+- Dialog, Drawer and the toast stack are sized against their containing block (`%`) instead of the window height (`dvh`); without a containing block the result is the same.
+- Drag previews (Kanban, SortableList) subtract the offset of their portal container, so they stay under the pointer inside a transformed or contained element.
+- Combobox, DatePicker and ColorPicker popups are never taller than the space available; their content scrolls.
+- Left/right drawers stretch with `inset-y-0` only (no `h-full`), so offsetting an edge with `style` (e.g. `top: 48`) keeps the bottom in place.
+- **Command** (and so Combobox and CommandDialog) highlights the best match until the user moves — an exact match on the label, then labels starting with the search, then the rest — so the highlighted row and Enter always agree. Previously the first listed match was highlighted.
+- Drag previews re-measure their origin when anything scrolls mid-drag and account for a scaled container.
+- `suspendTransitions` leaves a `momi-instant` class that the app put on `<html>` itself.
+- `ThemeProvider` suspends transitions with the `momi-instant` class instead of injecting a `<style>` element (works under a strict CSP).
+
 ## 0.2.1 — 2026-10-05
 
 ### Fixed

@@ -19,6 +19,7 @@ import {
   popAnimationClass,
   surfaceClass,
 } from './internal/overlay-styles'
+import { useCollisionProps, usePortalContainer } from './portal-provider'
 
 export interface MenuPosition {
   /** Viewport coordinates, e.g. `event.clientX` / `event.clientY`. */
@@ -96,11 +97,20 @@ export function DropdownMenuGroup(props: React.ComponentProps<typeof MenuPrimiti
   return <MenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />
 }
 
+export interface DropdownMenuContentProps extends React.ComponentProps<
+  typeof MenuPrimitive.Content
+> {
+  /** Mount it here instead of `PortalProvider`'s container (or `document.body`). */
+  container?: Element | DocumentFragment | null
+}
+
 export function DropdownMenuContent({
   side,
   align,
   sideOffset,
-  collisionPadding = 8,
+  collisionBoundary,
+  collisionPadding,
+  container,
   onCloseAutoFocus,
   onInteractOutside,
   onPointerDownOutside,
@@ -108,7 +118,9 @@ export function DropdownMenuContent({
   children,
   ref,
   ...props
-}: React.ComponentProps<typeof MenuPrimitive.Content>) {
+}: DropdownMenuContentProps) {
+  const portalContainer = usePortalContainer(container)
+  const collision = useCollisionProps({ collisionBoundary, collisionPadding })
   const positioned = React.useContext(PositionedContext)
   const contentRef = React.useRef<HTMLDivElement>(null)
   const setContent = React.useMemo(() => mergeRefs(contentRef, ref), [ref])
@@ -117,7 +129,7 @@ export function DropdownMenuContent({
   const interactedOutsideRef = React.useRef(false)
 
   return (
-    <MenuPrimitive.Portal>
+    <MenuPrimitive.Portal container={portalContainer}>
       <MenuPrimitive.Content
         data-slot="dropdown-menu-content"
         // At a point the menu opens to its right like a native context menu, flipping left near
@@ -125,7 +137,7 @@ export function DropdownMenuContent({
         side={side ?? (positioned ? 'right' : undefined)}
         align={align ?? (positioned ? 'start' : undefined)}
         sideOffset={sideOffset ?? (positioned ? 2 : 6)}
-        collisionPadding={collisionPadding}
+        {...collision}
         ref={setContent}
         onPointerDownOutside={(event) => {
           onPointerDownOutside?.(event)
@@ -296,13 +308,21 @@ export function DropdownMenuSubTrigger({
 }
 
 export function DropdownMenuSubContent({
+  collisionBoundary,
+  collisionPadding,
+  container,
   className,
   ...props
-}: React.ComponentProps<typeof MenuPrimitive.SubContent>) {
+}: React.ComponentProps<typeof MenuPrimitive.SubContent> & {
+  container?: Element | DocumentFragment | null
+}) {
+  const portalContainer = usePortalContainer(container)
+  const collision = useCollisionProps({ collisionBoundary, collisionPadding }, 0)
   return (
-    <MenuPrimitive.Portal>
+    <MenuPrimitive.Portal container={portalContainer}>
       <MenuPrimitive.SubContent
         data-slot="dropdown-menu-sub-content"
+        {...collision}
         className={cn(
           surfaceClass,
           popAnimationClass,

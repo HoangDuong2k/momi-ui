@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { suspendTransitions } from './transitions'
 
 export type Theme = 'light' | 'dark' | 'system'
 export type ResolvedTheme = 'light' | 'dark'
@@ -36,17 +37,6 @@ function readStoredTheme(key: string, fallback: Theme): Theme {
     return stored && (THEMES as string[]).includes(stored) ? (stored as Theme) : fallback
   } catch {
     return fallback
-  }
-}
-
-/** Temporarily disable CSS transitions so colors don't animate when the theme flips. */
-function suspendTransitions() {
-  const style = document.createElement('style')
-  style.appendChild(document.createTextNode('*,*::before,*::after{transition:none!important}'))
-  document.head.appendChild(style)
-  return () => {
-    void window.getComputedStyle(document.body).opacity
-    requestAnimationFrame(() => style.remove())
   }
 }
 

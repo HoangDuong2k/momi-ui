@@ -3,138 +3,232 @@ import * as React from 'react'
 import { useLocale, useMessages } from '../i18n/locale-provider'
 import type { MomiMessages } from '../i18n/messages'
 import { cn } from '../lib/cn'
-import type { WeekStart } from '../lib/date'
-import { XIcon } from '../lib/icons'
+import { isSameDay, startOfDay, startOfMonth, type WeekStart } from '../lib/date'
 import { useControllableState } from '../lib/use-controllable-state'
 import { Calendar, type DateRange } from './calendar'
-import { useFormControlProps } from './form-field'
 import { useDefaultSize } from './density-provider'
-import { controlSizeDefaults, inputVariants, type InputSize } from './input'
-import { popAnimationClass, surfaceClass } from './internal/overlay-styles'
+import { useFormControlProps } from './form-field'
+import { controlSizeDefaults, type InputSize } from './input'
+import {
+  isDayDisabled,
+  PickerContent,
+  PickerTrigger,
+  presetButtonClass,
+  type PickerBaseProps,
+} from './internal/picker'
 
-function CalendarIcon(props: React.ComponentProps<'svg'>) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      {...props}
-    >
-      <rect x="3" y="4.5" width="18" height="16.5" rx="2" />
-      <path d="M8 2.5v4M16 2.5v4M3 10h18" />
-    </svg>
-  )
-}
-
-interface PickerBaseProps {
-  /** @default messages.datePicker.placeholder / rangePlaceholder */
-  placeholder?: string
-  /** Override built-in text for this instance. */
-  labels?: Partial<MomiMessages['datePicker']>
-  /** @default 'md' (`xs` inside a compact `DensityProvider`) */
-  size?: InputSize
-  /** BCP 47 locale for the calendar and trigger text. Defaults to `LocaleProvider`'s. */
+/** Shared by the calendar panels. */
+interface PanelBaseProps {
+  /** BCP 47 locale for month and weekday names. Defaults to `LocaleProvider`'s. */
   locale?: string
-  /** Intl options for the trigger text. @default { dateStyle: 'medium' } */
-  formatOptions?: Intl.DateTimeFormatOptions
   weekStartsOn?: WeekStart
   minDate?: Date
   maxDate?: Date
   isDateDisabled?: (date: Date) => boolean
-  /** Show a clear button when a value is set. @default true */
-  clearable?: boolean
-  disabled?: boolean
-  id?: string
+  /** Focus the selected (or today's) day on mount. */
+  autoFocus?: boolean
+  /** Override built-in text for this instance. */
+  labels?: Partial<MomiMessages['datePicker']>
   className?: string
-  'aria-label'?: string
-  'aria-invalid'?: React.AriaAttributes['aria-invalid']
-  'aria-describedby'?: string
-  required?: boolean
 }
 
-function PickerTrigger({
-  size,
-  text,
-  placeholder,
-  clearLabel,
-  onClear,
-  open,
-  ...props
-}: {
-  size: InputSize
-  text: string | null
-  placeholder: string
-  clearLabel: string
-  onClear?: () => void
-  open: boolean
-} & Pick<
-  PickerBaseProps,
-  'id' | 'disabled' | 'className' | 'aria-label' | 'aria-invalid' | 'aria-describedby' | 'required'
->) {
-  const { className, required, ...rest } = props
+/* -------------------------------------------------------------------------------------------------
+ * DatePickerPanel
+ * -----------------------------------------------------------------------------------------------*/
+
+export interface DatePickerPreset {
+  label: React.ReactNode
+  /** `null` clears the date (e.g. "No date"). */
+  date: Date | null
+}
+
+export interface DatePickerPanelProps extends PanelBaseProps {
+  value?: Date | null
+  defaultValue?: Date | null
+  onValueChange?: (date: Date | null) => void
+  /** Quick picks shown above the calendar, e.g. Today / Tomorrow. The words come from your app. */
+  presets?: DatePickerPreset[]
+  /** Called when the user picks a day or a preset — also when it is already the value. */
+  onPick?: (date: Date | null, via: 'calendar' | 'preset') => void
+}
+
+/**
+ * The body of `DatePicker` — optional quick picks and a calendar — without a trigger or popover,
+ * to place inline or in your own Popover.
+ */
+export function DatePickerPanel({
+  value,
+  defaultValue = null,
+  onValueChange,
+  presets,
+  onPick,
+  locale: localeProp,
+  weekStartsOn,
+  minDate,
+  maxDate,
+  isDateDisabled,
+  autoFocus,
+  labels,
+  className,
+}: DatePickerPanelProps) {
+  const context = useLocale()
+  const locale = localeProp ?? context.locale
+  const t = useMessages('datePicker', labels)
+  const [date, setDate] = useControllableState<Date | null>({
+    value,
+    defaultValue,
+    onChange: onValueChange,
+  })
+  // Controlled here so a preset in another month brings that month into view.
+  const [month, setMonth] = React.useState(() => startOfMonth(date ?? new Date()))
+  const limits = { minDate, maxDate, isDateDisabled }
+
   return (
-    <PopoverPrimitive.Trigger asChild disabled={props.disabled}>
-      <button
-        type="button"
-        data-slot="date-picker-trigger"
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        aria-required={required || undefined}
-        className={cn(
-          inputVariants({ size }),
-          'cursor-pointer items-center justify-between gap-2 text-start',
-          !text && 'text-muted-foreground/70',
-          className,
-        )}
-        {...rest}
-      >
-        <span className="flex min-w-0 items-center gap-2">
-          <CalendarIcon
-            className={cn('shrink-0 text-muted-foreground', size === 'xs' ? 'size-3.5' : 'size-4')}
-          />
-          <span className="truncate">{text ?? placeholder}</span>
-        </span>
-        {text && onClear && (
-          <span
-            role="button"
-            tabIndex={-1}
-            aria-label={clearLabel}
-            onPointerDown={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              onClear()
-            }}
-            className="rounded-sm p-0.5 text-muted-foreground hover:text-foreground"
-          >
-            <XIcon className="size-3.5" />
-          </span>
-        )}
-      </button>
-    </PopoverPrimitive.Trigger>
+    <div data-slot="date-picker-panel" className={cn('flex w-min flex-col', className)}>
+      {presets && presets.length > 0 && (
+        <div role="group" aria-label={t.presets} className="flex flex-wrap gap-1.5 border-b p-3">
+          {presets.map((preset, i) => (
+            <button
+              key={i}
+              type="button"
+              aria-pressed={preset.date ? isSameDay(preset.date, date) : date === null}
+              disabled={preset.date !== null && isDayDisabled(preset.date, limits)}
+              onClick={() => {
+                const next = preset.date && startOfDay(preset.date)
+                setDate(next)
+                if (next) setMonth(startOfMonth(next))
+                onPick?.(next, 'preset')
+              }}
+              className={presetButtonClass}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+      )}
+      <Calendar
+        autoFocus={autoFocus}
+        month={month}
+        onMonthChange={setMonth}
+        selected={date}
+        onSelect={(d) => {
+          setDate(d)
+          onPick?.(d, 'calendar')
+        }}
+        locale={locale}
+        weekStartsOn={weekStartsOn}
+        minDate={minDate}
+        maxDate={maxDate}
+        isDateDisabled={isDateDisabled}
+      />
+    </div>
   )
 }
 
-function PickerContent({ children }: { children: React.ReactNode }) {
+/* -------------------------------------------------------------------------------------------------
+ * DateRangePickerPanel
+ * -----------------------------------------------------------------------------------------------*/
+
+export interface DateRangePreset {
+  label: React.ReactNode
+  /** `{}` clears the range. */
+  range: DateRange
+}
+
+export interface DateRangePickerPanelProps extends PanelBaseProps {
+  value?: DateRange
+  defaultValue?: DateRange
+  onValueChange?: (range: DateRange) => void
+  /** Quick picks shown above the calendar, e.g. Last 7 days. The words come from your app. */
+  presets?: DateRangePreset[]
+  /** Called when the user picks a day or a preset. */
+  onPick?: (range: DateRange, via: 'calendar' | 'preset') => void
+  /** @default 2 */
+  numberOfMonths?: 1 | 2
+}
+
+/** The body of `DateRangePicker` without a trigger or popover. */
+export function DateRangePickerPanel({
+  value,
+  defaultValue = {},
+  onValueChange,
+  presets,
+  onPick,
+  numberOfMonths = 2,
+  locale: localeProp,
+  weekStartsOn,
+  minDate,
+  maxDate,
+  isDateDisabled,
+  autoFocus,
+  labels,
+  className,
+}: DateRangePickerPanelProps) {
+  const context = useLocale()
+  const locale = localeProp ?? context.locale
+  const t = useMessages('datePicker', labels)
+  const [range, setRange] = useControllableState<DateRange>({
+    value,
+    defaultValue,
+    onChange: onValueChange,
+  })
+  const [month, setMonth] = React.useState(() => startOfMonth(range.from ?? new Date()))
+  const limits = { minDate, maxDate, isDateDisabled }
+
   return (
-    <PopoverPrimitive.Portal>
-      <PopoverPrimitive.Content
-        align="start"
-        sideOffset={6}
-        collisionPadding={8}
-        className={cn(
-          surfaceClass,
-          popAnimationClass,
-          'w-auto origin-(--radix-popover-content-transform-origin) p-0',
-        )}
-      >
-        {children}
-      </PopoverPrimitive.Content>
-    </PopoverPrimitive.Portal>
+    <div data-slot="date-range-picker-panel" className={cn('flex w-min flex-col', className)}>
+      {presets && presets.length > 0 && (
+        <div role="group" aria-label={t.presets} className="flex flex-wrap gap-1.5 border-b p-3">
+          {presets.map((preset, i) => {
+            const { from, to } = preset.range
+            return (
+              <button
+                key={i}
+                type="button"
+                aria-pressed={
+                  from || to
+                    ? isSameDay(from, range.from) && isSameDay(to, range.to)
+                    : !range.from && !range.to
+                }
+                disabled={
+                  (from !== undefined && isDayDisabled(from, limits)) ||
+                  (to !== undefined && isDayDisabled(to, limits))
+                }
+                onClick={() => {
+                  const next: DateRange = {
+                    from: from && startOfDay(from),
+                    to: to && startOfDay(to),
+                  }
+                  setRange(next)
+                  if (next.from) setMonth(startOfMonth(next.from))
+                  onPick?.(next, 'preset')
+                }}
+                className={presetButtonClass}
+              >
+                {preset.label}
+              </button>
+            )
+          })}
+        </div>
+      )}
+      <Calendar
+        mode="range"
+        autoFocus={autoFocus}
+        numberOfMonths={numberOfMonths}
+        month={month}
+        onMonthChange={setMonth}
+        selected={range}
+        onSelect={(r) => {
+          setRange(r)
+          onPick?.(r, 'calendar')
+        }}
+        locale={locale}
+        weekStartsOn={weekStartsOn}
+        minDate={minDate}
+        maxDate={maxDate}
+        isDateDisabled={isDateDisabled}
+      />
+    </div>
   )
 }
 
@@ -146,6 +240,12 @@ export interface DatePickerProps extends PickerBaseProps {
   value?: Date | null
   defaultValue?: Date | null
   onValueChange?: (date: Date | null) => void
+  /** Quick picks shown above the calendar. Picking one closes the popover. */
+  presets?: DatePickerPreset[]
+  /** @default messages.datePicker.placeholder */
+  placeholder?: string
+  /** Override built-in text for this instance. */
+  labels?: Partial<MomiMessages['datePicker']>
 }
 
 export function DatePicker(props: DatePickerProps) {
@@ -153,6 +253,7 @@ export function DatePicker(props: DatePickerProps) {
     value,
     defaultValue = null,
     onValueChange,
+    presets,
     placeholder,
     labels,
     size: sizeProp,
@@ -163,6 +264,9 @@ export function DatePicker(props: DatePickerProps) {
     maxDate,
     isDateDisabled,
     clearable = true,
+    container,
+    collisionBoundary,
+    collisionPadding,
     ...triggerProps
   } = useFormControlProps(props)
   const [open, setOpen] = React.useState(false)
@@ -188,19 +292,25 @@ export function DatePicker(props: DatePickerProps) {
         onClear={clearable ? () => setDate(null) : undefined}
         {...triggerProps}
       />
-      <PickerContent>
-        <Calendar
+      <PickerContent
+        container={container}
+        collisionBoundary={collisionBoundary}
+        collisionPadding={collisionPadding}
+      >
+        <DatePickerPanel
           autoFocus
-          selected={date}
-          onSelect={(d) => {
-            setDate(d)
-            if (d) setOpen(false)
+          value={date}
+          onValueChange={setDate}
+          presets={presets}
+          onPick={(d, via) => {
+            if (d || via === 'preset') setOpen(false)
           }}
           locale={locale}
           weekStartsOn={weekStartsOn}
           minDate={minDate}
           maxDate={maxDate}
           isDateDisabled={isDateDisabled}
+          labels={labels}
         />
       </PickerContent>
     </PopoverPrimitive.Root>
@@ -215,8 +325,14 @@ export interface DateRangePickerProps extends PickerBaseProps {
   value?: DateRange
   defaultValue?: DateRange
   onValueChange?: (range: DateRange) => void
+  /** Quick picks shown above the calendar. Picking one closes the popover. */
+  presets?: DateRangePreset[]
   /** @default 2 */
   numberOfMonths?: 1 | 2
+  /** @default messages.datePicker.rangePlaceholder */
+  placeholder?: string
+  /** Override built-in text for this instance. */
+  labels?: Partial<MomiMessages['datePicker']>
 }
 
 export function DateRangePicker(props: DateRangePickerProps) {
@@ -224,6 +340,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
     value,
     defaultValue = {},
     onValueChange,
+    presets,
     placeholder,
     labels,
     size: sizeProp,
@@ -235,6 +352,9 @@ export function DateRangePicker(props: DateRangePickerProps) {
     isDateDisabled,
     clearable = true,
     numberOfMonths = 2,
+    container,
+    collisionBoundary,
+    collisionPadding,
     ...triggerProps
   } = useFormControlProps(props)
   const [open, setOpen] = React.useState(false)
@@ -265,21 +385,26 @@ export function DateRangePicker(props: DateRangePickerProps) {
         onClear={clearable ? () => setRange({}) : undefined}
         {...triggerProps}
       />
-      <PickerContent>
-        <Calendar
-          mode="range"
+      <PickerContent
+        container={container}
+        collisionBoundary={collisionBoundary}
+        collisionPadding={collisionPadding}
+      >
+        <DateRangePickerPanel
           autoFocus
           numberOfMonths={numberOfMonths}
-          selected={range}
-          onSelect={(r) => {
-            setRange(r)
-            if (r.from && r.to) setOpen(false)
+          value={range}
+          onValueChange={setRange}
+          presets={presets}
+          onPick={(r, via) => {
+            if ((r.from && r.to) || via === 'preset') setOpen(false)
           }}
           locale={locale}
           weekStartsOn={weekStartsOn}
           minDate={minDate}
           maxDate={maxDate}
           isDateDisabled={isDateDisabled}
+          labels={labels}
         />
       </PickerContent>
     </PopoverPrimitive.Root>

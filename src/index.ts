@@ -21,12 +21,21 @@ export {
   type Theme,
   type ThemeProviderProps,
 } from './theme/theme-provider'
+export { INSTANT_CLASS, suspendTransitions, withoutTransitions } from './theme/transitions'
 export {
   getThemeScript,
   ThemeScript,
   type ThemeScriptOptions,
   type ThemeScriptProps,
 } from './theme/theme-script'
+export {
+  PortalProvider,
+  usePortalSettings,
+  type OverlayPlacementProps,
+  type PortalContainer,
+  type PortalProviderProps,
+  type PortalSettings,
+} from './components/portal-provider'
 export {
   DensityProvider,
   useDensity,
@@ -161,6 +170,7 @@ export {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
+  type SelectContentProps,
   type SelectTriggerProps,
 } from './components/select'
 
@@ -216,6 +226,16 @@ export {
   type DataTableRowReorderEvent,
   type DataTableSort,
 } from './components/data-table'
+export {
+  EventCalendar,
+  type CalendarEvent,
+  type EventCalendarChange,
+  type EventCalendarProps,
+  type EventCalendarRange,
+  type EventCalendarToolbarApi,
+  type EventCalendarView,
+  type EventRenderContext,
+} from './components/event-calendar'
 export {
   Kanban,
   moveKanbanItem,
@@ -299,7 +319,12 @@ export {
   type TooltipProps,
   type TooltipProviderProps,
 } from './components/tooltip'
-export { HoverCard, HoverCardContent, HoverCardTrigger } from './components/hover-card'
+export {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+  type HoverCardContentProps,
+} from './components/hover-card'
 export {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -315,6 +340,7 @@ export {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  type DropdownMenuContentProps,
   type DropdownMenuItemProps,
   type DropdownMenuProps,
   type MenuPosition,
@@ -335,6 +361,7 @@ export {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuTrigger,
+  type ContextMenuContentProps,
   type ContextMenuItemProps,
 } from './components/context-menu'
 
@@ -397,6 +424,7 @@ export {
   Combobox,
   type ComboboxMultipleProps,
   type ComboboxOption,
+  type ComboboxOptionState,
   type ComboboxProps,
   type ComboboxSingleProps,
 } from './components/combobox'
@@ -409,10 +437,25 @@ export {
 } from './components/calendar'
 export {
   DatePicker,
+  DatePickerPanel,
   DateRangePicker,
+  DateRangePickerPanel,
+  type DatePickerPanelProps,
+  type DatePickerPreset,
   type DatePickerProps,
+  type DateRangePickerPanelProps,
   type DateRangePickerProps,
+  type DateRangePreset,
 } from './components/date-picker'
+export {
+  DateTimePicker,
+  DateTimePickerPanel,
+  type DateTimePickerPanelProps,
+  type DateTimePickerProps,
+  type DateTimePreset,
+  type DateTimeValue,
+} from './components/date-time-picker'
+export { formatTime, parseTime, type TimeString } from './lib/time'
 export {
   FileUpload,
   formatBytes,

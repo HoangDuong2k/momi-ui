@@ -20,14 +20,18 @@ export type CommandFilter = (value: string, search: string, keywords: string[]) 
 const normalize = (s: string) =>
   s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd')
 
-/** Every search word must appear in the value or keywords. Prefix matches rank higher. */
+/**
+ * Every search word must appear in the value or keywords. Higher scores rank higher: an exact match
+ * on the value (3), a value starting with the search (2), anything else that matches (1).
+ */
 export const defaultCommandFilter: CommandFilter = (value, search, keywords) => {
   const query = normalize(search.trim())
   if (!query) return 1
   const haystack = normalize([value, ...keywords].join(' '))
   const words = query.split(/\s+/)
   if (!words.every((w) => haystack.includes(w))) return 0
-  return normalize(value).startsWith(query) ? 2 : 1
+  const label = normalize(value)
+  return label === query ? 3 : label.startsWith(query) ? 2 : 1
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -138,26 +142,36 @@ export function Command({
   const visible = React.useMemo(() => {
     const ids = new Set<string>()
     const groups = new Set<string>()
+    const scores = new Map<string, number>()
     for (const item of items.values()) {
-      if (!shouldFilter || filter(item.value, search, item.keywords) > 0) {
+      const score = shouldFilter ? filter(item.value, search, item.keywords) : 1
+      if (score > 0) {
         ids.add(item.id)
+        scores.set(item.id, score)
         if (item.groupId) groups.add(item.groupId)
       }
     }
-    return { ids, groups }
+    return { ids, groups, scores }
   }, [items, search, filter, shouldFilter])
 
-  // Fall back to the first visible, enabled item when the active one is filtered out.
-  const firstEnabled = React.useMemo(() => {
+  // Until the user moves, the best-scoring enabled item is active (the first one on a tie), so the
+  // highlight — and Enter — go to an exact match rather than whatever happens to be listed first.
+  const bestEnabled = React.useMemo(() => {
+    let best: string | null = null
+    let bestScore = 0
     for (const item of items.values()) {
-      if (visible.ids.has(item.id) && !item.disabled) return item.id
+      const score = visible.scores.get(item.id) ?? 0
+      if (!item.disabled && score > bestScore) {
+        best = item.id
+        bestScore = score
+      }
     }
-    return null
+    return best
   }, [items, visible])
   const activeId =
     activeIdState && visible.ids.has(activeIdState) && !items.get(activeIdState)?.disabled
       ? activeIdState
-      : firstEnabled
+      : bestEnabled
 
   const setSearch = (next: string) => {
     setSearchState(next)
@@ -444,6 +458,8 @@ export interface CommandDialogProps extends React.ComponentProps<typeof Dialog> 
   description?: string
   commandProps?: CommandProps
   className?: string
+  /** Mount it here instead of `PortalProvider`'s container (or `document.body`). */
+  container?: Element | DocumentFragment | null
 }
 
 /** Command palette in a modal — open it with a shortcut such as ⌘K. */
@@ -452,6 +468,7 @@ export function CommandDialog({
   description,
   commandProps,
   className,
+  container,
   children,
   ...props
 }: CommandDialogProps) {
@@ -459,6 +476,7 @@ export function CommandDialog({
   return (
     <Dialog {...props}>
       <DialogContent
+        container={container}
         showClose={false}
         className={cn('top-[20%] translate-y-0 gap-0 overflow-hidden p-0 sm:max-w-lg', className)}
       >

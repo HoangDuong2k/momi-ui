@@ -6,6 +6,7 @@ import { cn } from '../lib/cn'
 import { PlusIcon } from '../lib/icons'
 import { toneBg, type Tone } from '../lib/tones'
 import { useControllableState } from '../lib/use-controllable-state'
+import { usePortalContainer } from './portal-provider'
 import {
   INTERACTIVE,
   scrollNearEdge,
@@ -79,8 +80,13 @@ export interface KanbanProps<T> {
   onCollapsedChange?: (collapsed: string[]) => void
   /** Read-only board: no dragging. */
   disabled?: boolean
-  /** @default 288 */
-  columnWidth?: number
+  /**
+   * Column width in px, or `'fill'` to share the board's width equally between the columns
+   * (down to `minColumnWidth`, then the board scrolls sideways). @default 288
+   */
+  columnWidth?: number | 'fill'
+  /** Narrowest a `'fill'` column gets before the board scrolls. @default 200 */
+  minColumnWidth?: number
   /** Max column height; cards scroll inside the column. */
   maxHeight?: number | string
   /** Content of an empty column. @default messages.kanban.empty */
@@ -188,6 +194,7 @@ export function Kanban<T>({
   onCollapsedChange,
   disabled = false,
   columnWidth = 288,
+  minColumnWidth = 200,
   maxHeight,
   emptyState,
   labels,
@@ -197,6 +204,8 @@ export function Kanban<T>({
   cardClassName,
 }: KanbanProps<T>) {
   const t = useMessages('kanban', labels)
+  // The floating card follows the pointer; it lives in PortalProvider's container when there is one.
+  const overlayContainer = usePortalContainer()
   const baseId = React.useId()
   const helpId = `${baseId}-help`
 
@@ -539,7 +548,12 @@ export function Kanban<T>({
           'data-[blocked]:border-destructive/30 data-[blocked]:bg-destructive/5',
           columnClassName,
         )}
-        style={{ width: columnWidth, maxHeight }}
+        data-fill={columnWidth === 'fill' || undefined}
+        style={
+          columnWidth === 'fill'
+            ? { flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: minColumnWidth, maxHeight }
+            : { width: columnWidth, maxHeight }
+        }
       >
         <header className="flex h-11 shrink-0 items-center gap-2 ps-3 pe-1.5">
           {column.tone && (
@@ -649,7 +663,7 @@ export function Kanban<T>({
               })}
             </div>
           </div>,
-          document.body,
+          overlayContainer ?? document.body,
         )}
     </div>
   )

@@ -1,6 +1,7 @@
 import { HoverCard as HoverCardPrimitive } from 'radix-ui'
 import type * as React from 'react'
 import { cn } from '../lib/cn'
+import { useCollisionProps, usePortalContainer } from './portal-provider'
 import { popAnimationClass, surfaceClass } from './internal/overlay-styles'
 
 /** Rich preview shown when hovering a link (for sighted mouse users; not a replacement for content). */
@@ -23,19 +24,31 @@ export function HoverCardTrigger(props: React.ComponentProps<typeof HoverCardPri
   return <HoverCardPrimitive.Trigger data-slot="hover-card-trigger" {...props} />
 }
 
+export interface HoverCardContentProps extends React.ComponentProps<
+  typeof HoverCardPrimitive.Content
+> {
+  /** Mount it here instead of `PortalProvider`'s container (or `document.body`). */
+  container?: Element | DocumentFragment | null
+}
+
 export function HoverCardContent({
   align = 'center',
   sideOffset = 6,
+  collisionBoundary,
+  collisionPadding,
+  container,
   className,
   ...props
-}: React.ComponentProps<typeof HoverCardPrimitive.Content>) {
+}: HoverCardContentProps) {
+  const portalContainer = usePortalContainer(container)
+  const collision = useCollisionProps({ collisionBoundary, collisionPadding })
   return (
-    <HoverCardPrimitive.Portal>
+    <HoverCardPrimitive.Portal container={portalContainer}>
       <HoverCardPrimitive.Content
         data-slot="hover-card-content"
         align={align}
         sideOffset={sideOffset}
-        collisionPadding={8}
+        {...collision}
         className={cn(
           surfaceClass,
           popAnimationClass,

@@ -3,7 +3,7 @@
 Thư viện component React theo phong cách **Modern Minimal**, xây trên **Tailwind CSS v4** và **Radix UI**:
 nhiều khoảng trắng, typography rõ ràng, một màu accent, bo góc vừa phải, bóng đổ nhẹ, hỗ trợ dark mode.
 
-> Trạng thái: **v0.2.0**: ngoài component nền tảng, overlay, DataTable, landing blocks và input nâng cao, đã có Kanban, đa ngôn ngữ, mật độ nhỏ gọn và bộ component cho app desktop. Xem [Lộ trình](#lộ-trình) và [CHANGELOG](CHANGELOG.md).
+> Trạng thái: **v0.3.0**: ngoài component nền tảng, overlay, DataTable, landing blocks và input nâng cao, đã có Kanban, lịch sự kiện (EventCalendar), DateTimePicker, đa ngôn ngữ, mật độ nhỏ gọn, bộ component cho app desktop và nhúng trong một khung (PortalProvider). Xem [Lộ trình](#lộ-trình) và [CHANGELOG](CHANGELOG.md).
 
 ## Chạy playground
 
@@ -48,7 +48,7 @@ cd ../momi-ui && npm run dev:lib   # vite build --watch + tsc --watch + build CS
 **Khi app merge lên main / chạy CI** — cài từ git, ghim theo tag:
 
 ```jsonc
-"dependencies": { "momi-ui": "github:HoangDuong2k/momi-ui#v0.2.0" }
+"dependencies": { "momi-ui": "github:HoangDuong2k/momi-ui#v0.3.0" }
 ```
 
 Repo không chứa `dist/`, nên script `prepare` tự build khi cài từ git (cần Node ≥ 20.19 hoặc ≥ 22.12). Khi `dist/` đã có (cài `file:` với `dev:lib`), `prepare` bỏ qua để `npm install` của app không build lại mỗi lần; đặt `MOMI_FORCE_BUILD=1` nếu muốn build lại. Mỗi đợt app merge cần một tag mới của momi-ui.
@@ -192,7 +192,40 @@ Dark mode bật bằng class `.dark` hoặc `data-theme="dark"` trên một ph�
 
 **`ThemeProvider`**: `forcedTheme="dark"` cho app chỉ có nền tối (bỏ qua cài đặt hệ thống, không đọc/ghi localStorage). **`ThemeScript`** (hoặc `getThemeScript()` cho Astro) đặt trong `<head>` để trang render sẵn không nháy nền sáng ở chế độ tối; truyền cùng `storageKey` / `defaultTheme` / `attribute` với `ThemeProvider`.
 
+**Đổi màu tức thì khi theme đổi từ bên ngoài `ThemeProvider`** (app tự quản lý bảng màu, đồng bộ với một hiệu ứng hay một khung hình…): các nút, ô nhập có transition màu 150 ms, nên tắt transition đúng lúc đổi:
+
+```ts
+import { suspendTransitions, withoutTransitions } from 'momi-ui'
+
+withoutTransitions(() => document.documentElement.setAttribute('data-palette', 'night'))
+
+// hoặc tự quyết lúc bật lại
+const restore = suspendTransitions()
+applyPalette()
+restore() // transition bật lại sau khung hình kế tiếp
+```
+
+Cả hai dùng class `momi-instant` (có trong `theme.css`): đặt class này lên một phần tử thì mọi transition bên trong tắt hẳn. Không chèn thẻ `<style>` nên chạy được với CSP chặn inline style. `ThemeProvider` dùng chính cơ chế này khi tự đổi theme.
+
 Animation (overlay, accordion, toast…) dùng chung một bộ keyframes trong `theme.css`, tự rút gần như về 0 khi người dùng bật _prefers-reduced-motion_.
+
+## Nhúng trong một khung
+
+Khi giao diện chỉ chiếm một phần trang (một panel, khung thiết bị, widget nhúng…), bọc nó trong `PortalProvider` để mọi popup, menu, tooltip, hộp thoại, drawer và thẻ đang kéo (Kanban, SortableList) **gắn vào khung đó và không tràn ra ngoài**:
+
+```tsx
+<PortalProvider container={frameEl} collisionBoundary={frameEl} collisionPadding={6}>
+  <EmbeddedApp />
+</PortalProvider>
+```
+
+- `container`: nơi gắn overlay (mặc định `document.body`; nhận cả shadow root). `collisionBoundary` / `collisionPadding`: popup tự lật và dịch để nằm trong vùng này.
+- **Khung phải là containing block của phần tử `fixed`** — đặt `contain: layout`, hoặc có `transform` / `filter`. Khi đó lớp phủ của hộp thoại phủ đúng khung, hộp thoại nằm giữa khung, chiều cao hộp thoại và drawer tính theo khung (dùng `%`, không dùng `dvh`). Chỉ đặt `container-type` thì **không** đủ (đã thử trên Chrome 154: phần tử `fixed` vẫn tính theo cửa sổ).
+- Thẻ đang kéo tự trừ toạ độ của khung, nên luôn nằm đúng dưới con trỏ.
+- Từng component vẫn ghi đè được: `container`, `collisionBoundary`, `collisionPadding` trên `PopoverContent`, `DropdownMenuContent`, `SelectContent`, `Tooltip`, `Combobox`, `DatePicker`, `ColorPicker`, `DialogContent`, `DrawerContent`… Provider lồng nhau chỉ ghi đè phần nó đặt.
+- Không có provider thì mọi thứ giống hệt trước.
+
+Playground có trang **Embedded in a container** (khung 640×400) để thử.
 
 ## Đa ngôn ngữ
 
@@ -249,20 +282,20 @@ const platform = usePlatform()                         // 'mac' | 'windows' | 'l
 
 ## Component
 
-| Nhóm         | Component                                                                                                                                                                                                                                                                                                                                                                    |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Theme        | `ThemeProvider` (+ `forcedTheme`), `useTheme`, `ThemeScript` / `getThemeScript`, `DensityProvider`, `LocaleProvider`                                                                                                                                                                                                                                                         |
-| Layout       | `Container`, `Stack`, `HStack`, `VStack`, `Grid`, `Section`, `Separator`, `AspectRatio`, `ResizablePanelGroup` / `ResizablePanel` / `ResizableHandle` (kéo hoặc phím mũi tên, nhấp đúp về mặc định, thu gọn thành dải, nhớ bố cục), `ScrollArea` (thanh cuộn mảnh theo theme, hiện khi rê chuột)                                                                             |
-| Typography   | `Heading`, `Text`, `Link`, `Code`, `Kbd` (`keys` theo hệ điều hành), `Blockquote`                                                                                                                                                                                                                                                                                            |
-| Buttons      | `Button`, `IconButton`, `ButtonGroup`, `Toolbar` (+ `ToolbarButton`, `ToolbarToggle`, `ToolbarGroup`, `ToolbarSeparator`, `ToolbarLink`), `ToggleGroup` (single luôn có đúng một nút bật · multiple; ghost · outline · segmented)                                                                                                                                            |
-| Forms        | `FormField`, `Label`, `Input`, `InputGroup`, `InputAddon`, `Textarea`, `Select`, `NativeSelect`, `Checkbox`, `RadioGroup`, `RadioGroupItem`, `Switch`, `NumberField` (kéo để đổi số, Shift ×10 / Alt ×0,1, đơn vị, `format` / `parse`, nhận cả "0,5" lẫn "0.5")                                                                                                              |
-| Advanced     | `Slider` (range, marks, `resetValue`, `origin`), `Combobox` (single/multiple, tìm không dấu), `Calendar`, `DatePicker`, `DateRangePicker` (mọi locale), `InputOTP`, `FileUpload` (validate, preview, progress), `ColorPicker` / `ColorPickerPanel` (vùng bão hòa/độ sáng, sắc màu, độ đục, hex/rgba, màu gợi ý, hút màu), `Command` / `CommandDialog` + `useCommandShortcut` |
-| Data display | `Card` (+ `Header/Title/Description/Action/Content/Footer`), `Table` (row/col span, bordered, sticky header/footer), `DataTable`, `Kanban`, `SortableList` (+ `SortableHandle`), `Badge`, `Avatar`, `AvatarGroup`                                                                                                                                                            |
-| Navigation   | `Tabs` (segmented · underline · pills, ngang/dọc), `Breadcrumb`, `Pagination` (+ `getPaginationRange`)                                                                                                                                                                                                                                                                       |
-| Disclosure   | `Accordion` (default · bordered · separated, chevron/plus), `Collapsible`                                                                                                                                                                                                                                                                                                    |
-| Overlay      | `Dialog`, `AlertDialog`, `Drawer` (4 cạnh), `Popover`, `Tooltip` (`shortcut`), `HoverCard`, `DropdownMenu` (mở tại tọa độ bất kỳ qua `position`), `ContextMenu`, `Lightbox` (ảnh/video toàn màn hình, mũi tên, vuốt, chú thích)                                                                                                                                              |
-| Feedback     | `Alert`, `Toast` (`toast()` + `<Toaster />`, có promise/action/swipe, nút "Clear all" khi có từ 2 toast), `Progress`, `Skeleton`, `SkeletonText`, `Spinner`                                                                                                                                                                                                                  |
-| Tiện ích     | `formatShortcut`, `matchesShortcut`, `usePlatform`, `parseColor` / `formatColor`, `moveKanbanItem`, `cn`                                                                                                                                                                                                                                                                     |
+| Nhóm         | Component                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Theme        | `ThemeProvider` (+ `forcedTheme`), `useTheme`, `ThemeScript` / `getThemeScript`, `suspendTransitions` / `withoutTransitions`, `DensityProvider`, `LocaleProvider`, `PortalProvider`                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Layout       | `Container`, `Stack`, `HStack`, `VStack`, `Grid`, `Section`, `Separator`, `AspectRatio`, `ResizablePanelGroup` / `ResizablePanel` / `ResizableHandle` (kéo hoặc phím mũi tên, nhấp đúp về mặc định, thu gọn thành dải, nhớ bố cục), `ScrollArea` (thanh cuộn mảnh theo theme, hiện khi rê chuột)                                                                                                                                                                                                                                                                                                        |
+| Typography   | `Heading`, `Text`, `Link`, `Code`, `Kbd` (`keys` theo hệ điều hành), `Blockquote`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Buttons      | `Button`, `IconButton`, `ButtonGroup`, `Toolbar` (+ `ToolbarButton`, `ToolbarToggle`, `ToolbarGroup`, `ToolbarSeparator`, `ToolbarLink`), `ToggleGroup` (single luôn có đúng một nút bật · multiple; ghost · outline · segmented)                                                                                                                                                                                                                                                                                                                                                                       |
+| Forms        | `FormField`, `Label`, `Input`, `InputGroup`, `InputAddon`, `Textarea`, `Select`, `NativeSelect`, `Checkbox`, `RadioGroup`, `RadioGroupItem`, `Switch`, `NumberField` (kéo để đổi số, Shift ×10 / Alt ×0,1, đơn vị, `format` / `parse`, nhận cả "0,5" lẫn "0.5")                                                                                                                                                                                                                                                                                                                                         |
+| Advanced     | `Slider` (range, marks, `resetValue`, `origin`), `Combobox` (single/multiple, tìm không dấu, tạo mục mới, tuỳ biến dòng / chip), `Calendar`, `DatePicker`, `DateRangePicker` (mọi locale, `presets`), `DateTimePicker` (ngày + giờ gõ tự do, mốc nhanh, giờ gợi ý, cả ngày), `DatePickerPanel` / `DateRangePickerPanel` / `DateTimePickerPanel` (bảng chọn không kèm ô kích hoạt), `InputOTP`, `FileUpload` (validate, preview, progress), `ColorPicker` / `ColorPickerPanel` (vùng bão hòa/độ sáng, sắc màu, độ đục, hex/rgba, màu gợi ý, hút màu), `Command` / `CommandDialog` + `useCommandShortcut` |
+| Data display | `Card` (+ `Header/Title/Description/Action/Content/Footer`), `Table` (row/col span, bordered, sticky header/footer), `DataTable`, `EventCalendar` (tháng / tuần / ngày / danh sách, kéo thả), `Kanban`, `SortableList` (+ `SortableHandle`), `Badge`, `Avatar`, `AvatarGroup`                                                                                                                                                                                                                                                                                                                           |
+| Navigation   | `Tabs` (segmented · underline · pills, ngang/dọc), `Breadcrumb`, `Pagination` (+ `getPaginationRange`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Disclosure   | `Accordion` (default · bordered · separated, chevron/plus), `Collapsible`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Overlay      | `Dialog`, `AlertDialog`, `Drawer` (4 cạnh, `modal={false}`), `Popover`, `Tooltip` (`shortcut`), `HoverCard`, `DropdownMenu` (mở tại tọa độ bất kỳ qua `position`), `ContextMenu`, `Lightbox` (ảnh/video toàn màn hình, mũi tên, vuốt, chú thích)                                                                                                                                                                                                                                                                                                                                                        |
+| Feedback     | `Alert`, `Toast` (`toast()` + `<Toaster />`, có promise/action/swipe, nút "Clear all" khi có từ 2 toast), `Progress`, `Skeleton`, `SkeletonText`, `Spinner`                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Tiện ích     | `formatShortcut`, `matchesShortcut`, `usePlatform`, `parseColor` / `formatColor`, `moveKanbanItem`, `cn`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 ### DataTable
 
@@ -294,6 +327,45 @@ const columns: DataTableColumnDef<User>[] = [
 
 `getRowId` mặc định lấy `row.id` (nếu có), nên đặt id ổn định khi dùng expand / pin / reorder.
 
+### EventCalendar
+
+Lịch sự kiện với view **tháng, tuần, ngày và danh sách**. App giữ danh sách sự kiện; lịch báo thay đổi qua callback:
+
+```tsx
+const [events, setEvents] = useState<CalendarEvent[]>([
+  { id: '1', title: 'Design review', start: new Date(2026, 9, 6, 14), end: new Date(2026, 9, 6, 15, 30) },
+  { id: '2', title: 'Offsite', start: new Date(2026, 9, 7), end: new Date(2026, 9, 10), allDay: true, tone: 'success' },
+])
+
+<EventCalendar
+  events={events}
+  onEventChange={({ event, start, end, allDay }) =>
+    setEvents((list) => list.map((e) => (e.id === event.id ? { ...e, start, end, allDay } : e)))
+  }
+  onSelectRange={({ start, end, allDay }) => openNewEvent({ start, end, allDay })}
+  onEventClick={(event) => openEvent(event.id)}
+  onRangeChange={({ start, end }) => loadEvents(start, end)}
+/>
+```
+
+| Tính năng                       | Cách bật                                                                                                                                                                 |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Sự kiện                         | `{ id, title, start, end?, allDay?, tone?, color?, editable? }` — thêm trường riêng tuỳ ý (kiểu generic), callback trả lại đúng object của app                           |
+| `end`                           | **Không tính** (như iCalendar): sự kiện cả ngày 5–7/10 có `end` là 0h ngày 8/10. Không có `end`: cả ngày = 1 ngày, có giờ = một thời điểm                                |
+| View                            | `view` / `defaultView` / `onViewChange`; `views` chọn các view hiện trên thanh công cụ; `date` / `defaultDate` / `onDateChange`                                          |
+| Kéo, kéo dãn, dời bằng bàn phím | Bật khi có `onEventChange`. Bước `step` (mặc định 15 phút); `canChange` để cấm (hiện "không được" khi kéo); `editable: false` cho từng sự kiện                           |
+| Tạo sự kiện                     | `onSelectRange`: bấm hoặc kéo qua ô trống, Enter trên một ngày (view tháng). Bấm một lần tạo khoảng `defaultEventDuration` (60 phút)                                     |
+| Sự kiện có giờ ↔ cả ngày        | Kéo sự kiện có giờ lên dòng "Cả ngày" thành sự kiện cả ngày, và ngược lại                                                                                                |
+| Tải dữ liệu theo khoảng         | `onRangeChange({ start, end, view })`, gọi cả lần đầu                                                                                                                    |
+| Quá nhiều sự kiện               | View tháng tự đếm số dòng vừa ô, phần dư gộp vào "+N" (mở danh sách đầy đủ); `maxEventsPerDay`, `maxAllDayEvents` để cố định                                             |
+| Lưới giờ                        | `dayStartHour` / `dayEndHour`, `hourHeight`, `scrollToHour` (mặc định 8h); vạch giờ hiện tại; sự kiện trùng giờ tự chia cột                                              |
+| Nội dung, thanh công cụ         | `renderEvent(event, { view, variant, timeLabel, … })` (màu sự kiện có sẵn trong biến CSS `--event-color`); `toolbarActions` thêm nút; `renderToolbar(api)` thay cả thanh |
+| Ngôn ngữ                        | Chữ theo `LocaleProvider` (`messages`) hoặc `labels`; ngày giờ theo `locale` (prop → provider → trình duyệt), `hourCycle` ép 12/24 giờ; `weekStartsOn`                   |
+
+Bàn phím: Tab tới sự kiện, Enter để mở, phím cách để nhấc; mũi tên trái/phải dời một ngày, lên/xuống dời một bước (view tuần/ngày) hoặc một tuần (view tháng), Shift + lên/xuống đổi độ dài; phím cách hoặc Enter để thả, Esc để huỷ. Mỗi bước được đọc cho trình đọc màn hình. Trong view tháng, các ô ngày đi bằng mũi tên, PageUp/PageDown đổi tháng.
+
+Không có sẵn (để app tự lo): lặp lại theo quy tắc (trải thành từng lần rồi truyền vào `events`, lần nào không cho kéo thì `editable: false`), múi giờ khác giờ máy, view theo tài nguyên.
+
 ### Kanban
 
 Truyền `columns` + `value` (thẻ theo từng cột) + `renderCard`; kéo thả, bàn phím và trình đọc màn hình có sẵn:
@@ -308,6 +380,7 @@ Truyền `columns` + `value` (thẻ theo từng cột) + `renderCard`; kéo th�
 | Thêm thẻ, menu cột, mở thẻ   | `onAddCard(columnId)`, `renderColumnActions(column)`, `onCardClick(item)` (cả phím Enter)  |
 | Chỉ xem                      | `disabled`                                                                                 |
 | Tự cuộn khi kéo tới mép      | Có sẵn (ngang cho bảng, dọc cho cột khi đặt `maxHeight`)                                   |
+| Cột chia đều chiều ngang     | `columnWidth="fill"` (+ `minColumnWidth`, mặc định 200; hẹp hơn thì bảng cuộn ngang)       |
 
 ```tsx
 const columns: KanbanColumn[] = [
@@ -358,6 +431,40 @@ const [menu, setMenu] = useState<{ x: number; y: number } | null>(null)
 ```
 
 Không cần `DropdownMenuTrigger`. Menu mở sang phải con trỏ như menu chuột phải của hệ điều hành, tự lật hoặc dịch vào trong khi gần mép; Esc hoặc bấm ra ngoài thì đóng, focus trả về chỗ cũ. Ở chế độ này menu mặc định không modal, nên chuột phải chỗ khác mở lại ngay.
+
+### Drawer không modal
+
+```tsx
+<Drawer modal={false} open={task !== null} onOpenChange={(open) => !open && setTask(null)}>
+  <DrawerContent closeOnInteractOutside={false} style={{ top: 48 }}>
+    …
+  </DrawerContent>
+</Drawer>
+```
+
+`modal={false}`: không lớp phủ, không bẫy focus, trang bên cạnh vẫn bấm và gõ được. `closeOnInteractOutside={false}` giữ drawer mở khi người dùng bấm hoặc chuyển focus ra ngoài (mặc định `true`, đóng như Radix); Esc vẫn đóng. Muốn chừa chỗ cho thanh trên, đẩy mép drawer bằng `style` (ví dụ `top: 48`).
+
+### Chọn ngày và giờ
+
+```tsx
+<DateTimePicker
+  value={due} // { date: Date | null; time: 'HH:mm' | null } — time null = cả ngày
+  onValueChange={setDue}
+  presets={[
+    { label: 'Hôm nay', date: today },
+    { label: 'Ngày mai', date: tomorrow },
+    { label: 'Không hạn', date: null },
+  ]}
+  timeSuggestions={['09:00', '12:00', '18:00']}
+  allowAllDay
+/>
+```
+
+`presets` là mốc nhanh do app tự đặt tên; mốc không có `time` giữ giờ hiện tại, `time: null` thành cả ngày. Ô giờ nhận "830", "8h30", "20.00", "8 pm", "8:30 CH"; gõ sai thì trả lại giá trị cũ. Chọn ngày thì bảng vẫn mở; chọn mốc nhanh, giờ gợi ý hoặc Enter thì đóng. Giờ hiển thị theo `LocaleProvider` (vi-VN 24 giờ) hoặc `hourCycle`. Muốn đặt bảng chọn ngay trong trang hay trong popover riêng thì dùng `DateTimePickerPanel` / `DatePickerPanel` / `DateRangePickerPanel`; `DatePicker` và `DateRangePicker` cũng nhận `presets`. `parseTime(text, locale)` / `formatTime(time, locale)` export riêng; `parseTime` đọc lại được đúng chữ mà `formatTime` hiển thị ở mọi ngôn ngữ ("오후 8:30", "下午8:30", "٨:٣٠ م"). Khi chưa có ngày mà chọn giờ, ngày là hôm nay hoặc ngày được phép gần nhất sau đó.
+
+### Combobox tạo mục mới
+
+`onCreate(query)` hiện mục **Tạo “…”** khi chữ gõ không trùng mục nào (so sánh không phân biệt hoa thường và dấu); trả về (hoặc resolve) mục mới thì mục đó được chọn ngay, kể cả khi `options` chưa cập nhật. `renderOption` vẽ lại từng dòng (dấu tích vẫn giữ), `renderChip(option, remove)` vẽ lại từng chip ở chế độ chọn nhiều — ví dụ tô màu riêng cho từng nhãn. Ở chế độ chọn nhiều, Backspace trong ô tìm trống bỏ mục chọn cuối (giữ phím để xoá chữ thì không bỏ). Popup không bao giờ cao hơn chỗ trống, danh sách tự cuộn.
 
 ### Resizable và ScrollArea
 
@@ -442,11 +549,12 @@ scripts/           # build-css.mjs, dev-lib.mjs (build khi sửa), prepare.mjs (
 - [x] **Phase 3** — Landing page: Navbar, Hero, LogoCloud, Features/Bento, Stats, Steps, Testimonials, Pricing, FAQ, CTA, Newsletter, Team, Footer, Marquee, Reveal + trang landing hoàn chỉnh
 - [x] **Phase 4** — Nâng cao: Combobox, Command, Calendar/DatePicker, Slider, OTP, FileUpload; trang Installation, CI, LICENSE, CHANGELOG, sẵn sàng publish
 - [x] **Phase 5** — Kanban, đa ngôn ngữ; cho app desktop: cài từ `file:` / git tag, cỡ xs + `DensityProvider`, ColorPicker, NumberField, Slider `resetValue` / `origin`, Resizable, SortableList, ScrollArea, menu mở tại tọa độ, Toolbar / ToggleGroup, phím tắt theo hệ điều hành, theme desktop (`forcedTheme`, token bề mặt); cho landing: AppWindowFrame, VideoPlayer, Lightbox, ThemeScript, Changelog, hướng dẫn Astro / Next.js
+- [x] **Phase 6** — Nhúng trong một khung (`PortalProvider`), `EventCalendar` (tháng / tuần / ngày / danh sách, kéo thả), `DateTimePicker` và các panel, Combobox tạo mục mới, Drawer không modal, Kanban cột chia đều, `suspendTransitions`
 - [ ] **Sau này** — kéo nhiều hàng cùng lúc trong SortableList, pointer lock cho NumberField, so sánh trước / sau (ComparisonSlider), phát hành lên npm
 
 ## Phát hành
 
-Mỗi đợt app cần bản mới: chạy `npm run check`, cập nhật CHANGELOG, đánh tag rồi push (`git tag v0.2.0 && git push --tags`). App cài theo tag, `prepare` tự build khi cài.
+Mỗi đợt app cần bản mới: chạy `npm run check`, cập nhật CHANGELOG, đánh tag rồi push (`git tag v0.3.0 && git push --tags`). App cài theo tag, `prepare` tự build khi cài.
 
 Khi đưa lên npm:
 

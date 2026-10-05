@@ -6,6 +6,7 @@ import { cn } from '../lib/cn'
 import { GripVerticalIcon } from '../lib/icons'
 import { mergeRefs } from '../lib/merge-refs'
 import { useControllableState } from '../lib/use-controllable-state'
+import { usePortalContainer } from './portal-provider'
 import {
   moveIndex,
   scrollNearEdge,
@@ -162,6 +163,7 @@ export function SortableList<T>({
   ...props
 }: SortableListProps<T>) {
   const t = useMessages('sortableList', labels)
+  const overlayContainer = usePortalContainer()
   const helpId = `${React.useId()}-help`
   const vertical = orientation === 'vertical'
   const label = (item: T) => getItemLabel?.(item) ?? t.item
@@ -422,7 +424,7 @@ export function SortableList<T>({
               </HandleContext>
             </div>
           </div>,
-          document.body,
+          overlayContainer ?? document.body,
         )}
     </>
   )
