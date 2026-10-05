@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { useLocale, useMessages } from '../i18n/locale-provider'
+import type { MomiMessages } from '../i18n/messages'
 import { cn } from '../lib/cn'
 import {
   addDays,
@@ -30,8 +32,10 @@ interface CalendarBaseProps extends Omit<React.ComponentProps<'div'>, 'onSelect'
   numberOfMonths?: 1 | 2
   /** 0 = Sunday, 1 = Monday… @default 1 */
   weekStartsOn?: WeekStart
-  /** BCP 47 locale for month and weekday names, e.g. `vi-VN`. */
+  /** BCP 47 locale for month and weekday names, e.g. `vi-VN`. Defaults to `LocaleProvider`'s. */
   locale?: string
+  /** Override built-in text for this instance. */
+  labels?: Partial<MomiMessages['calendar']>
   minDate?: Date
   maxDate?: Date
   /** Return true to disable a day. */
@@ -66,7 +70,8 @@ export function Calendar(props: CalendarProps) {
     onMonthChange,
     numberOfMonths = 1,
     weekStartsOn = 1,
-    locale,
+    locale: localeProp,
+    labels,
     minDate,
     maxDate,
     isDateDisabled,
@@ -90,6 +95,9 @@ export function Calendar(props: CalendarProps) {
   void _defaultSelected
   void _onSelect
 
+  const context = useLocale()
+  const locale = localeProp ?? context.locale
+  const t = useMessages('calendar', labels)
   const isRange = props.mode === 'range'
   const today = React.useMemo(() => startOfDay(new Date()), [])
 
@@ -221,7 +229,7 @@ export function Calendar(props: CalendarProps) {
                 {index === 0 && (
                   <button
                     type="button"
-                    aria-label="Previous month"
+                    aria-label={t.previousMonth}
                     onClick={() => setMonth(addMonths(month, -1))}
                     disabled={
                       minDate !== undefined && compareDays(startOfMonth(month), minDate) <= 0
@@ -237,7 +245,7 @@ export function Calendar(props: CalendarProps) {
                 {index === months.length - 1 && (
                   <button
                     type="button"
-                    aria-label="Next month"
+                    aria-label={t.nextMonth}
                     onClick={() => setMonth(addMonths(month, 1))}
                     disabled={
                       maxDate !== undefined &&

@@ -2,6 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { Slot } from 'radix-ui'
 import type * as React from 'react'
 import { cn } from '../lib/cn'
+import { useDefaultSize } from './density-provider'
 import { Spinner } from './spinner'
 
 export const buttonVariants = cva(
@@ -27,6 +28,7 @@ export const buttonVariants = cva(
         danger: '',
       },
       size: {
+        xs: "h-6 gap-1 rounded-sm px-2 text-xs [&_svg:not([class*='size-'])]:size-3.5",
         sm: 'h-8 gap-1.5 rounded-md px-3 text-sm',
         md: 'h-9 rounded-md px-4 text-sm',
         lg: "h-11 rounded-lg px-6 text-base [&_svg:not([class*='size-'])]:size-[1.125rem]",
@@ -110,7 +112,7 @@ export interface ButtonProps extends React.ComponentProps<'button'> {
   variant?: ButtonVariant
   /** Defaults to `neutral` for `outline`/`ghost`, `primary` otherwise. */
   tone?: ButtonTone
-  /** @default 'md' */
+  /** @default 'md' (`xs` inside a compact `DensityProvider`) */
   size?: ButtonSize
   fullWidth?: boolean
   /** Render the child element (e.g. a router `<Link>`) with button styles. */
@@ -129,7 +131,7 @@ export function Button({
   className,
   variant = 'solid',
   tone,
-  size = 'md',
+  size: sizeProp,
   fullWidth,
   asChild = false,
   loading = false,
@@ -142,6 +144,7 @@ export function Button({
 }: ButtonProps) {
   const Comp = asChild ? Slot.Root : 'button'
   const isDisabled = disabled || loading
+  const size = useDefaultSize(sizeProp, { comfortable: 'md', compact: 'xs' })
 
   return (
     <Comp
@@ -159,7 +162,12 @@ export function Button({
       {...props}
     >
       {loading ? (
-        <Spinner size="sm" role={undefined} aria-label={undefined} aria-hidden />
+        <Spinner
+          size={size === 'xs' ? 'xs' : 'sm'}
+          role={undefined}
+          aria-label={undefined}
+          aria-hidden
+        />
       ) : (
         leftIcon
       )}

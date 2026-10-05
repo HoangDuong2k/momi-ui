@@ -2,6 +2,16 @@
 export { cn } from './lib/cn'
 export type { Tone } from './lib/tones'
 export type { Breakpoint, Responsive, SpaceScale } from './lib/responsive'
+export {
+  detectPlatform,
+  formatShortcut,
+  matchesShortcut,
+  parseShortcut,
+  usePlatform,
+  type Platform,
+  type Shortcut,
+  type ShortcutOptions,
+} from './lib/shortcut'
 
 // Theme
 export {
@@ -11,6 +21,29 @@ export {
   type Theme,
   type ThemeProviderProps,
 } from './theme/theme-provider'
+export {
+  getThemeScript,
+  ThemeScript,
+  type ThemeScriptOptions,
+  type ThemeScriptProps,
+} from './theme/theme-script'
+export {
+  DensityProvider,
+  useDensity,
+  type Density,
+  type DensityProviderProps,
+} from './components/density-provider'
+
+// Internationalization
+export {
+  LocaleProvider,
+  useLocale,
+  useMessages,
+  type LocaleProviderProps,
+} from './i18n/locale-provider'
+export { mergeMessages, type MomiMessages, type MomiMessagesInput } from './i18n/messages'
+export { en } from './i18n/en'
+export { vi } from './i18n/vi'
 
 // Layout
 export {
@@ -28,6 +61,22 @@ export {
 } from './components/layout'
 export { Separator, type SeparatorProps } from './components/separator'
 export { AspectRatio, type AspectRatioProps } from './components/aspect-ratio'
+export {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  type ResizableHandleProps,
+  type ResizableLayout,
+  type ResizablePanelGroupProps,
+  type ResizablePanelHandle,
+  type ResizablePanelProps,
+} from './components/resizable'
+export {
+  ScrollArea,
+  ScrollBar,
+  type ScrollAreaProps,
+  type ScrollBarProps,
+} from './components/scroll-area'
 
 // Typography
 export {
@@ -40,6 +89,7 @@ export {
   Text,
   type BlockquoteProps,
   type HeadingProps,
+  type KbdProps,
   type LinkProps,
   type TextProps,
 } from './components/typography'
@@ -55,6 +105,27 @@ export {
 } from './components/button'
 export { IconButton, type IconButtonProps } from './components/icon-button'
 export { ButtonGroup, type ButtonGroupProps } from './components/button-group'
+export {
+  ToggleGroup,
+  ToggleGroupItem,
+  toggleVariants,
+  type ToggleGroupItemProps,
+  type ToggleGroupMultipleProps,
+  type ToggleGroupProps,
+  type ToggleGroupSingleProps,
+  type ToggleGroupVariant,
+} from './components/toggle-group'
+export {
+  Toolbar,
+  ToolbarButton,
+  ToolbarGroup,
+  ToolbarLink,
+  ToolbarSeparator,
+  ToolbarToggle,
+  type ToolbarButtonProps,
+  type ToolbarProps,
+  type ToolbarToggleProps,
+} from './components/toolbar'
 
 // Forms
 export { Label, type LabelProps } from './components/label'
@@ -145,6 +216,23 @@ export {
   type DataTableRowReorderEvent,
   type DataTableSort,
 } from './components/data-table'
+export {
+  Kanban,
+  moveKanbanItem,
+  type KanbanCardContext,
+  type KanbanColumn,
+  type KanbanMoveEvent,
+  type KanbanPosition,
+  type KanbanProps,
+  type KanbanValue,
+} from './components/kanban'
+export {
+  SortableHandle,
+  SortableList,
+  type SortableItemContext,
+  type SortableListProps,
+  type SortableReorderEvent,
+} from './components/sortable-list'
 
 // Feedback
 export { Spinner, type SpinnerProps } from './components/spinner'
@@ -228,6 +316,9 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   type DropdownMenuItemProps,
+  type DropdownMenuProps,
+  type MenuPosition,
+  type MenuShortcutProps,
 } from './components/dropdown-menu'
 export {
   ContextMenu,
@@ -267,6 +358,22 @@ export {
 
 // Advanced inputs
 export { Slider, type SliderProps } from './components/slider'
+export { NumberField, parseDecimal, type NumberFieldProps } from './components/number-field'
+export {
+  ColorPicker,
+  ColorPickerPanel,
+  type ColorPickerPanelProps,
+  type ColorPickerProps,
+} from './components/color-picker'
+export {
+  formatColor,
+  hsvaToRgba,
+  parseColor,
+  rgbaToHsva,
+  toHex,
+  type Hsva,
+  type Rgba,
+} from './lib/color'
 export { InputOTP, type InputOTPProps } from './components/input-otp'
 export {
   Command,
@@ -313,9 +420,11 @@ export {
   type FileRejectionReason,
   type FileUploadProps,
 } from './components/file-upload'
+export { Lightbox, type LightboxItem, type LightboxProps } from './components/lightbox'
 
 // Landing blocks
 export { AnnouncementBar, type AnnouncementBarProps } from './blocks/announcement-bar'
+export { AppWindowFrame, type AppWindowFrameProps } from './blocks/app-window-frame'
 export {
   BackgroundPattern,
   type BackgroundFade,
@@ -324,6 +433,14 @@ export {
 } from './blocks/background-pattern'
 export { BentoCard, BentoGrid, type BentoCardProps, type BentoGridProps } from './blocks/bento'
 export { BrowserFrame, type BrowserFrameProps } from './blocks/browser-frame'
+export {
+  Changelog,
+  changelogAnchor,
+  type ChangelogChange,
+  type ChangelogChangeType,
+  type ChangelogProps,
+  type ChangelogRelease,
+} from './blocks/changelog'
 export { Cta, type CtaProps } from './blocks/cta'
 export { Faq, type FaqItem, type FaqProps } from './blocks/faq'
 export {
@@ -369,6 +486,7 @@ export {
   type TestimonialCardProps,
   type TestimonialGridProps,
 } from './blocks/testimonials'
+export { VideoPlayer, type VideoPlayerProps, type VideoSource } from './blocks/video-player'
 
 // Disclosure
 export {

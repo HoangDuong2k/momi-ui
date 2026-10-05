@@ -1,4 +1,4 @@
-import { Bold, Copy, Italic, Link2, Plus, Underline } from 'lucide-react'
+import { Bold, Copy, Italic, Link2, Plus, Redo2, Save, Underline } from 'lucide-react'
 import { Button, IconButton, Kbd, Separator, Tooltip, TooltipProvider } from '../../src'
 import { Example } from '../components/demo'
 
@@ -15,6 +15,22 @@ export default function TooltipDemo() {
           <Button variant="outline" leftIcon={<Copy />}>
             Copy link
           </Button>
+        </Tooltip>
+      </Example>
+
+      <Example
+        title="With a shortcut"
+        description="shortcut takes the keys once and shows them the way this computer writes them: ⌘S on a Mac, Ctrl+S on Windows and Linux. Redo even uses different keys per platform."
+      >
+        <Tooltip content="Save project" shortcut={['mod', 'S']}>
+          <IconButton aria-label="Save project" variant="outline">
+            <Save />
+          </IconButton>
+        </Tooltip>
+        <Tooltip content="Redo" shortcut={{ mac: 'mod+shift+z', default: 'mod+y' }}>
+          <IconButton aria-label="Redo" variant="outline">
+            <Redo2 />
+          </IconButton>
         </Tooltip>
       </Example>
 

@@ -1,6 +1,8 @@
 import { Tooltip as TooltipPrimitive } from 'radix-ui'
 import * as React from 'react'
 import { cn } from '../lib/cn'
+import type { Shortcut } from '../lib/shortcut'
+import { Kbd } from './typography'
 
 const InsideProviderContext = React.createContext(false)
 
@@ -29,6 +31,11 @@ export interface TooltipProps extends Omit<
 > {
   /** Tooltip text or content. Nothing is rendered when empty. */
   content: React.ReactNode
+  /**
+   * Keyboard shortcut shown after the content, formatted for the user's platform:
+   * `shortcut={['mod', 'S']}` → "Save project ⌘S" on a Mac, "Save project Ctrl+S" elsewhere.
+   */
+  shortcut?: Shortcut | string[]
   /** The trigger: a single element that accepts a ref (button, link, …). */
   children: React.ReactElement
   /** @default 'top' */
@@ -44,6 +51,7 @@ export interface TooltipProps extends Omit<
 /** A short label shown on hover/focus: `<Tooltip content="Copy"><IconButton … /></Tooltip>`. */
 export function Tooltip({
   content,
+  shortcut,
   children,
   side = 'top',
   align,
@@ -74,7 +82,17 @@ export function Tooltip({
             contentClassName,
           )}
         >
-          {content}
+          {shortcut ? (
+            <span className="flex items-center gap-2">
+              <span className="min-w-0">{content}</span>
+              <Kbd
+                keys={shortcut}
+                className="h-4 shrink-0 border-background/20 bg-background/10 px-1 text-[10px] text-background"
+              />
+            </span>
+          ) : (
+            content
+          )}
           {showArrow && (
             <TooltipPrimitive.Arrow width={10} height={5} className="fill-foreground" />
           )}

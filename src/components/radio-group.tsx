@@ -64,8 +64,8 @@ export function RadioGroupItem({
       id={controlId}
       aria-describedby={descriptionId}
       className={cn(
-        'peer inline-flex aspect-square size-4 shrink-0 items-center justify-center rounded-full border border-input bg-background text-primary shadow-xs',
-        'transition-[border-color,box-shadow] duration-150 outline-none dark:bg-input/30',
+        'peer inline-flex aspect-square size-4 shrink-0 items-center justify-center rounded-full border border-input bg-surface-sunken text-primary shadow-xs',
+        'transition-[border-color,box-shadow] duration-150 outline-none',
         'focus-visible:ring-[3px] focus-visible:ring-ring/40',
         'aria-invalid:border-destructive data-[state=checked]:border-primary',
         'disabled:cursor-not-allowed disabled:opacity-50',

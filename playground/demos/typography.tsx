@@ -1,4 +1,4 @@
-import { Blockquote, Code, Heading, Kbd, Link, Text } from '../../src'
+import { Blockquote, Code, formatShortcut, Heading, Kbd, Link, Text } from '../../src'
 import { Example, Row } from '../components/demo'
 
 export default function TypographyDemo() {
@@ -97,6 +97,28 @@ export default function TypographyDemo() {
         <Text>
           Open the command menu with <Kbd>⌘</Kbd> <Kbd>K</Kbd> or <Kbd>Ctrl</Kbd> <Kbd>K</Kbd>.
         </Text>
+      </Example>
+
+      <Example
+        title="Platform-aware shortcuts"
+        description="Kbd keys formats a shortcut for the visitor's OS: mod is ⌘ on Apple devices and Ctrl elsewhere. Redo and full screen use different keys per platform."
+        layout="stack"
+      >
+        <Text>
+          Save with <Kbd keys={['mod', 'S']} />, save as <Kbd keys="mod+shift+s" />, redo{' '}
+          <Kbd keys={{ mac: 'mod+shift+z', default: 'mod+y' }} />, full screen{' '}
+          <Kbd keys={{ mac: 'ctrl+mod+f', default: 'f11' }} />.
+        </Text>
+        <div className="grid gap-1 font-mono text-xs text-muted-foreground sm:grid-cols-2">
+          {(['mac', 'windows'] as const).map((platform) => (
+            <div key={platform} className="rounded-md border px-3 py-2">
+              <span className="text-foreground">{platform}</span> ·{' '}
+              {formatShortcut('mod+shift+s', { platform })} ·{' '}
+              {formatShortcut({ mac: 'mod+shift+z', default: 'mod+y' }, { platform })} ·{' '}
+              {formatShortcut('alt+enter', { platform })}
+            </div>
+          ))}
+        </div>
       </Example>
 
       <Example title="Blockquote" layout="stack">

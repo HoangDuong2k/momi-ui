@@ -1,5 +1,7 @@
 import { Popover as PopoverPrimitive } from 'radix-ui'
 import * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
+import type { MomiMessages } from '../i18n/messages'
 import { cn } from '../lib/cn'
 import { CheckIcon, ChevronsUpDownIcon, XIcon } from '../lib/icons'
 import { useControllableState } from '../lib/use-controllable-state'
@@ -13,7 +15,8 @@ import {
   CommandList,
 } from './command'
 import { useFormControlProps } from './form-field'
-import { inputVariants, type InputSize } from './input'
+import { useDefaultSize } from './density-provider'
+import { controlSizeDefaults, inputVariants, type InputSize } from './input'
 import { popAnimationClass, surfaceClass } from './internal/overlay-styles'
 
 export interface ComboboxOption {
@@ -29,12 +32,14 @@ export interface ComboboxOption {
 
 interface ComboboxBaseProps {
   options: ComboboxOption[]
-  /** @default 'Select…' */
+  /** @default messages.combobox.placeholder ('Select…') */
   placeholder?: string
-  /** @default 'Search…' */
+  /** @default messages.combobox.searchPlaceholder ('Search…') */
   searchPlaceholder?: string
-  /** @default 'No results found.' */
+  /** @default messages.combobox.empty ('No results found.') */
   emptyText?: React.ReactNode
+  /** Override built-in text for this instance. */
+  labels?: Partial<MomiMessages['combobox']>
   /** @default 'md' */
   size?: InputSize
   disabled?: boolean
@@ -70,10 +75,11 @@ export type ComboboxProps = ComboboxSingleProps | ComboboxMultipleProps
 export function Combobox(props: ComboboxProps) {
   const {
     options,
-    placeholder = 'Select…',
-    searchPlaceholder = 'Search…',
+    labels,
+    placeholder,
+    searchPlaceholder,
     emptyText,
-    size = 'md',
+    size: sizeProp,
     className,
     contentClassName,
     id,
@@ -82,6 +88,8 @@ export function Combobox(props: ComboboxProps) {
     'aria-describedby': describedBy,
     'aria-invalid': invalid,
   } = useFormControlProps(props)
+  const t = useMessages('combobox', labels)
+  const size = useDefaultSize<InputSize>(sizeProp, controlSizeDefaults)
   const [open, setOpen] = React.useState(false)
 
   const [single, setSingle] = useControllableState<string | null>({
@@ -117,19 +125,24 @@ export function Combobox(props: ComboboxProps) {
 
   const maxBadges = props.multiple ? (props.maxBadges ?? 2) : 0
   let display: React.ReactNode = (
-    <span className="truncate text-muted-foreground/70">{placeholder}</span>
+    <span className="truncate text-muted-foreground/70">{placeholder ?? t.placeholder}</span>
   )
   if (selectedOptions.length > 0) {
     if (props.multiple) {
       display = (
         <span className="flex min-w-0 flex-wrap items-center gap-1">
           {selectedOptions.slice(0, maxBadges).map((o) => (
-            <Badge key={o.value} size="sm" shape="rounded" className="max-w-32">
+            <Badge
+              key={o.value}
+              size={size === 'xs' ? 'xs' : 'sm'}
+              shape="rounded"
+              className="max-w-32"
+            >
               <span className="truncate">{o.label}</span>
             </Badge>
           ))}
           {selectedOptions.length > maxBadges && (
-            <Badge size="sm" shape="rounded" variant="outline">
+            <Badge size={size === 'xs' ? 'xs' : 'sm'} shape="rounded" variant="outline">
               +{selectedOptions.length - maxBadges}
             </Badge>
           )}
@@ -163,7 +176,13 @@ export function Combobox(props: ComboboxProps) {
           className={cn(
             inputVariants({ size }),
             'h-auto items-center justify-between gap-2 text-start',
-            size === 'sm' ? 'min-h-8 py-1' : size === 'lg' ? 'min-h-11 py-2' : 'min-h-9 py-1.5',
+            size === 'xs'
+              ? 'min-h-6 py-0.5 [&_svg]:size-3.5'
+              : size === 'sm'
+                ? 'min-h-8 py-1'
+                : size === 'lg'
+                  ? 'min-h-11 py-2'
+                  : 'min-h-9 py-1.5',
             'cursor-pointer',
             className,
           )}
@@ -174,7 +193,7 @@ export function Combobox(props: ComboboxProps) {
               <span
                 role="button"
                 tabIndex={-1}
-                aria-label="Clear selection"
+                aria-label={t.clear}
                 onPointerDown={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
@@ -202,9 +221,9 @@ export function Combobox(props: ComboboxProps) {
           )}
         >
           <Command>
-            <CommandInput placeholder={searchPlaceholder} />
+            <CommandInput placeholder={searchPlaceholder ?? t.searchPlaceholder} />
             <CommandList>
-              <CommandEmpty>{emptyText}</CommandEmpty>
+              <CommandEmpty>{emptyText ?? t.empty}</CommandEmpty>
               {[...groups.entries()].map(([group, list]) => {
                 const items = list.map((option) => {
                   const isSelected = selected.includes(option.value)

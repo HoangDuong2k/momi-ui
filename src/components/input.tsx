@@ -1,16 +1,17 @@
 import { cva } from 'class-variance-authority'
 import type * as React from 'react'
 import { cn } from '../lib/cn'
+import { useDefaultSize } from './density-provider'
 import { useFormControlProps } from './form-field'
 
-export type InputSize = 'sm' | 'md' | 'lg'
+export type InputSize = 'xs' | 'sm' | 'md' | 'lg'
 
 /** Shared look for text-like controls (Input, NativeSelect, …). */
 export const inputVariants = cva(
   [
-    'flex w-full min-w-0 rounded-md border border-input bg-background text-foreground shadow-xs',
+    'flex w-full min-w-0 rounded-md border border-input bg-surface-sunken text-foreground shadow-xs',
     'transition-[color,border-color,box-shadow] duration-150 outline-none',
-    'placeholder:text-muted-foreground/70 dark:bg-input/30',
+    'placeholder:text-muted-foreground/70',
     'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/30',
     'aria-invalid:border-destructive aria-invalid:focus-visible:ring-destructive/20',
     'read-only:focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50',
@@ -19,6 +20,7 @@ export const inputVariants = cva(
   {
     variants: {
       size: {
+        xs: 'h-6 rounded-sm px-2 text-xs file:text-xs',
         sm: 'h-8 px-2.5 text-sm',
         md: 'h-9 px-3 text-base sm:text-sm',
         lg: 'h-11 rounded-lg px-4 text-base',
@@ -30,12 +32,18 @@ export const inputVariants = cva(
   },
 )
 
-const sectionWidth: Record<InputSize, string> = { sm: 'w-8', md: 'w-9', lg: 'w-11' }
-const startPadding: Record<InputSize, string> = { sm: 'ps-8', md: 'ps-9', lg: 'ps-11' }
-const endPadding: Record<InputSize, string> = { sm: 'pe-8', md: 'pe-9', lg: 'pe-11' }
+const sectionWidth: Record<InputSize, string> = { xs: 'w-6', sm: 'w-8', md: 'w-9', lg: 'w-11' }
+const startPadding: Record<InputSize, string> = { xs: 'ps-6', sm: 'ps-8', md: 'ps-9', lg: 'ps-11' }
+const endPadding: Record<InputSize, string> = { xs: 'pe-6', sm: 'pe-8', md: 'pe-9', lg: 'pe-11' }
+
+/** Default control size at each density (Input, Select, NativeSelect, Combobox, pickers). */
+export const controlSizeDefaults = { comfortable: 'md', compact: 'xs' } as const satisfies Record<
+  string,
+  InputSize
+>
 
 export interface InputProps extends Omit<React.ComponentProps<'input'>, 'size'> {
-  /** @default 'md' */
+  /** @default 'md' (`xs` inside a compact `DensityProvider`) */
   size?: InputSize
   /** Content (usually an icon) rendered inside the input, at the start. */
   leftSection?: React.ReactNode
@@ -48,12 +56,13 @@ export interface InputProps extends Omit<React.ComponentProps<'input'>, 'size'> 
 export function Input(props: InputProps) {
   const {
     className,
-    size = 'md',
+    size: sizeProp,
     leftSection,
     rightSection,
     wrapperClassName,
     ...rest
   } = useFormControlProps(props)
+  const size = useDefaultSize<InputSize>(sizeProp, controlSizeDefaults)
 
   const input = (
     <input
@@ -73,6 +82,7 @@ export function Input(props: InputProps) {
   const section = cn(
     'pointer-events-none absolute inset-y-0 flex items-center justify-center text-muted-foreground',
     "[&_button]:pointer-events-auto [&_svg:not([class*='size-'])]:size-4",
+    size === 'xs' && "[&_svg:not([class*='size-'])]:size-3.5",
     sectionWidth[size],
   )
 

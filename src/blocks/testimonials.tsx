@@ -1,4 +1,5 @@
 import type * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
 import { StarIcon } from '../lib/icons'
 import { Avatar } from '../components/avatar'
@@ -24,10 +25,11 @@ export function StarRating({
   max?: number
   className?: string
 }) {
+  const t = useMessages('testimonials')
   return (
     <div
       role="img"
-      aria-label={`${value} out of ${max} stars`}
+      aria-label={t.rating(value, max)}
       className={cn('flex gap-0.5 text-warning', className)}
     >
       {Array.from({ length: max }, (_, i) => (

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
 import { CheckIcon, MinusIcon } from '../lib/icons'
 import { useControllableState } from '../lib/use-controllable-state'
@@ -56,14 +57,15 @@ export function BillingToggle({
     defaultValue,
     onChange: onValueChange,
   })
+  const t = useMessages('pricing')
   const options: { value: Billing; label: React.ReactNode }[] = [
-    { value: 'monthly', label: labels?.monthly ?? 'Monthly' },
-    { value: 'yearly', label: labels?.yearly ?? 'Yearly' },
+    { value: 'monthly', label: labels?.monthly ?? t.monthly },
+    { value: 'yearly', label: labels?.yearly ?? t.yearly },
   ]
   return (
     <div
       role="radiogroup"
-      aria-label="Billing period"
+      aria-label={t.billingPeriod}
       data-slot="billing-toggle"
       className={cn(
         'inline-flex items-center gap-1 rounded-full border bg-muted/60 p-1',
@@ -106,9 +108,9 @@ export interface PricingCardProps extends React.ComponentProps<'div'> {
   billing?: Billing
   /** @default '$' */
   currency?: string
-  /** @default '/mo' */
+  /** @default messages.pricing.perMonth ('/mo') */
   periodLabel?: React.ReactNode
-  /** Note shown under the price for yearly billing. @default 'billed yearly' */
+  /** Note shown under the price for yearly billing. @default messages.pricing.billedYearly */
   yearlyNote?: React.ReactNode
 }
 
@@ -116,11 +118,12 @@ export function PricingCard({
   plan,
   billing = 'monthly',
   currency = '$',
-  periodLabel = '/mo',
-  yearlyNote = 'billed yearly',
+  periodLabel,
+  yearlyNote,
   className,
   ...props
 }: PricingCardProps) {
+  const t = useMessages('pricing')
   const price = typeof plan.price === 'object' ? plan.price[billing] : plan.price
   const numeric = typeof price === 'number'
 
@@ -153,10 +156,14 @@ export function PricingCard({
           <span className="text-4xl font-semibold tracking-tight tabular-nums">
             {numeric ? `${currency}${price}` : price}
           </span>
-          {numeric && <span className="text-sm text-muted-foreground">{periodLabel}</span>}
+          {numeric && (
+            <span className="text-sm text-muted-foreground">{periodLabel ?? t.perMonth}</span>
+          )}
         </div>
         <p className="h-5 text-xs text-muted-foreground">
-          {numeric && typeof plan.price === 'object' && billing === 'yearly' ? yearlyNote : null}
+          {numeric && typeof plan.price === 'object' && billing === 'yearly'
+            ? (yearlyNote ?? t.billedYearly)
+            : null}
         </p>
       </div>
       {plan.cta && <div className="grid *:w-full">{plan.cta}</div>}
@@ -277,13 +284,14 @@ export function PricingComparison({
   className,
   ...props
 }: PricingComparisonProps) {
+  const t = useMessages('pricing')
   return (
     <div data-slot="pricing-comparison" className={className} {...props}>
       <Table hoverable={false} stickyHeader>
         <TableHeader>
           <TableRow>
             <TableHead className="w-1/3">
-              <span className="sr-only">Feature</span>
+              <span className="sr-only">{t.feature}</span>
             </TableHead>
             {plans.map((plan) => (
               <TableHead
@@ -316,12 +324,12 @@ export function PricingComparison({
                       <TableCell key={plan.id} align="center">
                         {value === true ? (
                           <CheckIcon
-                            aria-label="Included"
+                            aria-label={t.included}
                             className="mx-auto size-4 text-primary"
                           />
                         ) : value === false || value === undefined ? (
                           <MinusIcon
-                            aria-label="Not included"
+                            aria-label={t.notIncluded}
                             className="mx-auto size-4 text-muted-foreground/50"
                           />
                         ) : (

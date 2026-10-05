@@ -1,4 +1,5 @@
 import type * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
 
 const spinnerSizes = {
@@ -11,11 +12,12 @@ const spinnerSizes = {
 
 export interface SpinnerProps extends React.ComponentProps<'svg'> {
   size?: keyof typeof spinnerSizes
-  /** Accessible label announced by screen readers. @default 'Loading' */
+  /** Accessible label announced by screen readers. @default messages.common.loading ('Loading') */
   label?: string
 }
 
-export function Spinner({ size = 'md', label = 'Loading', className, ...props }: SpinnerProps) {
+export function Spinner({ size = 'md', label, className, ...props }: SpinnerProps) {
+  const t = useMessages('common')
   return (
     <svg
       data-slot="spinner"
@@ -23,7 +25,7 @@ export function Spinner({ size = 'md', label = 'Loading', className, ...props }:
       viewBox="0 0 24 24"
       fill="none"
       role="status"
-      aria-label={label}
+      aria-label={label ?? t.loading}
       className={cn('shrink-0 animate-spin', spinnerSizes[size], className)}
       {...props}
     >

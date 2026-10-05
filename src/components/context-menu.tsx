@@ -2,6 +2,7 @@ import { ContextMenu as MenuPrimitive } from 'radix-ui'
 import type * as React from 'react'
 import { cn } from '../lib/cn'
 import { CheckIcon, ChevronRightIcon } from '../lib/icons'
+import { MenuShortcut, type MenuShortcutProps } from './internal/menu-shortcut'
 import {
   menuContentClass,
   menuIndicatorClass,
@@ -9,13 +10,15 @@ import {
   menuItemClass,
   menuLabelClass,
   menuSeparatorClass,
-  menuShortcutClass,
   menuSubTriggerClass,
   popAnimationClass,
   surfaceClass,
 } from './internal/overlay-styles'
 
-/** Menu opened with right-click / long-press on its trigger area. Same API as DropdownMenu. */
+/**
+ * Menu opened with right-click / long-press on its trigger area. Same API as DropdownMenu.
+ * To open a menu from code at any point (canvas, timeline), use `DropdownMenu` with `position`.
+ */
 export function ContextMenu(props: React.ComponentProps<typeof MenuPrimitive.Root>) {
   return <MenuPrimitive.Root data-slot="context-menu" {...props} />
 }
@@ -150,14 +153,8 @@ export function ContextMenuSeparator({
   )
 }
 
-export function ContextMenuShortcut({ className, ...props }: React.ComponentProps<'span'>) {
-  return (
-    <span
-      data-slot="context-menu-shortcut"
-      className={cn(menuShortcutClass, className)}
-      {...props}
-    />
-  )
+export function ContextMenuShortcut(props: MenuShortcutProps) {
+  return <MenuShortcut slot="context-menu-shortcut" {...props} />
 }
 
 export function ContextMenuSub(props: React.ComponentProps<typeof MenuPrimitive.Sub>) {

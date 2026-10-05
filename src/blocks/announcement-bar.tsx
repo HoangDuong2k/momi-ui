@@ -1,4 +1,5 @@
 import type * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
 import { ArrowUpRightIcon, XIcon } from '../lib/icons'
 
@@ -20,6 +21,7 @@ export function AnnouncementBar({
   children,
   ...props
 }: AnnouncementBarProps) {
+  const t = useMessages('announcementBar')
   const content = (
     <>
       <span className="truncate">{children}</span>
@@ -51,7 +53,7 @@ export function AnnouncementBar({
       {onDismiss && (
         <button
           type="button"
-          aria-label="Dismiss announcement"
+          aria-label={t.dismiss}
           onClick={onDismiss}
           className="absolute end-3 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-md opacity-70 transition-opacity outline-none hover:opacity-100 focus-visible:ring-2 focus-visible:ring-current/50"
         >

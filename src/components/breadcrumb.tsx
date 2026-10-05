@@ -1,13 +1,12 @@
 import { Slot } from 'radix-ui'
 import type * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
 import { ChevronRightIcon, EllipsisIcon } from '../lib/icons'
 
-export function Breadcrumb({
-  'aria-label': ariaLabel = 'Breadcrumb',
-  ...props
-}: React.ComponentProps<'nav'>) {
-  return <nav data-slot="breadcrumb" aria-label={ariaLabel} {...props} />
+export function Breadcrumb({ 'aria-label': ariaLabel, ...props }: React.ComponentProps<'nav'>) {
+  const t = useMessages('breadcrumb')
+  return <nav data-slot="breadcrumb" aria-label={ariaLabel ?? t.nav} {...props} />
 }
 
 export function BreadcrumbList({ className, ...props }: React.ComponentProps<'ol'>) {
@@ -83,6 +82,7 @@ export function BreadcrumbSeparator({ children, className, ...props }: React.Com
 
 /** Collapsed middle items. Wrap in a DropdownMenuTrigger to reveal them. */
 export function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps<'span'>) {
+  const t = useMessages('breadcrumb')
   return (
     <span
       data-slot="breadcrumb-ellipsis"
@@ -90,7 +90,7 @@ export function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps
       {...props}
     >
       <EllipsisIcon className="size-4" />
-      <span className="sr-only">More pages</span>
+      <span className="sr-only">{t.more}</span>
     </span>
   )
 }

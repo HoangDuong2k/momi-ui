@@ -2,10 +2,11 @@ import type * as React from 'react'
 import { cn } from '../lib/cn'
 import { ChevronDownIcon } from '../lib/icons'
 import { useFormControlProps } from './form-field'
-import { inputVariants, type InputSize } from './input'
+import { useDefaultSize } from './density-provider'
+import { controlSizeDefaults, inputVariants, type InputSize } from './input'
 
 export interface NativeSelectProps extends Omit<React.ComponentProps<'select'>, 'size'> {
-  /** @default 'md' */
+  /** @default 'md' (`xs` inside a compact `DensityProvider`) */
   size?: InputSize
   /** Adds an empty, non-selectable first option. */
   placeholder?: string
@@ -16,7 +17,7 @@ export interface NativeSelectProps extends Omit<React.ComponentProps<'select'>, 
 export function NativeSelect(props: NativeSelectProps) {
   const {
     className,
-    size = 'md',
+    size: sizeProp,
     placeholder,
     wrapperClassName,
     children,
@@ -25,6 +26,7 @@ export function NativeSelect(props: NativeSelectProps) {
     multiple,
     ...rest
   } = useFormControlProps(props)
+  const size = useDefaultSize<InputSize>(sizeProp, controlSizeDefaults)
 
   // Start on the placeholder when the select is uncontrolled.
   const initialValue =
@@ -41,7 +43,8 @@ export function NativeSelect(props: NativeSelectProps) {
         multiple={multiple}
         className={cn(
           inputVariants({ size }),
-          'cursor-pointer appearance-none pe-9',
+          'cursor-pointer appearance-none',
+          size === 'xs' ? 'pe-7' : 'pe-9',
           "[&_option]:text-foreground [&:has(option[value='']:checked)]:text-muted-foreground",
           multiple && 'h-auto py-2 pe-3',
           className,
@@ -56,7 +59,12 @@ export function NativeSelect(props: NativeSelectProps) {
         {children}
       </select>
       {!multiple && (
-        <ChevronDownIcon className="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <ChevronDownIcon
+          className={cn(
+            'pointer-events-none absolute top-1/2 -translate-y-1/2 text-muted-foreground',
+            size === 'xs' ? 'end-2 size-3.5' : 'end-3 size-4',
+          )}
+        />
       )}
     </div>
   )

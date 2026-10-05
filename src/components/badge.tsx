@@ -2,6 +2,7 @@ import { Slot } from 'radix-ui'
 import type * as React from 'react'
 import { cn } from '../lib/cn'
 import { toneOutline, toneSoft, toneSolid, type Tone } from '../lib/tones'
+import { useDefaultSize } from './density-provider'
 
 const badgeVariantClasses = {
   solid: toneSolid,
@@ -10,6 +11,7 @@ const badgeVariantClasses = {
 } as const
 
 const badgeSizes = {
+  xs: 'h-4 gap-1 px-1 text-[10px] [&>svg]:size-2.5',
   sm: 'h-5 px-1.5 text-[11px]',
   md: 'h-6 px-2.5 text-xs',
 } as const
@@ -19,7 +21,7 @@ export interface BadgeProps extends React.ComponentProps<'span'> {
   variant?: keyof typeof badgeVariantClasses
   /** @default 'neutral' */
   tone?: Tone
-  /** @default 'md' */
+  /** @default 'md' (`sm` inside a compact `DensityProvider`) */
   size?: keyof typeof badgeSizes
   /** @default 'pill' */
   shape?: 'pill' | 'rounded'
@@ -32,7 +34,7 @@ export function Badge({
   className,
   variant = 'soft',
   tone = 'neutral',
-  size = 'md',
+  size: sizeProp,
   shape = 'pill',
   dot = false,
   asChild = false,
@@ -40,6 +42,7 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const Comp = asChild ? Slot.Root : 'span'
+  const size = useDefaultSize(sizeProp, { comfortable: 'md', compact: 'sm' })
   return (
     <Comp
       data-slot="badge"
@@ -55,7 +58,12 @@ export function Badge({
       )}
       {...props}
     >
-      {dot && <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-current" />}
+      {dot && (
+        <span
+          aria-hidden
+          className={cn('shrink-0 rounded-full bg-current', size === 'xs' ? 'size-1' : 'size-1.5')}
+        />
+      )}
       <Slot.Slottable>{children}</Slot.Slottable>
     </Comp>
   )

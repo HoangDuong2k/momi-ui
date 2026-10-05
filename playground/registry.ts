@@ -3,6 +3,9 @@ import AccordionDemo from './demos/accordion'
 import AlertDemo from './demos/alert'
 import AlertDialogDemo from './demos/alert-dialog'
 import AspectRatioDemo from './demos/aspect-ratio'
+import ResizableDemo from './demos/resizable'
+import ScrollAreaDemo from './demos/scroll-area'
+import ToolbarDemo from './demos/toolbar'
 import AvatarDemo from './demos/avatar'
 import BadgeDemo from './demos/badge'
 import BreadcrumbDemo from './demos/breadcrumb'
@@ -13,6 +16,9 @@ import CheckboxDemo from './demos/checkbox'
 import CollapsibleDemo from './demos/collapsible'
 import ContextMenuDemo from './demos/context-menu'
 import DataTableDemo from './demos/data-table'
+import I18nDemo from './demos/i18n'
+import KanbanDemo from './demos/kanban'
+import SortableListDemo from './demos/sortable-list'
 import DialogDemo from './demos/dialog'
 import DrawerDemo from './demos/drawer'
 import DropdownMenuDemo from './demos/dropdown-menu'
@@ -37,6 +43,7 @@ import TabsDemo from './demos/tabs'
 import TextareaDemo from './demos/textarea'
 import ToastDemo from './demos/toast'
 import TokensDemo from './demos/tokens'
+import DensityDemo from './demos/density'
 import TooltipDemo from './demos/tooltip'
 import TypographyDemo from './demos/typography'
 import ComboboxDemo from './demos/combobox'
@@ -46,6 +53,8 @@ import FileUploadDemo from './demos/file-upload'
 import InputOTPDemo from './demos/input-otp'
 import InstallationDemo from './demos/installation'
 import SliderDemo from './demos/slider'
+import ColorPickerDemo from './demos/color-picker'
+import NumberFieldDemo from './demos/number-field'
 import CtaDemo from './demos/cta'
 import EffectsDemo from './demos/effects'
 import FaqDemo from './demos/faq'
@@ -59,6 +68,8 @@ import PricingDemo from './demos/pricing'
 import StatsDemo from './demos/stats'
 import TeamDemo from './demos/team'
 import TestimonialsDemo from './demos/testimonials'
+import ChangelogDemo from './demos/changelog'
+import MediaDemo from './demos/media'
 
 export interface DemoEntry {
   id: string
@@ -97,8 +108,29 @@ export const demos: DemoEntry[] = [
     id: 'tokens',
     title: 'Design tokens',
     group: 'Getting started',
-    description: 'Colors, radius, type scale and elevation. Customize the accent and radius live.',
+    description:
+      'Colors, surfaces, radius, type scale and elevation. Customize the accent and radius live, or switch to the Studio brand theme.',
     component: TokensDemo,
+  },
+  {
+    id: 'density',
+    title: 'Density & sizes',
+    group: 'Getting started',
+    description:
+      'A compact density for dense editors: DensityProvider makes controls default to the 24px xs size.',
+    imports: ['DensityProvider'],
+    isNew: true,
+    component: DensityDemo,
+  },
+  {
+    id: 'i18n',
+    title: 'Internationalization',
+    group: 'Getting started',
+    description:
+      'Translate every built-in label with one provider — English and Vietnamese included, any other language in a typed pack.',
+    imports: ['LocaleProvider', 'vi', 'useMessages', 'type MomiMessages'],
+    isNew: true,
+    component: I18nDemo,
   },
 
   // Layout
@@ -126,6 +158,27 @@ export const demos: DemoEntry[] = [
     description: 'Display content within a fixed ratio.',
     imports: ['AspectRatio'],
     component: AspectRatioDemo,
+  },
+  {
+    id: 'resizable',
+    title: 'Resizable',
+    group: 'Layout',
+    description:
+      'Panels the user resizes by dragging or with the arrow keys — pixel or percent limits, collapsible strips and a remembered layout.',
+    imports: ['ResizablePanelGroup', 'ResizablePanel', 'ResizableHandle'],
+    isNew: true,
+    wide: true,
+    component: ResizableDemo,
+  },
+  {
+    id: 'scroll-area',
+    title: 'Scroll Area',
+    group: 'Layout',
+    description:
+      'Thin themed scrollbars that appear on hover, plus a momi-scrollbar class for plain overflow elements.',
+    imports: ['ScrollArea'],
+    isNew: true,
+    component: ScrollAreaDemo,
   },
 
   // Typography
@@ -162,6 +215,16 @@ export const demos: DemoEntry[] = [
     description: 'Join buttons into a segmented control, or space them apart.',
     imports: ['ButtonGroup'],
     component: ButtonGroupDemo,
+  },
+  {
+    id: 'toolbar',
+    title: 'Toolbar & Toggle Group',
+    group: 'Buttons',
+    description:
+      'App and timeline toolbars with arrow-key navigation, on/off toggles and toggle groups, with shortcuts in tooltips.',
+    imports: ['Toolbar', 'ToolbarButton', 'ToolbarToggle', 'ToggleGroup', 'ToggleGroupItem'],
+    isNew: true,
+    component: ToolbarDemo,
   },
 
   // Forms
@@ -240,6 +303,26 @@ export const demos: DemoEntry[] = [
     component: SliderDemo,
   },
   {
+    id: 'number-field',
+    title: 'Number Field',
+    group: 'Forms',
+    description:
+      'A number you can drag like in video and design tools — units, Shift/Alt steps, reset, format/parse and decimal commas.',
+    imports: ['NumberField'],
+    isNew: true,
+    component: NumberFieldDemo,
+  },
+  {
+    id: 'color-picker',
+    title: 'Color Picker',
+    group: 'Forms',
+    description:
+      'Saturation/brightness area, hue and opacity sliders, hex/rgba input, swatches and the screen eyedropper.',
+    imports: ['ColorPicker', 'ColorPickerPanel'],
+    isNew: true,
+    component: ColorPickerDemo,
+  },
+  {
     id: 'combobox',
     title: 'Combobox',
     group: 'Forms',
@@ -310,6 +393,27 @@ export const demos: DemoEntry[] = [
       'Columns + data in, everything else built in: sorting, resizable and pinned columns, pinned rows, sticky header/footer, grouped headers, cell spans, expandable rows, drag-to-reorder and virtual scrolling.',
     imports: ['DataTable', 'type DataTableColumnDef'],
     component: DataTableDemo,
+  },
+  {
+    id: 'kanban',
+    title: 'Kanban',
+    group: 'Data display',
+    description:
+      'A board of columns and cards: drag with mouse, touch or keyboard, WIP limits, workflow rules, collapsible columns and screen-reader announcements.',
+    imports: ['Kanban', 'type KanbanColumn', 'type KanbanValue'],
+    isNew: true,
+    wide: true,
+    component: KanbanDemo,
+  },
+  {
+    id: 'sortable-list',
+    title: 'Sortable List',
+    group: 'Data display',
+    description:
+      'Reorder a list by dragging a row or its handle — mouse, touch or keyboard, with a drop line, auto-scroll and screen-reader announcements.',
+    imports: ['SortableList', 'SortableHandle'],
+    isNew: true,
+    component: SortableListDemo,
   },
   {
     id: 'badge',
@@ -636,6 +740,27 @@ export const demos: DemoEntry[] = [
     isNew: true,
     wide: true,
     component: EffectsDemo,
+  },
+  {
+    id: 'media',
+    title: 'App window, Video & Lightbox',
+    group: 'Landing blocks',
+    description:
+      'Show a desktop app at work: window chrome for screenshots, a lazy demo video that plays in view, and a full-screen viewer for galleries.',
+    imports: ['AppWindowFrame', 'VideoPlayer', 'Lightbox'],
+    isNew: true,
+    wide: true,
+    component: MediaDemo,
+  },
+  {
+    id: 'changelog',
+    title: 'Changelog',
+    group: 'Landing blocks',
+    description: 'Release notes, newest first, with deep-linkable versions and tagged changes.',
+    imports: ['Changelog', 'type ChangelogRelease'],
+    isNew: true,
+    wide: true,
+    component: ChangelogDemo,
   },
 ]
 

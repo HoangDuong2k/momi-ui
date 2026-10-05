@@ -1,5 +1,6 @@
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import type * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
 import { XIcon } from '../lib/icons'
 import { IconButton } from './icon-button'
@@ -40,16 +41,20 @@ export interface DrawerContentProps extends React.ComponentProps<typeof DialogPr
   size?: keyof typeof drawerSizes
   /** @default true */
   showClose?: boolean
+  /** Accessible label of the close button. @default messages.common.close */
+  closeLabel?: string
 }
 
 export function DrawerContent({
   side = 'right',
   size = 'md',
   showClose = true,
+  closeLabel,
   className,
   children,
   ...props
 }: DrawerContentProps) {
+  const t = useMessages('common')
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay data-slot="drawer-overlay" className={overlayClass} />
@@ -57,7 +62,7 @@ export function DrawerContent({
         data-slot="drawer-content"
         data-side={side}
         className={cn(
-          'fixed z-50 flex flex-col bg-background shadow-xl outline-none',
+          'fixed z-50 flex flex-col bg-surface-modal shadow-xl outline-none',
           'data-[state=closed]:animate-slide-out data-[state=open]:animate-slide-in',
           drawerSides[side],
           drawerSizes[size],
@@ -72,7 +77,7 @@ export function DrawerContent({
         {showClose && (
           <DialogPrimitive.Close asChild>
             <IconButton
-              aria-label="Close"
+              aria-label={closeLabel ?? t.close}
               size="sm"
               className="absolute end-3 top-3 text-muted-foreground"
             >

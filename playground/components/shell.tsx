@@ -16,6 +16,7 @@ import {
   useTheme,
   type Theme,
 } from '../../src'
+import { useBrand } from '../lib/brand-context'
 import { useCustomizer } from '../lib/customizer-context'
 import { accents, radii } from '../lib/customizer-presets'
 import { demos, groups } from '../registry'
@@ -33,14 +34,11 @@ function SearchCommand() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="ms-2 hidden h-8 w-56 items-center gap-2 rounded-md border bg-muted/40 px-2.5 text-sm text-muted-foreground transition-colors outline-none hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring/40 md:flex"
+        className="ms-2 hidden h-8 w-56 items-center gap-2 rounded-md border bg-muted/40 px-2.5 text-sm whitespace-nowrap text-muted-foreground transition-colors outline-none hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring/40 md:flex"
       >
-        <Search className="size-4" />
-        Search components…
-        <span className="ms-auto flex gap-0.5">
-          <Kbd>⌘</Kbd>
-          <Kbd>K</Kbd>
-        </span>
+        <Search className="size-4 shrink-0" />
+        <span className="truncate">Search components…</span>
+        <Kbd keys="mod+k" className="ms-auto shrink-0" />
       </button>
       <IconButton
         aria-label="Search components"
@@ -81,7 +79,9 @@ function SearchCommand() {
 
 export function Header({ navOpen, onToggleNav }: { navOpen: boolean; onToggleNav: () => void }) {
   const { theme, setTheme } = useTheme()
-  const { accent, setAccent, radius, setRadius } = useCustomizer()
+  const { accent, setAccent, radius, setRadius, language, setLanguage } = useCustomizer()
+  const { brand, setBrand } = useBrand()
+  const studio = brand === 'studio'
   const ThemeIcon = themeIcon[theme]
   const nextTheme = themeOrder[(themeOrder.indexOf(theme) + 1) % themeOrder.length]
 
@@ -108,13 +108,23 @@ export function Header({ navOpen, onToggleNav }: { navOpen: boolean; onToggleNav
           </span>
         </a>
         <Badge size="sm" variant="outline" shape="rounded" className="hidden sm:inline-flex">
-          v0.1.0
+          v{__MOMI_VERSION__}
         </Badge>
         <SearchCommand />
 
         <div className="ms-auto flex items-center gap-2">
+          <NativeSelect
+            size="sm"
+            aria-label="Brand theme"
+            value={brand}
+            onChange={(e) => setBrand(e.target.value as 'default' | 'studio')}
+            wrapperClassName="hidden w-28 md:block"
+          >
+            <option value="default">momi</option>
+            <option value="studio">Studio</option>
+          </NativeSelect>
           <div
-            className="hidden items-center gap-1.5 lg:flex"
+            className={cn('hidden items-center gap-1.5 lg:flex', studio && 'lg:hidden')}
             role="group"
             aria-label="Accent color"
           >
@@ -139,7 +149,7 @@ export function Header({ navOpen, onToggleNav }: { navOpen: boolean; onToggleNav
             aria-label="Radius"
             value={radius}
             onChange={(e) => setRadius(e.target.value)}
-            wrapperClassName="hidden w-28 sm:block"
+            wrapperClassName={cn('hidden w-28 sm:block', studio && 'sm:hidden')}
           >
             {radii.map((r) => (
               <option key={r.value} value={r.value}>
@@ -147,11 +157,34 @@ export function Header({ navOpen, onToggleNav }: { navOpen: boolean; onToggleNav
               </option>
             ))}
           </NativeSelect>
+          <div
+            role="group"
+            aria-label="Component language"
+            className="flex h-8 items-center rounded-md border p-0.5"
+          >
+            {(['en', 'vi'] as const).map((l) => (
+              <button
+                key={l}
+                type="button"
+                aria-pressed={language === l}
+                title={l === 'en' ? 'English' : 'Tiếng Việt'}
+                onClick={() => setLanguage(l)}
+                className={cn(
+                  'h-full rounded-[calc(var(--radius)-4px)] px-2 font-mono text-xs font-medium text-muted-foreground uppercase transition-colors outline-none',
+                  'hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/40',
+                  'aria-pressed:bg-accent aria-pressed:text-foreground',
+                )}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
           <IconButton
             variant="outline"
             size="sm"
             aria-label={`Theme: ${theme}. Switch to ${nextTheme}`}
-            title={`Theme: ${theme}`}
+            title={studio ? 'Studio is dark only (forcedTheme)' : `Theme: ${theme}`}
+            disabled={studio}
             onClick={() => setTheme(nextTheme)}
           >
             <ThemeIcon />

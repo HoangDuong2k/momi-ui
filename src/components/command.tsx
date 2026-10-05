@@ -1,5 +1,7 @@
 import * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
+import { matchesShortcut, type Shortcut } from '../lib/shortcut'
 import { useControllableState } from '../lib/use-controllable-state'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from './dialog'
 import {
@@ -210,7 +212,7 @@ export function Command({
         data-slot="command"
         aria-label={label}
         className={cn(
-          'flex h-full w-full flex-col overflow-hidden rounded-xl bg-popover text-popover-foreground',
+          'flex h-full w-full flex-col overflow-hidden rounded-xl bg-surface-raised text-popover-foreground',
           className,
         )}
         onKeyDown={(e) => {
@@ -304,6 +306,7 @@ export function CommandList({ className, ...props }: React.ComponentProps<'div'>
 
 export function CommandEmpty({ className, children, ...props }: React.ComponentProps<'div'>) {
   const { visibleCount } = useCommand()
+  const t = useMessages('command')
   if (visibleCount > 0) return null
   return (
     <div
@@ -312,7 +315,7 @@ export function CommandEmpty({ className, children, ...props }: React.ComponentP
       className={cn('py-8 text-center text-sm text-muted-foreground', className)}
       {...props}
     >
-      {children ?? 'No results found.'}
+      {children ?? t.empty}
     </div>
   )
 }
@@ -435,8 +438,9 @@ export function CommandShortcut({ className, ...props }: React.ComponentProps<'s
  * -----------------------------------------------------------------------------------------------*/
 
 export interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
-  /** Accessible title (visually hidden). @default 'Command palette' */
+  /** Accessible title (visually hidden). @default messages.command.dialogTitle ('Command palette') */
   title?: string
+  /** @default messages.command.dialogDescription */
   description?: string
   commandProps?: CommandProps
   className?: string
@@ -444,22 +448,25 @@ export interface CommandDialogProps extends React.ComponentProps<typeof Dialog> 
 
 /** Command palette in a modal — open it with a shortcut such as ⌘K. */
 export function CommandDialog({
-  title = 'Command palette',
-  description = 'Search for a command to run.',
+  title,
+  description,
   commandProps,
   className,
   children,
   ...props
 }: CommandDialogProps) {
+  const t = useMessages('command')
   return (
     <Dialog {...props}>
       <DialogContent
         showClose={false}
         className={cn('top-[20%] translate-y-0 gap-0 overflow-hidden p-0 sm:max-w-lg', className)}
       >
-        <DialogTitle className="sr-only">{title}</DialogTitle>
-        <DialogDescription className="sr-only">{description}</DialogDescription>
-        <Command label={title} {...commandProps}>
+        <DialogTitle className="sr-only">{title ?? t.dialogTitle}</DialogTitle>
+        <DialogDescription className="sr-only">
+          {description ?? t.dialogDescription}
+        </DialogDescription>
+        <Command label={title ?? t.dialogTitle} {...commandProps}>
           {children}
         </Command>
       </DialogContent>
@@ -467,20 +474,28 @@ export function CommandDialog({
   )
 }
 
-/** Run `callback` on ⌘/Ctrl + `key` (default K). */
-export function useCommandShortcut(callback: () => void, key = 'k') {
+/**
+ * Run `callback` on a shortcut. A single key (default `'k'`) means ⌘ or Ctrl + that key; anything
+ * else uses the `formatShortcut` syntax, e.g. `'mod+shift+p'` or `{ mac: 'mod+shift+z', default: 'mod+y' }`.
+ */
+export function useCommandShortcut(callback: () => void, shortcut: Shortcut = 'k') {
   const latest = React.useRef(callback)
   React.useEffect(() => {
     latest.current = callback
   })
+  const singleKey = typeof shortcut === 'string' && !shortcut.includes('+') ? shortcut : null
+  const combo = singleKey ? null : JSON.stringify(shortcut)
   React.useEffect(() => {
+    const parsed: Shortcut | null = combo ? (JSON.parse(combo) as Shortcut) : null
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === key.toLowerCase() && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        latest.current()
-      }
+      const hit = parsed
+        ? matchesShortcut(e, parsed)
+        : (e.key ?? '').toLowerCase() === singleKey?.toLowerCase() && (e.metaKey || e.ctrlKey)
+      if (!hit) return
+      e.preventDefault()
+      latest.current()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [key])
+  }, [singleKey, combo])
 }

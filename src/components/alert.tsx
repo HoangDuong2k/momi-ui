@@ -1,4 +1,5 @@
 import type * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
 import { CircleAlertIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon, XIcon } from '../lib/icons'
 import { toneSoftBordered, toneText, type Tone } from '../lib/tones'
@@ -25,6 +26,8 @@ export interface AlertProps extends Omit<React.ComponentProps<'div'>, 'title'> {
   action?: React.ReactNode
   /** Shows a close button that calls this handler. */
   onClose?: () => void
+  /** Accessible label of the close button. @default messages.common.dismiss */
+  closeLabel?: string
 }
 
 /** A static callout for important, contextual messages. */
@@ -35,11 +38,13 @@ export function Alert({
   icon,
   action,
   onClose,
+  closeLabel,
   className,
   children,
   role = 'alert',
   ...props
 }: AlertProps) {
+  const t = useMessages('common')
   const DefaultIcon = defaultIcons[tone]
   return (
     <div
@@ -79,7 +84,7 @@ export function Alert({
       {action && <div className="flex shrink-0 items-center gap-2 self-center">{action}</div>}
       {onClose && (
         <IconButton
-          aria-label="Dismiss"
+          aria-label={closeLabel ?? t.dismiss}
           size="sm"
           tone={variant === 'soft' && tone === 'danger' ? 'danger' : 'neutral'}
           onClick={onClose}

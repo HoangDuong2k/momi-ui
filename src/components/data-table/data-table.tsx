@@ -1,5 +1,7 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
 import * as React from 'react'
+import { useLocale, useMessages } from '../../i18n/locale-provider'
+import type { MomiMessages } from '../../i18n/messages'
 import { cn } from '../../lib/cn'
 import {
   ArrowDownIcon,
@@ -80,7 +82,10 @@ export interface DataTableProps<T> {
   /** @default 8 */
   overscan?: number
 
+  /** @default messages.dataTable.empty ('No results.') */
   emptyState?: React.ReactNode
+  /** Override built-in text (screen-reader labels, announcements) for this instance. */
+  labels?: Partial<MomiMessages['dataTable']>
   rowClassName?: (row: T, index: number) => string | undefined
   className?: string
   containerClassName?: string
@@ -118,10 +123,10 @@ function defaultRowId(row: unknown, index: number): string {
   return String(index)
 }
 
-function renderValue(value: unknown): React.ReactNode {
+function renderValue(value: unknown, locale: string | undefined): React.ReactNode {
   if (value === null || value === undefined) return null
-  if (value instanceof Date) return value.toLocaleDateString()
-  if (typeof value === 'number') return value.toLocaleString()
+  if (value instanceof Date) return value.toLocaleDateString(locale)
+  if (typeof value === 'number') return value.toLocaleString(locale)
   if (typeof value === 'string') return value
   return String(value)
 }
@@ -185,10 +190,13 @@ export function DataTable<T>({
   estimateRowHeight,
   overscan = 8,
   emptyState,
+  labels,
   rowClassName,
   className,
   containerClassName,
 }: DataTableProps<T>) {
+  const { locale } = useLocale()
+  const t = useMessages('dataTable', labels)
   const tableId = React.useId()
   const containerRef = React.useRef<HTMLDivElement>(null)
   const tableRef = React.useRef<HTMLTableElement>(null)
@@ -366,7 +374,7 @@ export function DataTable<T>({
       from: fromEntry.index,
       to: toEntry.index,
     })
-    setAnnouncement(`Row moved to position ${toBody + 1} of ${body.length}.`)
+    setAnnouncement(t.rowMoved(toBody + 1, body.length))
   }
 
   /** Insertion index (0…body.length) for a pointer position, using the rendered rows. */
@@ -531,7 +539,7 @@ export function DataTable<T>({
           className={cn(headBase, 'px-0', pin)}
           style={style}
         >
-          <span className="sr-only">{leaf.kind === 'drag' ? 'Reorder' : 'Expand'}</span>
+          <span className="sr-only">{leaf.kind === 'drag' ? t.reorderColumn : t.expandColumn}</span>
         </th>
       )
     }
@@ -580,7 +588,7 @@ export function DataTable<T>({
           <div
             role="separator"
             aria-orientation="vertical"
-            aria-label={`Resize ${label} column`}
+            aria-label={t.resizeColumn(label)}
             aria-valuenow={leaf.width}
             aria-valuemin={leaf.minWidth}
             aria-valuemax={leaf.maxWidth}
@@ -614,10 +622,10 @@ export function DataTable<T>({
             <button
               type="button"
               data-dt-handle={entry.id}
-              aria-label="Reorder row"
+              aria-label={t.reorderRow}
               aria-describedby={`${tableId}-reorder-help`}
               disabled={!reorderEnabled}
-              title={reorderEnabled ? undefined : 'Clear sorting to reorder rows'}
+              title={reorderEnabled ? undefined : t.reorderDisabled}
               onPointerDown={(e) => onHandlePointerDown(e, entry, bodyIndex)}
               onPointerMove={(e) => updateDragOver(e.clientY)}
               onPointerUp={() => endDrag(true)}
@@ -641,7 +649,7 @@ export function DataTable<T>({
               type="button"
               aria-expanded={isExpanded}
               aria-controls={isExpanded ? `${tableId}-expanded-${entry.id}` : undefined}
-              aria-label={isExpanded ? 'Collapse row' : 'Expand row'}
+              aria-label={isExpanded ? t.collapseRow : t.expandRow}
               onClick={() => toggleExpanded(entry.id)}
               className={iconButtonClass}
             >
@@ -671,7 +679,7 @@ export function DataTable<T>({
       >
         {def.cell
           ? def.cell({ row: entry.row, rowId: entry.id, rowIndex: entry.index, value })
-          : renderValue(value)}
+          : renderValue(value, locale)}
       </td>
     )
   }
@@ -770,7 +778,7 @@ export function DataTable<T>({
     <tbody>
       <tr>
         <td colSpan={columnCount} className="h-32 px-3 text-center text-sm text-muted-foreground">
-          {emptyState ?? 'No results.'}
+          {emptyState ?? t.empty}
         </td>
       </tr>
     </tbody>
@@ -902,7 +910,7 @@ export function DataTable<T>({
       {canReorder && (
         <>
           <span id={`${tableId}-reorder-help`} className="sr-only">
-            Drag, or press arrow up or arrow down, to move the row.
+            {t.reorderHelp}
           </span>
           <div aria-live="polite" className="sr-only">
             {announcement}

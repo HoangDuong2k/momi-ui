@@ -1,13 +1,17 @@
 import { createContext, useContext } from 'react'
 
+export type Language = 'en' | 'vi'
+
 export interface CustomizerState {
   accent: string
   radius: string
+  language: Language
 }
 
 export interface CustomizerContextValue extends CustomizerState {
   setAccent: (id: string) => void
   setRadius: (value: string) => void
+  setLanguage: (language: Language) => void
 }
 
 export const CustomizerContext = createContext<CustomizerContextValue | null>(null)

@@ -1,4 +1,5 @@
 import type * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
 import { Avatar } from '../components/avatar'
 import { Reveal } from './reveal'
@@ -33,6 +34,7 @@ export function TeamGrid({
   className,
   ...props
 }: TeamGridProps) {
+  const t = useMessages('team')
   return (
     <ul
       data-slot="team-grid"
@@ -59,7 +61,7 @@ export function TeamGrid({
                   <a
                     key={link.label}
                     href={link.href}
-                    aria-label={`${member.name} on ${link.label}`}
+                    aria-label={t.socialLink(member.name, link.label)}
                     className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/40 [&_svg]:size-4"
                   >
                     {link.icon}

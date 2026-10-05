@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
+import type { MomiMessages } from '../i18n/messages'
 import { cn } from '../lib/cn'
 import { CircleAlertIcon, XIcon } from '../lib/icons'
 import { useControllableState } from '../lib/use-controllable-state'
@@ -26,8 +28,10 @@ export interface FileUploadProps extends Omit<
   maxSize?: number
   /** Max number of files in total. */
   maxFiles?: number
-  /** Main text in the dropzone. */
+  /** Main text in the dropzone. @default messages.fileUpload.label */
   label?: React.ReactNode
+  /** Override built-in text (validation messages, button labels) for this instance. */
+  labels?: Partial<MomiMessages['fileUpload']>
   /** Secondary text (accepted types, size limit…). */
   description?: React.ReactNode
   /** Upload progress (0–100) per file, e.g. from your uploader. */
@@ -124,7 +128,8 @@ export function FileUpload(props: FileUploadProps) {
     multiple = true,
     maxSize,
     maxFiles,
-    label = 'Drop files here or click to browse',
+    label,
+    labels,
     description,
     getProgress,
     showPreviews = true,
@@ -134,6 +139,7 @@ export function FileUpload(props: FileUploadProps) {
     id: idProp,
     ...inputProps
   } = useFormControlProps(props)
+  const t = useMessages('fileUpload', labels)
   const generatedId = React.useId()
   const id = idProp ?? generatedId
   const [files, setFiles] = useControllableState<File[]>({
@@ -153,12 +159,12 @@ export function FileUpload(props: FileUploadProps) {
 
     for (const file of incoming) {
       if (!matchesAccept(file, accept)) {
-        rejected.push({ file, reason: 'type', message: `${file.name}: file type not allowed.` })
+        rejected.push({ file, reason: 'type', message: t.invalidType(file.name) })
       } else if (maxSize !== undefined && file.size > maxSize) {
         rejected.push({
           file,
           reason: 'size',
-          message: `${file.name}: larger than ${formatBytes(maxSize)}.`,
+          message: t.tooLarge(file.name, formatBytes(maxSize)),
         })
       } else if (!existing.has(fileKey(file))) {
         accepted.push(file)
@@ -171,7 +177,7 @@ export function FileUpload(props: FileUploadProps) {
       rejected.push({
         file,
         reason: 'count',
-        message: `${file.name}: too many files (max ${limit}).`,
+        message: t.tooMany(file.name, limit),
       })
     }
     const next = [...base, ...accepted.slice(0, room)]
@@ -217,7 +223,7 @@ export function FileUpload(props: FileUploadProps) {
           <UploadIcon className="size-4.5 text-muted-foreground" />
         </span>
         <span className="grid gap-1">
-          <span className="text-sm font-medium">{label}</span>
+          <span className="text-sm font-medium">{label ?? t.label}</span>
           {description && (
             <span className="text-[0.8125rem] text-muted-foreground">{description}</span>
           )}
@@ -275,12 +281,12 @@ export function FileUpload(props: FileUploadProps) {
                     </span>
                   </div>
                   {progress !== undefined && progress < 100 && (
-                    <Progress value={progress} size="xs" aria-label={`Uploading ${file.name}`} />
+                    <Progress value={progress} size="xs" aria-label={t.uploading(file.name)} />
                   )}
                 </div>
                 <button
                   type="button"
-                  aria-label={`Remove ${file.name}`}
+                  aria-label={t.remove(file.name)}
                   onClick={() => removeFile(file)}
                   disabled={disabled}
                   className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/40"

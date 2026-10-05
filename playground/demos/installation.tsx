@@ -5,9 +5,27 @@ export default function InstallationDemo() {
   return (
     <div className="space-y-12">
       <Example title="1. Install" layout="stack">
-        <CodeBlock code="npm install momi-ui" />
+        <Text size="sm">
+          momi-ui isn&apos;t on npm yet. <strong>Developing side by side</strong> — point at the
+          repo and keep <Code>dist/</Code> rebuilding:
+        </Text>
+        <CodeBlock
+          code={`// your app's package.json
+"momi-ui": "file:../momi-ui"
+
+// in ../momi-ui
+npm run dev:lib   # rebuilds JS, types and CSS on every change`}
+        />
+        <Text size="sm">
+          <strong>CI and releases</strong> — install a git tag; <Code>prepare</Code> builds it on
+          install:
+        </Text>
+        <CodeBlock code={`"momi-ui": "github:HoangDuong2k/momi-ui#v0.2.0"`} />
         <Text size="sm" tone="muted">
-          Peer dependencies: <Code>react</Code> and <Code>react-dom</Code> 19+.
+          Peer dependencies: <Code>react</Code> and <Code>react-dom</Code> 19+. With{' '}
+          <Code>file:</Code>, add{' '}
+          <Code>resolve.dedupe: [&apos;react&apos;, &apos;react-dom&apos;]</Code> to your Vite
+          config.
         </Text>
       </Example>
 
@@ -23,6 +41,17 @@ export default function InstallationDemo() {
           <strong>No Tailwind</strong> — import the precompiled stylesheet once:
         </Text>
         <CodeBlock code={`import 'momi-ui/styles.css'`} />
+        <Text size="sm">
+          <strong>Existing global CSS</strong> (e.g. <Code>button {'{ … }'}</Code> rules) — put it
+          in a layer between Tailwind&apos;s base and components so it beats the reset but not
+          momi&apos;s classes:
+        </Text>
+        <CodeBlock
+          code={`@layer theme, base, legacy, components, utilities;
+@import 'tailwindcss';
+@import 'momi-ui/tailwind.css';
+@import './legacy.css' layer(legacy);`}
+        />
       </Example>
 
       <Example title="3. Providers (optional)" layout="stack">

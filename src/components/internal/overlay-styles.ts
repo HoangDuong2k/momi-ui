@@ -8,7 +8,7 @@ export const overlayClass =
 
 /** Floating panel surface (popover, menu, select, hover card). */
 export const surfaceClass =
-  'z-50 rounded-lg border bg-popover text-popover-foreground shadow-lg outline-none'
+  'z-50 rounded-lg border border-border-strong bg-surface-raised text-popover-foreground shadow-lg outline-none'
 
 /** Enter/exit animation that nudges in from the side the panel opens on. */
 export const popAnimationClass =
@@ -16,7 +16,7 @@ export const popAnimationClass =
 
 /** Centered modal panel (Dialog, AlertDialog). */
 export const modalContentClass =
-  'fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-y-auto rounded-xl border bg-background p-6 shadow-xl outline-none data-[state=open]:animate-dialog-in data-[state=closed]:animate-dialog-out'
+  'fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-y-auto rounded-xl border border-border-strong bg-surface-modal p-6 shadow-xl outline-none data-[state=open]:animate-dialog-in data-[state=closed]:animate-dialog-out'
 
 export const modalHeaderClass = 'flex flex-col gap-1.5 text-start'
 export const modalTitleClass = 'text-lg leading-tight font-semibold tracking-tight'

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
 import { MenuIcon, XIcon } from '../lib/icons'
 import { Container, type ContainerProps } from '../components/layout'
@@ -25,7 +26,7 @@ export interface NavbarProps extends Omit<React.ComponentProps<'header'>, 'child
   sticky?: boolean
   /** @default 'xl' */
   containerSize?: ContainerProps['size']
-  /** Label for the mobile menu button. @default 'Menu' */
+  /** Label for the mobile menu button. @default messages.navbar.menu ('Menu') */
   menuLabel?: string
 }
 
@@ -37,10 +38,11 @@ export function Navbar({
   variant = 'blur',
   sticky = true,
   containerSize = 'xl',
-  menuLabel = 'Menu',
+  menuLabel,
   className,
   ...props
 }: NavbarProps) {
+  const t = useMessages('navbar')
   const [open, setOpen] = React.useState(false)
   const [scrolled, setScrolled] = React.useState(false)
   const menuId = React.useId()
@@ -85,7 +87,7 @@ export function Navbar({
       <Container size={containerSize} className="flex h-16 items-center gap-6">
         <div className="flex shrink-0 items-center">{brand}</div>
         {links.length > 0 && (
-          <nav aria-label="Main" className="hidden md:block">
+          <nav aria-label={t.nav} className="hidden md:block">
             <ul className="flex items-center gap-1">
               {links.map((link, i) => (
                 <li key={i}>
@@ -110,7 +112,7 @@ export function Navbar({
         <div className="ms-auto hidden items-center gap-2 md:flex">{actions}</div>
         <button
           type="button"
-          aria-label={menuLabel}
+          aria-label={menuLabel ?? t.menu}
           aria-expanded={open}
           aria-controls={menuId}
           onClick={() => setOpen((o) => !o)}

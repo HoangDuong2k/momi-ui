@@ -1,5 +1,6 @@
 import { Avatar as AvatarPrimitive } from 'radix-ui'
 import * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
 import { UserIcon } from '../lib/icons'
 
@@ -63,6 +64,7 @@ export function Avatar({
   children,
   ...props
 }: AvatarProps) {
+  const t = useMessages('avatar')
   const label = alt ?? name
   const avatar = (
     <AvatarPrimitive.Root
@@ -104,7 +106,7 @@ export function Avatar({
       {avatar}
       <span
         role="status"
-        aria-label={status}
+        aria-label={t[status]}
         className={cn(
           'absolute end-0 bottom-0 rounded-full ring-2 ring-background',
           statusSizes[size],
@@ -134,6 +136,7 @@ export function AvatarGroup({ max, size = 'md', className, children, ...props }:
   const items = React.Children.toArray(children).filter(React.isValidElement<AvatarProps>)
   const visible = max !== undefined ? items.slice(0, max) : items
   const hidden = items.length - visible.length
+  const t = useMessages('avatar')
 
   return (
     <div
@@ -147,7 +150,7 @@ export function AvatarGroup({ max, size = 'md', className, children, ...props }:
       {...props}
     >
       {visible.map((child) => React.cloneElement(child, { size: child.props.size ?? size }))}
-      {hidden > 0 && <Avatar size={size} aria-label={`${hidden} more`} fallback={`+${hidden}`} />}
+      {hidden > 0 && <Avatar size={size} aria-label={t.more(hidden)} fallback={`+${hidden}`} />}
     </div>
   )
 }

@@ -44,6 +44,14 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.89 0 0);
   --ring: oklch(0.708 0 0);
+
+  /*
+   * Optional surface tokens for app-like themes — leave unset to keep the defaults:
+   *   --surface-sunken  fields, wells (default: background; a translucent input tint in dark mode)
+   *   --surface-raised  menus, popovers, toasts, dialogs (default: popover / background)
+   *   --border-strong   borders of raised surfaces (default: border)
+   */
+  --momi-field: var(--background);
 }
 
 .dark,
@@ -78,6 +86,8 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
+
+  --momi-field: color-mix(in oklab, var(--input) 30%, transparent);
 }
 
 @theme {
@@ -245,6 +255,10 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-surface-sunken: var(--surface-sunken, var(--momi-field));
+  --color-surface-raised: var(--surface-raised, var(--popover));
+  --color-surface-modal: var(--surface-raised, var(--background));
+  --color-border-strong: var(--border-strong, var(--border));
 
   --radius-sm: max(0px, calc(var(--radius) - 4px));
   --radius-md: max(0px, calc(var(--radius) - 2px));
@@ -278,5 +292,55 @@
 
   ::selection {
     background-color: color-mix(in oklch, var(--primary) 18%, transparent);
+  }
+}
+
+/*
+ * .momi-scrollbar — thin themed scrollbars for plain `overflow: auto` elements that can't use
+ * <ScrollArea> (e.g. a very wide timeline that sets scrollLeft itself). The thumb appears on hover
+ * or keyboard focus; add .momi-scrollbar-visible too to keep it shown. Plain CSS (not a Tailwind
+ * utility) so it ships even when no momi-ui component uses it.
+ */
+@layer components {
+  .momi-scrollbar {
+    --momi-scrollbar-thumb: color-mix(in oklab, var(--foreground) 22%, transparent);
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  .momi-scrollbar:hover,
+  .momi-scrollbar:focus-within,
+  .momi-scrollbar.momi-scrollbar-visible {
+    scrollbar-color: var(--momi-scrollbar-thumb) transparent;
+  }
+
+  /* Browsers without standard scrollbar styling (Safari) use the WebKit pseudo-elements. */
+  @supports not (scrollbar-color: auto) {
+    .momi-scrollbar::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .momi-scrollbar::-webkit-scrollbar-track,
+    .momi-scrollbar::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    .momi-scrollbar::-webkit-scrollbar-thumb {
+      border: 1px solid transparent;
+      border-radius: 9999px;
+      background-clip: padding-box;
+      background-color: transparent;
+    }
+
+    .momi-scrollbar:hover::-webkit-scrollbar-thumb,
+    .momi-scrollbar:focus-within::-webkit-scrollbar-thumb,
+    .momi-scrollbar.momi-scrollbar-visible::-webkit-scrollbar-thumb {
+      background-color: var(--momi-scrollbar-thumb);
+    }
+
+    .momi-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: color-mix(in oklab, var(--foreground) 35%, transparent);
+    }
   }
 }

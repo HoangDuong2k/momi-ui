@@ -1,5 +1,6 @@
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import type * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
 import { XIcon } from '../lib/icons'
 import { IconButton } from './icon-button'
@@ -50,6 +51,8 @@ export interface DialogContentProps extends React.ComponentProps<typeof DialogPr
   size?: keyof typeof dialogSizes
   /** Show the close button in the top corner. @default true */
   showClose?: boolean
+  /** Accessible label of the close button. @default messages.common.close */
+  closeLabel?: string
   /** Props for the portal (e.g. a custom `container`). */
   portalProps?: React.ComponentProps<typeof DialogPrimitive.Portal>
 }
@@ -57,11 +60,13 @@ export interface DialogContentProps extends React.ComponentProps<typeof DialogPr
 export function DialogContent({
   size = 'md',
   showClose = true,
+  closeLabel,
   portalProps,
   className,
   children,
   ...props
 }: DialogContentProps) {
+  const t = useMessages('common')
   return (
     <DialogPrimitive.Portal {...portalProps}>
       <DialogOverlay />
@@ -74,7 +79,7 @@ export function DialogContent({
         {showClose && (
           <DialogPrimitive.Close asChild>
             <IconButton
-              aria-label="Close"
+              aria-label={closeLabel ?? t.close}
               size="sm"
               className="absolute end-3 top-3 text-muted-foreground"
             >

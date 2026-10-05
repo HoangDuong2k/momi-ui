@@ -3,7 +3,8 @@ import type * as React from 'react'
 import { cn } from '../lib/cn'
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '../lib/icons'
 import { useFormControlProps } from './form-field'
-import { inputVariants, type InputSize } from './input'
+import { useDefaultSize } from './density-provider'
+import { controlSizeDefaults, inputVariants, type InputSize } from './input'
 import {
   menuItemClass,
   menuLabelClass,
@@ -26,12 +27,13 @@ export function SelectValue(props: React.ComponentProps<typeof SelectPrimitive.V
 }
 
 export interface SelectTriggerProps extends React.ComponentProps<typeof SelectPrimitive.Trigger> {
-  /** @default 'md' */
+  /** @default 'md' (`xs` inside a compact `DensityProvider`) */
   size?: InputSize
 }
 
 export function SelectTrigger(props: SelectTriggerProps) {
-  const { size = 'md', className, children, ...rest } = useFormControlProps(props)
+  const { size: sizeProp, className, children, ...rest } = useFormControlProps(props)
+  const size = useDefaultSize<InputSize>(sizeProp, controlSizeDefaults)
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
@@ -40,6 +42,7 @@ export function SelectTrigger(props: SelectTriggerProps) {
         'cursor-pointer items-center justify-between gap-2 text-start whitespace-nowrap',
         'data-[placeholder]:text-muted-foreground/70 *:data-[slot=select-value]:truncate',
         "[&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
+        size === 'xs' && "gap-1.5 [&_svg:not([class*='size-'])]:size-3.5",
         className,
       )}
       {...rest}

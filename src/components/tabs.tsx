@@ -1,10 +1,15 @@
 import { Tabs as TabsPrimitive } from 'radix-ui'
 import * as React from 'react'
 import { cn } from '../lib/cn'
+import { useDefaultSize } from './density-provider'
 
 type TabsVariant = 'segmented' | 'underline' | 'pills'
+type TabsSize = 'xs' | 'md'
 
-const TabsVariantContext = React.createContext<TabsVariant>('segmented')
+const TabsListContext = React.createContext<{ variant: TabsVariant; size: TabsSize }>({
+  variant: 'segmented',
+  size: 'md',
+})
 
 export function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Root>) {
   return (
@@ -27,23 +32,31 @@ export interface TabsListProps extends React.ComponentProps<typeof TabsPrimitive
   variant?: TabsVariant
   /** Stretch the list and share the width between triggers. */
   fullWidth?: boolean
+  /** @default 'md' (`xs` inside a compact `DensityProvider`) */
+  size?: TabsSize
 }
 
 export function TabsList({
   variant = 'segmented',
   fullWidth = false,
+  size: sizeProp,
   className,
   ...props
 }: TabsListProps) {
+  const size = useDefaultSize(sizeProp, { comfortable: 'md', compact: 'xs' })
+  const context = React.useMemo(() => ({ variant, size }), [variant, size])
   return (
-    <TabsVariantContext value={variant}>
+    <TabsListContext value={context}>
       <TabsPrimitive.List
         data-slot="tabs-list"
         data-variant={variant}
+        data-size={size}
         className={cn(
           'shrink-0 text-muted-foreground',
           'data-[orientation=vertical]:h-fit data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch',
           listVariants[variant],
+          size === 'xs' && variant === 'segmented' && 'gap-0.5 rounded-md p-0.5',
+          size === 'xs' && variant === 'underline' && 'gap-4',
           variant === 'underline' &&
             'data-[orientation=vertical]:w-48 data-[orientation=vertical]:gap-0 data-[orientation=vertical]:border-e data-[orientation=vertical]:border-b-0',
           fullWidth && 'w-full *:flex-1',
@@ -51,8 +64,14 @@ export function TabsList({
         )}
         {...props}
       />
-    </TabsVariantContext>
+    </TabsListContext>
   )
+}
+
+const triggerXs: Record<TabsVariant, string> = {
+  segmented: "h-6 rounded-sm px-2 text-xs [&_svg:not([class*='size-'])]:size-3.5",
+  underline: "h-8 text-xs [&_svg:not([class*='size-'])]:size-3.5",
+  pills: "h-6 px-2.5 text-xs [&_svg:not([class*='size-'])]:size-3.5",
 }
 
 const triggerVariants: Record<TabsVariant, string> = {
@@ -68,7 +87,7 @@ export function TabsTrigger({
   className,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
-  const variant = React.useContext(TabsVariantContext)
+  const { variant, size } = React.useContext(TabsListContext)
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
@@ -78,6 +97,7 @@ export function TabsTrigger({
         'focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50',
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         triggerVariants[variant],
+        size === 'xs' && triggerXs[variant],
         className,
       )}
       {...props}

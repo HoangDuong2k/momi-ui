@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useLocale } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
 
 export interface NumberTickerProps extends Omit<
@@ -12,6 +13,7 @@ export interface NumberTickerProps extends Omit<
   duration?: number
   /** Fraction digits. @default 0 */
   decimals?: number
+  /** BCP 47 locale for number formatting. Defaults to `LocaleProvider`'s. */
   locale?: string
   formatOptions?: Intl.NumberFormatOptions
   prefix?: React.ReactNode
@@ -26,13 +28,15 @@ export function NumberTicker({
   from = 0,
   duration = 1600,
   decimals = 0,
-  locale,
+  locale: localeProp,
   formatOptions,
   prefix,
   suffix,
   className,
   ...props
 }: NumberTickerProps) {
+  const context = useLocale()
+  const locale = localeProp ?? context.locale
   const ref = React.useRef<HTMLSpanElement>(null)
   const [phase, setPhase] = React.useState<Phase>('idle')
   const [current, setCurrent] = React.useState(from)

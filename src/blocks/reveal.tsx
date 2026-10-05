@@ -55,7 +55,20 @@ export interface RevealProps extends React.ComponentProps<'div'> {
   asChild?: boolean
 }
 
-/** Fades and slides its content in when scrolled into view. Respects reduced motion. */
+const noopSubscribe = () => () => {}
+const useIsomorphicLayoutEffect =
+  typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect
+
+function isInViewport(el: Element) {
+  const rect = el.getBoundingClientRect()
+  return rect.top < window.innerHeight && rect.bottom > 0
+}
+
+/**
+ * Fades and slides its content in when scrolled into view. Respects reduced motion.
+ * Progressive: the content is visible without JavaScript (static / server-rendered pages) and is
+ * only hidden for the animation once the component runs in the browser.
+ */
 export function Reveal({
   delay = 0,
   y = 16,
@@ -71,14 +84,34 @@ export function Reveal({
     rootMargin: '0px 0px -8% 0px',
   })
   const Comp = asChild ? Slot.Root : 'div'
+  const ownRef = React.useRef<HTMLDivElement>(null)
+  // True when this first render hydrates server HTML (the content has already been painted).
+  const hydrating = React.useSyncExternalStore(
+    noopSubscribe,
+    () => false,
+    () => true,
+  )
+  const hydratedRef = React.useRef(hydrating)
+
+  // Arm the hidden state before paint — except for content the server already showed on screen,
+  // which would otherwise flash out and back in during hydration.
+  useIsomorphicLayoutEffect(() => {
+    const el = ownRef.current
+    if (!el || (hydratedRef.current && isInViewport(el))) return
+    // Reduced motion: never hide, never animate.
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    el.dataset.armed = ''
+  }, [])
+
   return (
     <Comp
-      ref={mergeRefs(inViewRef, ref)}
+      ref={mergeRefs(inViewRef, ownRef, ref)}
       data-slot="reveal"
       data-visible={inView || undefined}
       className={cn(
-        'translate-y-(--reveal-y) opacity-0 transition-[opacity,translate] duration-700 ease-out-soft',
-        'data-visible:translate-y-0 data-visible:opacity-100',
+        'transition-[opacity,translate] duration-700 ease-out-soft',
+        'data-armed:translate-y-(--reveal-y) data-armed:opacity-0',
+        'data-armed:data-visible:translate-y-0 data-armed:data-visible:opacity-100',
         'motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none',
         className,
       )}

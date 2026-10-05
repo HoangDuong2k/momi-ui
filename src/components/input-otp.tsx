@@ -142,7 +142,7 @@ export function InputOTP(props: InputOTPProps) {
                     data-active={active || undefined}
                     data-filled={char !== undefined || undefined}
                     className={cn(
-                      'relative -ms-px flex items-center justify-center border border-input bg-background font-medium tabular-nums shadow-xs transition-[border-color,box-shadow] first:ms-0 first:rounded-s-md last:rounded-e-md dark:bg-input/30',
+                      'relative -ms-px flex items-center justify-center border border-input bg-surface-sunken font-medium tabular-nums shadow-xs transition-[border-color,box-shadow] first:ms-0 first:rounded-s-md last:rounded-e-md',
                       'data-[active]:z-10 data-[active]:border-ring data-[active]:ring-[3px] data-[active]:ring-ring/30',
                       'group-data-[invalid]/otp:border-destructive',
                       slotSizes[size],

@@ -1,6 +1,7 @@
 import { Check } from 'lucide-react'
-import { cn, Heading, Text } from '../../src'
-import { Example } from '../components/demo'
+import { Button, cn, Code, Heading, Text } from '../../src'
+import { CodeBlock, Example } from '../components/demo'
+import { useBrand } from '../lib/brand-context'
 import { useCustomizer } from '../lib/customizer-context'
 import { accents, radii } from '../lib/customizer-presets'
 
@@ -19,10 +20,77 @@ const colorTokens = [
 
 const lineTokens = ['border', 'input', 'ring'] as const
 
+const surfaceTokens = [
+  ['surface-sunken', 'Fields and wells (inputs, timeline)'],
+  ['surface-raised', 'Menus, popovers, toasts, dialogs'],
+  ['border-strong', 'Borders of raised surfaces'],
+] as const
+
+const studioCss = `/* Warm dark desktop theme — tokens only, no component overrides */
+:root {
+  --radius: 0.375rem;
+  --font-sans: 'Hanken Grotesk Variable', system-ui, sans-serif;
+  --background: #131211;   --foreground: #ece9e4;
+  --card: #191816;         --popover: #211f1d;
+  --muted: #211f1d;        --muted-foreground: #8e897f;
+  --accent: #2b2926;       --secondary: #2b2926;
+  --primary: #e3a04a;      --primary-foreground: #1c1407;
+  --border: #2a2825;       --input: #3b3834;   --ring: #e3a04a;
+  /* optional surfaces */
+  --surface-sunken: #0f0e0d;
+  --surface-raised: #211f1d;
+  --border-strong: #3b3834;
+}
+
+<ThemeProvider forcedTheme="dark">…</ThemeProvider>`
+
+function BrandTheme() {
+  const { brand, setBrand } = useBrand()
+  return (
+    <Example
+      title="Brand theme"
+      description="momi-ui doesn't have to look like the default. Overriding a handful of tokens re-themes every component — including menus, popovers and toasts rendered in portals."
+      layout="stack"
+    >
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          variant={brand === 'studio' ? 'outline' : 'solid'}
+          onClick={() => setBrand(brand === 'studio' ? 'default' : 'studio')}
+        >
+          {brand === 'studio' ? 'Back to the default theme' : 'Try the Studio theme'}
+        </Button>
+        <Text size="sm" tone="muted">
+          Studio is dark-only, so the playground passes <Code>forcedTheme=&quot;dark&quot;</Code> to{' '}
+          <Code>ThemeProvider</Code>.
+        </Text>
+      </div>
+      <CodeBlock code={studioCss} />
+      <div className="grid gap-3 sm:grid-cols-3">
+        {surfaceTokens.map(([token, use]) => (
+          <div key={token} className="grid gap-2">
+            <div
+              className="h-14 rounded-lg border"
+              style={
+                token === 'border-strong'
+                  ? { borderColor: 'var(--color-border-strong)', borderWidth: 2 }
+                  : { background: `var(--color-${token})` }
+              }
+            />
+            <span className="font-mono text-xs">--{token}</span>
+            <span className="text-xs text-muted-foreground">{use}</span>
+          </div>
+        ))}
+      </div>
+    </Example>
+  )
+}
+
 export default function TokensDemo() {
   return (
     <div className="space-y-12">
       <Customizer />
+
+      <BrandTheme />
 
       <Example
         title="Colors"

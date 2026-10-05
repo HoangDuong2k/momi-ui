@@ -1,4 +1,6 @@
 import type * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
+import type { MomiMessages } from '../i18n/messages'
 import { cn } from '../lib/cn'
 import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from '../lib/icons'
 import { useControllableState } from '../lib/use-controllable-state'
@@ -63,7 +65,11 @@ export interface PaginationProps extends Omit<React.ComponentProps<'nav'>, 'onCh
   size?: 'sm' | 'md'
   /** Hide the "Previous"/"Next" text on the arrow buttons. */
   compact?: boolean
-  labels?: { previous?: string; next?: string; nav?: string }
+  /**
+   * Override built-in text for this instance (see `LocaleProvider` for app-wide text).
+   * `previous` / `next` also label the arrow buttons unless `previousPage` / `nextPage` are set.
+   */
+  labels?: Partial<MomiMessages['pagination']>
 }
 
 export function Pagination({
@@ -89,11 +95,12 @@ export function Pagination({
     if (clamped !== current) setPage(clamped)
   }
   const square = size === 'sm' ? 'size-8 px-0' : 'size-9 px-0'
+  const t = useMessages('pagination', labels)
 
   return (
     <nav
       data-slot="pagination"
-      aria-label={labels?.nav ?? 'Pagination'}
+      aria-label={t.nav}
       className={cn('flex justify-center', className)}
       {...props}
     >
@@ -102,13 +109,13 @@ export function Pagination({
           <Button
             variant="ghost"
             size={size}
-            aria-label={labels?.previous ?? 'Previous page'}
+            aria-label={labels?.previousPage ?? labels?.previous ?? t.previousPage}
             disabled={current <= 1}
             onClick={() => go(current - 1)}
             leftIcon={<ChevronLeftIcon className="rtl:rotate-180" />}
             className={cn(compact ? square : 'ps-2.5')}
           >
-            {!compact && <span className="hidden sm:inline">{labels?.previous ?? 'Previous'}</span>}
+            {!compact && <span className="hidden sm:inline">{t.previous}</span>}
           </Button>
         </li>
         {getPaginationRange(current, pageCount, siblings, boundaries).map((item) =>
@@ -118,7 +125,7 @@ export function Pagination({
                 variant={item === current ? 'outline' : 'ghost'}
                 size={size}
                 aria-current={item === current ? 'page' : undefined}
-                aria-label={`Page ${item}`}
+                aria-label={t.page(item)}
                 onClick={() => go(item)}
                 className={cn(square, 'tabular-nums', item === current && 'pointer-events-none')}
               >
@@ -139,13 +146,13 @@ export function Pagination({
           <Button
             variant="ghost"
             size={size}
-            aria-label={labels?.next ?? 'Next page'}
+            aria-label={labels?.nextPage ?? labels?.next ?? t.nextPage}
             disabled={current >= pageCount}
             onClick={() => go(current + 1)}
             rightIcon={<ChevronRightIcon className="rtl:rotate-180" />}
             className={cn(compact ? square : 'pe-2.5')}
           >
-            {!compact && <span className="hidden sm:inline">{labels?.next ?? 'Next'}</span>}
+            {!compact && <span className="hidden sm:inline">{t.next}</span>}
           </Button>
         </li>
       </ul>

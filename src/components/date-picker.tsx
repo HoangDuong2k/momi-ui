@@ -1,12 +1,15 @@
 import { Popover as PopoverPrimitive } from 'radix-ui'
 import * as React from 'react'
+import { useLocale, useMessages } from '../i18n/locale-provider'
+import type { MomiMessages } from '../i18n/messages'
 import { cn } from '../lib/cn'
 import type { WeekStart } from '../lib/date'
 import { XIcon } from '../lib/icons'
 import { useControllableState } from '../lib/use-controllable-state'
 import { Calendar, type DateRange } from './calendar'
 import { useFormControlProps } from './form-field'
-import { inputVariants, type InputSize } from './input'
+import { useDefaultSize } from './density-provider'
+import { controlSizeDefaults, inputVariants, type InputSize } from './input'
 import { popAnimationClass, surfaceClass } from './internal/overlay-styles'
 
 function CalendarIcon(props: React.ComponentProps<'svg'>) {
@@ -29,9 +32,13 @@ function CalendarIcon(props: React.ComponentProps<'svg'>) {
 }
 
 interface PickerBaseProps {
+  /** @default messages.datePicker.placeholder / rangePlaceholder */
   placeholder?: string
-  /** @default 'md' */
+  /** Override built-in text for this instance. */
+  labels?: Partial<MomiMessages['datePicker']>
+  /** @default 'md' (`xs` inside a compact `DensityProvider`) */
   size?: InputSize
+  /** BCP 47 locale for the calendar and trigger text. Defaults to `LocaleProvider`'s. */
   locale?: string
   /** Intl options for the trigger text. @default { dateStyle: 'medium' } */
   formatOptions?: Intl.DateTimeFormatOptions
@@ -54,6 +61,7 @@ function PickerTrigger({
   size,
   text,
   placeholder,
+  clearLabel,
   onClear,
   open,
   ...props
@@ -61,6 +69,7 @@ function PickerTrigger({
   size: InputSize
   text: string | null
   placeholder: string
+  clearLabel: string
   onClear?: () => void
   open: boolean
 } & Pick<
@@ -85,14 +94,16 @@ function PickerTrigger({
         {...rest}
       >
         <span className="flex min-w-0 items-center gap-2">
-          <CalendarIcon className="size-4 shrink-0 text-muted-foreground" />
+          <CalendarIcon
+            className={cn('shrink-0 text-muted-foreground', size === 'xs' ? 'size-3.5' : 'size-4')}
+          />
           <span className="truncate">{text ?? placeholder}</span>
         </span>
         {text && onClear && (
           <span
             role="button"
             tabIndex={-1}
-            aria-label="Clear date"
+            aria-label={clearLabel}
             onPointerDown={(e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -142,9 +153,10 @@ export function DatePicker(props: DatePickerProps) {
     value,
     defaultValue = null,
     onValueChange,
-    placeholder = 'Pick a date',
-    size = 'md',
-    locale,
+    placeholder,
+    labels,
+    size: sizeProp,
+    locale: localeProp,
     formatOptions = { dateStyle: 'medium' },
     weekStartsOn,
     minDate,
@@ -154,6 +166,10 @@ export function DatePicker(props: DatePickerProps) {
     ...triggerProps
   } = useFormControlProps(props)
   const [open, setOpen] = React.useState(false)
+  const context = useLocale()
+  const locale = localeProp ?? context.locale
+  const size = useDefaultSize<InputSize>(sizeProp, controlSizeDefaults)
+  const t = useMessages('datePicker', labels)
   const [date, setDate] = useControllableState<Date | null>({
     value,
     defaultValue,
@@ -166,7 +182,8 @@ export function DatePicker(props: DatePickerProps) {
       <PickerTrigger
         size={size}
         text={text}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t.placeholder}
+        clearLabel={t.clear}
         open={open}
         onClear={clearable ? () => setDate(null) : undefined}
         {...triggerProps}
@@ -207,9 +224,10 @@ export function DateRangePicker(props: DateRangePickerProps) {
     value,
     defaultValue = {},
     onValueChange,
-    placeholder = 'Pick a date range',
-    size = 'md',
-    locale,
+    placeholder,
+    labels,
+    size: sizeProp,
+    locale: localeProp,
     formatOptions = { dateStyle: 'medium' },
     weekStartsOn,
     minDate,
@@ -220,6 +238,10 @@ export function DateRangePicker(props: DateRangePickerProps) {
     ...triggerProps
   } = useFormControlProps(props)
   const [open, setOpen] = React.useState(false)
+  const context = useLocale()
+  const locale = localeProp ?? context.locale
+  const size = useDefaultSize<InputSize>(sizeProp, controlSizeDefaults)
+  const t = useMessages('datePicker', labels)
   const [range, setRange] = useControllableState<DateRange>({
     value,
     defaultValue,
@@ -237,7 +259,8 @@ export function DateRangePicker(props: DateRangePickerProps) {
       <PickerTrigger
         size={size}
         text={text}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t.rangePlaceholder}
+        clearLabel={t.clear}
         open={open}
         onClear={clearable ? () => setRange({}) : undefined}
         {...triggerProps}

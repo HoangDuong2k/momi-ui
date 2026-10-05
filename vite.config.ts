@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8')) as {
+  version: string
   dependencies?: Record<string, string>
   peerDependencies?: Record<string, string>
 }
@@ -18,11 +19,14 @@ const isExternal = (id: string) =>
   externalDeps.some((dep) => id === dep || id.startsWith(`${dep}/`))
 
 export default defineConfig(({ command, mode }) => {
-  // `vite` → playground dev server, `vite build` → library, `vite build --mode playground` → static playground
+  // `vite` → playground dev server, `vite build` → library, `vite build --mode playground` → static playground,
+  // `vite build --watch --mode watch` → library rebuilds for `npm run dev:lib`
   const isLibraryBuild = command === 'build' && mode !== 'playground'
 
   return {
     plugins: [react(), tailwindcss()],
+    // The playground shows the package version (playground/env.d.ts declares it).
+    define: { __MOMI_VERSION__: JSON.stringify(pkg.version) },
     build: isLibraryBuild
       ? {
           lib: {
@@ -39,7 +43,8 @@ export default defineConfig(({ command, mode }) => {
           },
           sourcemap: true,
           copyPublicDir: false,
-          emptyOutDir: true,
+          // In watch mode the type declarations and CSS are written by other watchers — keep them.
+          emptyOutDir: mode !== 'watch',
         }
       : {
           outDir: 'playground-dist',

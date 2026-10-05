@@ -1,7 +1,9 @@
 import { cva } from 'class-variance-authority'
 import { Slot } from 'radix-ui'
 import type * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
+import { formatShortcut, usePlatform, type Shortcut } from '../lib/shortcut'
 import { ArrowUpRightIcon } from '../lib/icons'
 import { toneText, type Tone } from '../lib/tones'
 
@@ -214,17 +216,33 @@ export function Code({ className, ...props }: React.ComponentProps<'code'>) {
   )
 }
 
-export function Kbd({ className, ...props }: React.ComponentProps<'kbd'>) {
+export interface KbdProps extends React.ComponentProps<'kbd'> {
+  /**
+   * A shortcut formatted for the user's platform instead of `children`:
+   * `keys={['mod', 'S']}` (or `'mod+s'`) shows "⌘S" on Apple devices and "Ctrl+S" elsewhere.
+   */
+  keys?: Shortcut | string[]
+}
+
+export function Kbd({ keys, className, children, ...props }: KbdProps) {
+  const platform = usePlatform()
+  const names = useMessages('shortcut')
+  const shortcut = Array.isArray(keys) ? keys.join('+') : keys
   return (
     <kbd
       data-slot="kbd"
+      aria-label={
+        shortcut ? formatShortcut(shortcut, { platform, spoken: true, names }) : undefined
+      }
       className={cn(
         'pointer-events-none inline-flex h-5 min-w-5 items-center justify-center gap-0.5 rounded-[5px] border border-b-2 bg-muted px-1.5',
         'font-sans text-[11px] font-medium text-muted-foreground select-none',
         className,
       )}
       {...props}
-    />
+    >
+      {shortcut ? formatShortcut(shortcut, { platform }) : children}
+    </kbd>
   )
 }
 

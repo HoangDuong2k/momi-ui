@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
 import { CircleCheckIcon } from '../lib/icons'
 import { Button } from '../components/button'
@@ -10,11 +11,11 @@ export interface NewsletterFormProps extends Omit<
 > {
   /** Called with a valid email. Throw / reject to show an error. */
   onSubscribe: (email: string) => void | Promise<void>
-  /** @default 'you@company.com' */
+  /** @default messages.newsletter.placeholder ('you@company.com') */
   placeholder?: string
-  /** @default 'Subscribe' */
+  /** @default messages.newsletter.subscribe ('Subscribe') */
   buttonLabel?: React.ReactNode
-  /** @default 'Thanks! Check your inbox to confirm.' */
+  /** @default messages.newsletter.success */
   successMessage?: React.ReactNode
   /** Small print under the form. */
   note?: React.ReactNode
@@ -29,14 +30,15 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 /** Email capture with validation, loading, success and error states. */
 export function NewsletterForm({
   onSubscribe,
-  placeholder = 'you@company.com',
-  buttonLabel = 'Subscribe',
-  successMessage = 'Thanks! Check your inbox to confirm.',
+  placeholder,
+  buttonLabel,
+  successMessage,
   note,
   size = 'md',
   className,
   ...props
 }: NewsletterFormProps) {
+  const t = useMessages('newsletter')
   const [email, setEmail] = React.useState('')
   const [status, setStatus] = React.useState<Status>('idle')
   const [error, setError] = React.useState<string | null>(null)
@@ -45,7 +47,7 @@ export function NewsletterForm({
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!EMAIL.test(email.trim())) {
-      setError('Enter a valid email address.')
+      setError(t.invalidEmail)
       setStatus('error')
       return
     }
@@ -55,7 +57,7 @@ export function NewsletterForm({
       await onSubscribe(email.trim())
       setStatus('success')
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
+      setError(e instanceof Error ? e.message : t.error)
       setStatus('error')
     }
   }
@@ -68,7 +70,7 @@ export function NewsletterForm({
         className={cn('flex items-center gap-2 text-sm font-medium text-success', className)}
       >
         <CircleCheckIcon className="size-4" />
-        {successMessage}
+        {successMessage ?? t.success}
       </div>
     )
   }
@@ -86,8 +88,8 @@ export function NewsletterForm({
           type="email"
           name="email"
           autoComplete="email"
-          aria-label="Email address"
-          placeholder={placeholder}
+          aria-label={t.email}
+          placeholder={placeholder ?? t.placeholder}
           value={email}
           onChange={(e) => {
             setEmail(e.target.value)
@@ -99,7 +101,7 @@ export function NewsletterForm({
           className="flex-1"
         />
         <Button type="submit" size={size} loading={status === 'loading'} className="shrink-0">
-          {buttonLabel}
+          {buttonLabel ?? t.subscribe}
         </Button>
       </div>
       {error ? (

@@ -2,23 +2,26 @@ import { Switch as SwitchPrimitive } from 'radix-ui'
 import * as React from 'react'
 import { cn } from '../lib/cn'
 import { joinIds } from '../lib/ids'
+import { useDefaultSize } from './density-provider'
 import { useFormControlProps } from './form-field'
 import { ChoiceLabel } from './internal/choice-label'
 
 const trackSizes = {
+  xs: 'h-3.5 w-6',
   sm: 'h-4 w-7',
   md: 'h-5 w-9',
   lg: 'h-6 w-11',
 } as const
 
 const thumbSizes = {
+  xs: 'size-2.5 data-[state=checked]:translate-x-2.5 rtl:data-[state=checked]:-translate-x-2.5',
   sm: 'size-3 data-[state=checked]:translate-x-3 rtl:data-[state=checked]:-translate-x-3',
   md: 'size-4 data-[state=checked]:translate-x-4 rtl:data-[state=checked]:-translate-x-4',
   lg: 'size-5 data-[state=checked]:translate-x-5 rtl:data-[state=checked]:-translate-x-5',
 } as const
 
 export interface SwitchProps extends React.ComponentProps<typeof SwitchPrimitive.Root> {
-  /** @default 'md' */
+  /** @default 'md' (`sm` inside a compact `DensityProvider`) */
   size?: keyof typeof trackSizes
   label?: React.ReactNode
   description?: React.ReactNode
@@ -28,13 +31,14 @@ export interface SwitchProps extends React.ComponentProps<typeof SwitchPrimitive
 export function Switch(props: SwitchProps) {
   const {
     className,
-    size = 'md',
+    size: sizeProp,
     label,
     description,
     wrapperClassName,
     id,
     ...rest
   } = useFormControlProps(props)
+  const size = useDefaultSize(sizeProp, { comfortable: 'md', compact: 'sm' })
   const generatedId = React.useId()
   const controlId = id ?? (label || description ? generatedId : undefined)
   const descriptionId = description ? `${controlId}-description` : undefined

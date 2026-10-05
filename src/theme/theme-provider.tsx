@@ -4,10 +4,12 @@ export type Theme = 'light' | 'dark' | 'system'
 export type ResolvedTheme = 'light' | 'dark'
 
 interface ThemeContextValue {
-  /** The user's choice, possibly `system`. */
+  /** The user's choice, possibly `system` (the forced theme while `forcedTheme` is set). */
   theme: Theme
   /** The theme actually applied to the document. */
   resolvedTheme: ResolvedTheme
+  /** Set when the provider ignores the user's choice. */
+  forcedTheme?: ResolvedTheme
   setTheme: (theme: Theme) => void
 }
 
@@ -15,6 +17,13 @@ const ThemeContext = React.createContext<ThemeContextValue | null>(null)
 
 const MEDIA = '(prefers-color-scheme: dark)'
 const THEMES: Theme[] = ['light', 'dark', 'system']
+
+/** Defaults shared with `ThemeScript`, so both read and apply the theme the same way. */
+export const themeDefaults = {
+  storageKey: 'momi-theme',
+  defaultTheme: 'system',
+  attribute: 'class',
+} as const
 
 function getSystemTheme(): ResolvedTheme {
   if (typeof window === 'undefined' || !window.matchMedia) return 'light'
@@ -51,17 +60,23 @@ export interface ThemeProviderProps {
   attribute?: 'class' | 'data-theme'
   /** @default true */
   disableTransitionOnChange?: boolean
+  /**
+   * Always apply this theme — e.g. a dark-only desktop app. The system preference is ignored and
+   * nothing is read from or written to storage.
+   */
+  forcedTheme?: ResolvedTheme
 }
 
 export function ThemeProvider({
   children,
-  defaultTheme = 'system',
-  storageKey = 'momi-theme',
-  attribute = 'class',
+  defaultTheme = themeDefaults.defaultTheme,
+  storageKey = themeDefaults.storageKey,
+  attribute = themeDefaults.attribute,
   disableTransitionOnChange = true,
+  forcedTheme,
 }: ThemeProviderProps) {
   const [theme, setThemeState] = React.useState<Theme>(() =>
-    storageKey && typeof window !== 'undefined'
+    storageKey && !forcedTheme && typeof window !== 'undefined'
       ? readStoredTheme(storageKey, defaultTheme)
       : defaultTheme,
   )
@@ -75,7 +90,7 @@ export function ThemeProvider({
     return () => mql.removeEventListener('change', onChange)
   }, [])
 
-  const resolvedTheme: ResolvedTheme = theme === 'system' ? systemTheme : theme
+  const resolvedTheme: ResolvedTheme = forcedTheme ?? (theme === 'system' ? systemTheme : theme)
 
   React.useEffect(() => {
     const root = document.documentElement
@@ -93,19 +108,19 @@ export function ThemeProvider({
   const setTheme = React.useCallback(
     (next: Theme) => {
       setThemeState(next)
-      if (!storageKey) return
+      if (!storageKey || forcedTheme) return
       try {
         window.localStorage.setItem(storageKey, next)
       } catch {
         // Storage can be unavailable (private mode, blocked cookies) — theme still applies.
       }
     },
-    [storageKey],
+    [storageKey, forcedTheme],
   )
 
   const value = React.useMemo(
-    () => ({ theme, resolvedTheme, setTheme }),
-    [theme, resolvedTheme, setTheme],
+    () => ({ theme: forcedTheme ?? theme, resolvedTheme, forcedTheme, setTheme }),
+    [theme, resolvedTheme, forcedTheme, setTheme],
   )
 
   return <ThemeContext value={value}>{children}</ThemeContext>

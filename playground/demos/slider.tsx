@@ -57,6 +57,20 @@ export default function SliderDemo() {
 
       <Example title="Vertical">
         <div className="flex h-44 gap-8">
+          <Slider
+            orientation="vertical"
+            min={-12}
+            max={12}
+            defaultValue={[4]}
+            origin={0}
+            resetValue={0}
+            marks={[
+              { value: 12, label: '+12' },
+              { value: 0, label: '0 dB' },
+              { value: -12, label: '−12' },
+            ]}
+            thumbLabels={['Gain']}
+          />
           <Slider orientation="vertical" defaultValue={[70]} thumbLabels={['Bass']} />
           <Slider orientation="vertical" defaultValue={[40]} thumbLabels={['Mid']} />
           <Slider orientation="vertical" defaultValue={[55]} thumbLabels={['Treble']} />

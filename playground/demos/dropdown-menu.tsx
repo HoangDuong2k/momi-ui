@@ -54,17 +54,17 @@ export default function DropdownMenuDemo() {
               <DropdownMenuItem>
                 <User />
                 Profile
-                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                <DropdownMenuShortcut keys="mod+shift+p" />
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard />
                 Billing
-                <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                <DropdownMenuShortcut keys="mod+b" />
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings />
                 Settings
-                <DropdownMenuShortcut>⌘,</DropdownMenuShortcut>
+                <DropdownMenuShortcut keys="mod+," />
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
@@ -89,7 +89,7 @@ export default function DropdownMenuDemo() {
             <DropdownMenuItem onSelect={() => toast('Logged out')}>
               <LogOut />
               Log out
-              <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+              <DropdownMenuShortcut keys="mod+shift+q" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

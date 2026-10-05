@@ -1,5 +1,7 @@
 import { Toast as ToastPrimitive } from 'radix-ui'
 import * as React from 'react'
+import { useMessages } from '../i18n/locale-provider'
+import type { MomiMessages } from '../i18n/messages'
 import { cn } from '../lib/cn'
 import { CircleAlertIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon, XIcon } from '../lib/icons'
 import { Button } from './button'
@@ -154,8 +156,10 @@ export interface ToasterProps {
    * @default 2
    */
   clearAll?: number | false
-  /** @default 'Clear all' */
+  /** @default messages.toast.clearAll ('Clear all') */
   clearAllLabel?: string
+  /** Override built-in text for this instance. */
+  labels?: Partial<MomiMessages['toast']>
   className?: string
 }
 
@@ -166,9 +170,11 @@ export function Toaster({
   visibleToasts = 4,
   closeButton = true,
   clearAll = 2,
-  clearAllLabel = 'Clear all',
+  clearAllLabel,
+  labels,
   className,
 }: ToasterProps) {
+  const t = useMessages('toast', labels)
   const items = React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
   const open = items.filter((t) => t.open)
   // Keep the newest `visibleToasts` open toasts, plus any that are still animating out.
@@ -182,15 +188,17 @@ export function Toaster({
       type="button"
       data-slot="toast-clear-all"
       onClick={() => dismiss()}
-      aria-label={`${clearAllLabel} (${open.length} notifications)`}
+      aria-label={
+        clearAllLabel ? `${clearAllLabel} (${open.length})` : t.clearAllLabel(open.length)
+      }
       className={cn(
-        'pointer-events-auto inline-flex h-7 shrink-0 animate-fade-in items-center gap-1.5 rounded-full border bg-popover px-3',
+        'pointer-events-auto inline-flex h-7 shrink-0 animate-fade-in items-center gap-1.5 rounded-full border border-border-strong bg-surface-raised px-3',
         'text-xs font-medium text-muted-foreground shadow-md transition-colors outline-none',
         'hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/40',
       )}
     >
       <XIcon className="size-3" />
-      {clearAllLabel}
+      {clearAllLabel ?? t.clearAll}
       <span className="text-muted-foreground/70 tabular-nums">{open.length}</span>
     </button>
   )
@@ -199,7 +207,7 @@ export function Toaster({
     <ToastPrimitive.Provider
       duration={duration}
       swipeDirection={swipeDirections[position]}
-      label="Notifications"
+      label={t.region}
     >
       {rendered.map((item) => (
         <ToastItem key={item.id} item={item} closeButton={closeButton} />
@@ -234,6 +242,7 @@ const toneIcons: Record<Exclude<ToastTone, 'neutral' | 'loading'>, React.ReactNo
 }
 
 function ToastItem({ item, closeButton }: { item: ToastRecord; closeButton: boolean }) {
+  const t = useMessages('common')
   const tone = item.tone ?? 'neutral'
   const icon =
     tone === 'loading' ? (
@@ -252,7 +261,7 @@ function ToastItem({ item, closeButton }: { item: ToastRecord; closeButton: bool
       }}
       duration={tone === 'loading' ? Infinity : item.duration}
       className={cn(
-        'group pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-xl border bg-popover p-4 text-popover-foreground shadow-lg',
+        'group pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-xl border border-border-strong bg-surface-raised p-4 text-popover-foreground shadow-lg',
         closeButton && 'pe-10',
         'data-[state=closed]:animate-pop-out data-[state=open]:animate-pop-in',
         'data-[swipe=move]:translate-x-(--radix-toast-swipe-move-x) data-[swipe=move]:translate-y-(--radix-toast-swipe-move-y)',
@@ -285,7 +294,7 @@ function ToastItem({ item, closeButton }: { item: ToastRecord; closeButton: bool
       )}
       {closeButton && (
         <ToastPrimitive.Close
-          aria-label="Close"
+          aria-label={t.close}
           className="absolute end-2.5 top-2.5 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity outline-none group-hover:opacity-100 hover:text-foreground focus-visible:opacity-100 focus-visible:ring-[3px] focus-visible:ring-ring/40"
         >
           <XIcon className="size-3.5" />
