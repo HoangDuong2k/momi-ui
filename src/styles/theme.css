@@ -181,16 +181,13 @@
   }
   @keyframes momi-swipe-out {
     from {
-      transform: translate(
-        var(--radix-toast-swipe-end-x, 0px),
-        var(--radix-toast-swipe-end-y, 0px)
-      );
+      transform: translate(var(--momi-swipe-end-x, 0px), var(--momi-swipe-end-y, 0px));
     }
     to {
       opacity: 0;
       transform: translate(
-        calc(var(--radix-toast-swipe-end-x, 0px) * 2),
-        calc(var(--radix-toast-swipe-end-y, 0px) * 2)
+        calc(var(--momi-swipe-end-x, 0px) * 2),
+        calc(var(--momi-swipe-end-y, 0px) * 2)
       );
     }
   }

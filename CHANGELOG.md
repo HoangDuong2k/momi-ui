@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 — 2026-10-05
+
+### Fixed
+
+- **DropdownMenu**: pressing the trigger again while the menu is still animating closed (e.g. right after picking an item) now reopens it. A press on the menu's own trigger is no longer treated as an outside press by the closing content.
+- **Toast**: Escape no longer gets stuck on notifications. Toasts used to be Radix dismissable layers, so a toast shown while a dialog, popover or menu was open took Escape away from it. Toasts are now plain items in the Radix viewport (still a layer _branch_, so pressing a toast doesn't dismiss the dialog behind it); Escape closes a toast only when focus is inside it.
+- **Toast**: the "Clear all" button works over an open modal dialog without closing it, and toasts use the full width of the stack (up to 352px instead of shrinking to their text).
+
 ## 0.2.0 — 2026-10-05
 
 ### Added

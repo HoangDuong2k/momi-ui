@@ -3,6 +3,7 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useMessages } from '../i18n/locale-provider'
 import { cn } from '../lib/cn'
+import { mergeRefs } from '../lib/merge-refs'
 import { CheckIcon, ChevronRightIcon } from '../lib/icons'
 import { MenuShortcut, type MenuShortcutProps } from './internal/menu-shortcut'
 
@@ -102,11 +103,15 @@ export function DropdownMenuContent({
   collisionPadding = 8,
   onCloseAutoFocus,
   onInteractOutside,
+  onPointerDownOutside,
   className,
   children,
+  ref,
   ...props
 }: React.ComponentProps<typeof MenuPrimitive.Content>) {
   const positioned = React.useContext(PositionedContext)
+  const contentRef = React.useRef<HTMLDivElement>(null)
+  const setContent = React.useMemo(() => mergeRefs(contentRef, ref), [ref])
   // A positioned menu has no trigger to return focus to: restore whatever had focus before.
   const returnFocusRef = React.useRef<HTMLElement | null>(null)
   const interactedOutsideRef = React.useRef(false)
@@ -121,6 +126,18 @@ export function DropdownMenuContent({
         align={align ?? (positioned ? 'start' : undefined)}
         sideOffset={sideOffset ?? (positioned ? 2 : 6)}
         collisionPadding={collisionPadding}
+        ref={setContent}
+        onPointerDownOutside={(event) => {
+          onPointerDownOutside?.(event)
+          // A press on this menu's own trigger is handled by the trigger, which toggles the menu.
+          // Otherwise pressing it while the menu animates closed reopens the menu, and the closing
+          // content — still mounted — treats the press as "outside" and closes it again.
+          const content = contentRef.current
+          const triggerId = content?.getAttribute('aria-labelledby')
+          const trigger = triggerId ? content?.ownerDocument.getElementById(triggerId) : null
+          const target = event.detail.originalEvent.target
+          if (trigger && target instanceof Node && trigger.contains(target)) event.preventDefault()
+        }}
         onInteractOutside={(event) => {
           interactedOutsideRef.current = true
           onInteractOutside?.(event)
