@@ -3,7 +3,7 @@
 Thư viện component React theo phong cách **Modern Minimal**, xây trên **Tailwind CSS v4** và **Radix UI**:
 nhiều khoảng trắng, typography rõ ràng, một màu accent, bo góc vừa phải, bóng đổ nhẹ, hỗ trợ dark mode.
 
-> Trạng thái: **v0.3.0**: ngoài component nền tảng, overlay, DataTable, landing blocks và input nâng cao, đã có Kanban, lịch sự kiện (EventCalendar), DateTimePicker, đa ngôn ngữ, mật độ nhỏ gọn, bộ component cho app desktop và nhúng trong một khung (PortalProvider). Xem [Lộ trình](#lộ-trình) và [CHANGELOG](CHANGELOG.md).
+> Trạng thái: **v0.3.1**: ngoài component nền tảng, overlay, DataTable, landing blocks và input nâng cao, đã có Kanban, lịch sự kiện (EventCalendar), DateTimePicker, đa ngôn ngữ, mật độ nhỏ gọn, bộ component cho app desktop và nhúng trong một khung (PortalProvider). Xem [Lộ trình](#lộ-trình) và [CHANGELOG](CHANGELOG.md).
 
 ## Chạy playground
 
@@ -48,7 +48,7 @@ cd ../momi-ui && npm run dev:lib   # vite build --watch + tsc --watch + build CS
 **Khi app merge lên main / chạy CI** — cài từ git, ghim theo tag:
 
 ```jsonc
-"dependencies": { "momi-ui": "github:HoangDuong2k/momi-ui#v0.3.0" }
+"dependencies": { "momi-ui": "github:HoangDuong2k/momi-ui#v0.3.1" }
 ```
 
 Repo không chứa `dist/`, nên script `prepare` tự build khi cài từ git (cần Node ≥ 20.19 hoặc ≥ 22.12). Khi `dist/` đã có (cài `file:` với `dev:lib`), `prepare` bỏ qua để `npm install` của app không build lại mỗi lần; đặt `MOMI_FORCE_BUILD=1` nếu muốn build lại. Mỗi đợt app merge cần một tag mới của momi-ui.
@@ -138,6 +138,42 @@ Mỗi island là một React root riêng: provider (`LocaleProvider`, `ThemeProv
 **Next.js** (App Router, `output: 'export'` để xuất trang tĩnh): bundle đã có `'use client'`, nên import trực tiếp vào server component được. Đặt `<ThemeScript />` trong `<head>` và thêm `suppressHydrationWarning` vào `<html>` (script đổi class trước khi React chạy).
 
 **Cần JavaScript trên trình duyệt** (Astro: thêm `client:*`): `Navbar` (menu mobile), `Faq` / `Accordion`, `Tabs`, `PricingTable` / `BillingToggle`, `NumberTicker`, `Reveal`, `Marquee` (tạm dừng khi hover chạy bằng CSS), `VideoPlayer`, `Lightbox`, `NewsletterForm`, mọi overlay (`Dialog`, `Popover`, `DropdownMenu`, `Toast`…) và mọi control nhập liệu. **Chạy tĩnh được**: `Hero`, `SectionHeader`, `FeatureGrid` / `FeatureSplit`, `BentoGrid`, `LogoCloud`, `Stats` (không kèm `NumberTicker`), `Steps`, `TestimonialGrid`, `TeamGrid`, `Cta`, `Footer`, `AppWindowFrame`, `BrowserFrame`, `Changelog`, `Card`, `Badge`, `Table`.
+
+## Dùng với AI agent
+
+momi-ui kèm sẵn một **skill** cho agent viết code (Claude Code, OpenAI Codex, GitHub Copilot, Cursor, Gemini CLI… — các công cụ đọc chuẩn [Agent Skills](https://agentskills.io) `SKILL.md`). Khi agent làm giao diện trong một dự án dùng momi-ui, skill chỉ cho nó:
+
+- cách cài và thứ tự import CSS, các provider cần đặt ở gốc;
+- quy ước chung của mọi component (`value` / `onValueChange`, `onValueCommit`, `size` / `tone` / `variant`, `labels`, `FormField`…);
+- tìm component có sẵn trước khi tự viết, qua danh mục mọi export và prop sinh tự động từ mã nguồn;
+- những chỗ dễ sai: class Tailwind phải viết nguyên văn, token màu đặt trên `:root`, khung nhúng cần `contain: layout`, `end` của `EventCalendar` không tính…;
+- ví dụ mẫu cho các màn hình thường gặp (luôn được typecheck theo đúng phiên bản);
+- cách đề xuất bổ sung cho thư viện khi thiếu, thay vì vá tạm trong app.
+
+Skill nằm trong package (`node_modules/momi-ui/skills/momi-ui/`), nên luôn **khớp với phiên bản đang cài**.
+
+**Bật skill cho một dự án** (làm một lần, chạy ở thư mục gốc của app sau `npm install`):
+
+```bash
+npx momi-ui link-skill
+```
+
+Lệnh tạo hai liên kết trỏ vào `node_modules`:
+
+| Liên kết                 | Công cụ đọc                                          |
+| ------------------------ | ---------------------------------------------------- |
+| `.claude/skills/momi-ui` | Claude Code (GitHub Copilot và Cursor cũng đọc được) |
+| `.agents/skills/momi-ui` | OpenAI Codex (Cursor cũng đọc được)                  |
+
+Commit hai liên kết này. Người khác clone repo chỉ cần `npm install` là agent của họ có skill; khi nâng momi-ui lên tag mới, skill tự đổi theo. Sau đó **mở phiên agent mới**: agent tự nạp skill khi việc đang làm liên quan đến giao diện; trong Claude Code có thể gọi thẳng bằng `/momi-ui`.
+
+Tuỳ chọn:
+
+- `--to claude,agents,github` — chọn nơi đặt liên kết (`github` = `.github/skills/` cho GitHub Copilot).
+- `--copy` — chép file thay vì liên kết (dùng khi không tạo được symlink, ví dụ Windows chưa bật Developer Mode; lệnh tự chuyển sang chép khi gặp lỗi này). Bản chép **không tự cập nhật**: chạy lại lệnh sau mỗi lần nâng momi-ui, hoặc thêm `"postinstall": "momi-ui link-skill --copy"` vào app.
+- `--force` — thay một thư mục `momi-ui` có sẵn không phải do lệnh này tạo.
+
+Liên kết chỉ hoạt động khi `node_modules` đã có (sau `npm install`). Công cụ không đọc `SKILL.md` vẫn có thể mở `node_modules/momi-ui/skills/momi-ui/SKILL.md` như một tài liệu Markdown thường.
 
 ## Theming
 
@@ -274,9 +310,13 @@ formatShortcut({ mac: 'mod+shift+z', default: 'mod+y' }) // làm lại: "⇧⌘Z
 formatShortcut({ mac: 'ctrl+mod+f', default: 'f11' })    // toàn màn hình: "⌃⌘F" / "F11"
 
 <Kbd keys={['mod', 'S']} />                            // hiện đúng theo máy, có nhãn cho trình đọc màn hình
-useCommandShortcut(save, 'mod+s')                      // bắt phím tắt theo cùng cách viết
+useShortcut('mod+s', save)                             // bắt phím tắt theo cùng cách viết
+useShortcut('n', openNewTask)                          // phím đơn: bỏ qua khi đang gõ trong ô nhập
+useShortcut(['?', 'shift+/'], showHelp, { enabled: !dialogOpen })
 const platform = usePlatform()                         // 'mac' | 'windows' | 'linux' | …; an toàn khi SSR
 ```
+
+`useShortcut` khớp đúng tổ hợp đã viết: `'n'` là phím N không kèm phím nào. Phím không có Ctrl / ⌘ / Alt mặc định **không chạy khi đang gõ** trong ô nhập, select hay vùng soạn thảo (`whileTyping` để đổi), và bỏ qua phím đã được nơi khác xử lý (menu, Esc của hộp thoại) hay giữ phím lặp lại (`repeat`). `useCommandShortcut(open, 'k')` giữ cách cũ: một phím đơn nghĩa là Ctrl/⌘ + phím đó.
 
 `mod` là ⌘ trên thiết bị Apple và Ctrl ở nơi khác; `ctrl` luôn là phím Control. `DropdownMenuShortcut`, `ContextMenuShortcut` và `Tooltip` (`shortcut`) nhận cùng cách viết. Chuyển từ `keyLabel` của app: đổi `Ctrl+` trong chuỗi thành `mod+`, còn "Ctrl+Y" và "F11" dùng dạng `{ mac, default }` như trên.
 
@@ -348,19 +388,20 @@ const [events, setEvents] = useState<CalendarEvent[]>([
 />
 ```
 
-| Tính năng                       | Cách bật                                                                                                                                                                 |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Sự kiện                         | `{ id, title, start, end?, allDay?, tone?, color?, editable? }` — thêm trường riêng tuỳ ý (kiểu generic), callback trả lại đúng object của app                           |
-| `end`                           | **Không tính** (như iCalendar): sự kiện cả ngày 5–7/10 có `end` là 0h ngày 8/10. Không có `end`: cả ngày = 1 ngày, có giờ = một thời điểm                                |
-| View                            | `view` / `defaultView` / `onViewChange`; `views` chọn các view hiện trên thanh công cụ; `date` / `defaultDate` / `onDateChange`                                          |
-| Kéo, kéo dãn, dời bằng bàn phím | Bật khi có `onEventChange`. Bước `step` (mặc định 15 phút); `canChange` để cấm (hiện "không được" khi kéo); `editable: false` cho từng sự kiện                           |
-| Tạo sự kiện                     | `onSelectRange`: bấm hoặc kéo qua ô trống, Enter trên một ngày (view tháng). Bấm một lần tạo khoảng `defaultEventDuration` (60 phút)                                     |
-| Sự kiện có giờ ↔ cả ngày        | Kéo sự kiện có giờ lên dòng "Cả ngày" thành sự kiện cả ngày, và ngược lại                                                                                                |
-| Tải dữ liệu theo khoảng         | `onRangeChange({ start, end, view })`, gọi cả lần đầu                                                                                                                    |
-| Quá nhiều sự kiện               | View tháng tự đếm số dòng vừa ô, phần dư gộp vào "+N" (mở danh sách đầy đủ); `maxEventsPerDay`, `maxAllDayEvents` để cố định                                             |
-| Lưới giờ                        | `dayStartHour` / `dayEndHour`, `hourHeight`, `scrollToHour` (mặc định 8h); vạch giờ hiện tại; sự kiện trùng giờ tự chia cột                                              |
-| Nội dung, thanh công cụ         | `renderEvent(event, { view, variant, timeLabel, … })` (màu sự kiện có sẵn trong biến CSS `--event-color`); `toolbarActions` thêm nút; `renderToolbar(api)` thay cả thanh |
-| Ngôn ngữ                        | Chữ theo `LocaleProvider` (`messages`) hoặc `labels`; ngày giờ theo `locale` (prop → provider → trình duyệt), `hourCycle` ép 12/24 giờ; `weekStartsOn`                   |
+| Tính năng                       | Cách bật                                                                                                                                                                                                 |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sự kiện                         | `{ id, title, start, end?, allDay?, tone?, color?, editable? }` — thêm trường riêng tuỳ ý (kiểu generic), callback trả lại đúng object của app                                                           |
+| `end`                           | **Không tính** (như iCalendar): sự kiện cả ngày 5–7/10 có `end` là 0h ngày 8/10. Không có `end`: cả ngày = 1 ngày, có giờ = một thời điểm                                                                |
+| View                            | `view` / `defaultView` / `onViewChange`; `views` chọn các view hiện trên thanh công cụ; `date` / `defaultDate` / `onDateChange`                                                                          |
+| Kéo, kéo dãn, dời bằng bàn phím | Bật khi có `onEventChange`. Bước `step` (mặc định 15 phút); `canChange` để cấm (hiện "không được" khi kéo); `editable: false` cho từng sự kiện                                                           |
+| Tạo sự kiện                     | `onSelectRange`: bấm hoặc kéo qua ô trống, Enter trên một ngày (view tháng). Bấm một lần tạo khoảng `defaultEventDuration` (60 phút)                                                                     |
+| Sự kiện có giờ ↔ cả ngày        | Kéo sự kiện có giờ lên dòng "Cả ngày" thành sự kiện cả ngày, và ngược lại                                                                                                                                |
+| Tải dữ liệu theo khoảng         | `onRangeChange({ start, end, view })`, gọi cả lần đầu                                                                                                                                                    |
+| Quá nhiều sự kiện               | View tháng tự đếm số dòng vừa ô, phần dư gộp vào "+N" (mở danh sách đầy đủ); `maxEventsPerDay`, `maxAllDayEvents` để cố định                                                                             |
+| Lưới giờ                        | `dayStartHour` / `dayEndHour`, `hourHeight`, `scrollToHour` (mặc định 8h); vạch giờ hiện tại; sự kiện trùng giờ tự chia cột                                                                              |
+| Khung hẹp                       | View tháng bỏ giờ và rút "+N nữa" thành "+N"; view tuần/ngày xếp thứ và ngày thành hai dòng, thu hẹp cột giờ; view danh sách đưa giờ lên một dòng riêng — theo bề rộng của chính lịch, không theo cửa sổ |
+| Nội dung, thanh công cụ         | `renderEvent(event, { view, variant, timeLabel, … })` (màu sự kiện có sẵn trong biến CSS `--event-color`); `toolbarActions` thêm nút; `renderToolbar(api)` thay cả thanh                                 |
+| Ngôn ngữ                        | Chữ theo `LocaleProvider` (`messages`) hoặc `labels`; ngày giờ theo `locale` (prop → provider → trình duyệt), `hourCycle` ép 12/24 giờ; `weekStartsOn`                                                   |
 
 Bàn phím: Tab tới sự kiện, Enter để mở, phím cách để nhấc; mũi tên trái/phải dời một ngày, lên/xuống dời một bước (view tuần/ngày) hoặc một tuần (view tháng), Shift + lên/xuống đổi độ dài; phím cách hoặc Enter để thả, Esc để huỷ. Mỗi bước được đọc cho trình đọc màn hình. Trong view tháng, các ô ngày đi bằng mũi tên, PageUp/PageDown đổi tháng.
 
@@ -464,7 +505,7 @@ Không cần `DropdownMenuTrigger`. Menu mở sang phải con trỏ như menu ch
 
 ### Combobox tạo mục mới
 
-`onCreate(query)` hiện mục **Tạo “…”** khi chữ gõ không trùng mục nào (so sánh không phân biệt hoa thường và dấu); trả về (hoặc resolve) mục mới thì mục đó được chọn ngay, kể cả khi `options` chưa cập nhật. `renderOption` vẽ lại từng dòng (dấu tích vẫn giữ), `renderChip(option, remove)` vẽ lại từng chip ở chế độ chọn nhiều — ví dụ tô màu riêng cho từng nhãn. Ở chế độ chọn nhiều, Backspace trong ô tìm trống bỏ mục chọn cuối (giữ phím để xoá chữ thì không bỏ). Popup không bao giờ cao hơn chỗ trống, danh sách tự cuộn.
+`onCreate(query)` hiện mục **Tạo “…”** khi chữ gõ không trùng mục nào (so sánh không phân biệt hoa thường và dấu); trả về (hoặc resolve) mục mới thì mục đó được chọn ngay, kể cả khi `options` chưa cập nhật. `renderOption` vẽ lại từng dòng (dấu tích vẫn giữ), `renderChip(option, remove)` vẽ lại từng chip ở chế độ chọn nhiều — ví dụ tô màu riêng cho từng nhãn. Ở chế độ chọn nhiều, chọn xong một mục thì ô tìm được xoá để tìm mục kế tiếp, và Backspace trong ô tìm trống bỏ mục chọn cuối (giữ phím để xoá chữ thì không bỏ). Popup không bao giờ cao hơn chỗ trống, danh sách tự cuộn.
 
 ### Resizable và ScrollArea
 
@@ -474,7 +515,7 @@ Không cần `DropdownMenuTrigger`. Menu mở sang phải con trỏ như menu ch
 
 ### Toolbar và ToggleGroup
 
-`Toolbar` chỉ chiếm một điểm dừng Tab; phím mũi tên đi qua các nút, nhóm nút và link bên trong. `ToolbarButton`, `ToolbarToggle`, `ToggleGroupItem` nhận `icon` + `label` (+ `shortcut`) cho nút chỉ có icon, tự kèm tooltip kiểu "Lưu project ⌘S". `ToggleGroup type="single"` luôn giữ đúng một nút bật (trừ khi đặt `allowDeselect`). Toolbar mặc định cỡ `sm`, thành `xs` trong `DensityProvider density="compact"`.
+`Toolbar` chỉ chiếm một điểm dừng Tab; phím mũi tên đi qua các nút, nhóm nút và link bên trong. `ToolbarButton`, `ToolbarToggle`, `ToggleGroupItem` nhận `icon` + `label` (+ `shortcut`) cho nút chỉ có icon, tự kèm tooltip kiểu "Lưu project ⌘S". `ToggleGroup type="single"` luôn giữ đúng một nút bật (trừ khi đặt `allowDeselect`). Đặt `ToggleGroup` trong `FormField` thì nhóm nút tự nhận nhãn, mô tả, lỗi và trạng thái tắt của field, như `RadioGroup`. Toolbar mặc định cỡ `sm`, thành `xs` trong `DensityProvider density="compact"`.
 
 ### Landing blocks
 
@@ -534,10 +575,12 @@ src/
   i18n/            # LocaleProvider, bộ message en / vi
   index.ts         # public API
 playground/        # App cho `npm run dev` (demos/, registry.ts, components/)
-scripts/           # build-css.mjs, dev-lib.mjs (build khi sửa), prepare.mjs (build khi cài từ git)
+scripts/           # build-css.mjs, dev-lib.mjs (build khi sửa), prepare.mjs (build khi cài từ git),
+                   # cli.mjs (`npx momi-ui link-skill`), skill-reference.mjs (sinh danh mục cho skill)
+skills/momi-ui/    # skill cho agent: SKILL.md, examples/ (được typecheck), references/components.md (sinh tự động)
 ```
 
-**Thêm component mới:** tạo `src/components/<ten>.tsx` → export trong `src/index.ts` → thêm demo `playground/demos/<ten>.tsx` và khai báo trong `playground/registry.ts` → viết test trong `src/components/__tests__/`.
+**Thêm component mới:** tạo `src/components/<ten>.tsx` → export trong `src/index.ts` → thêm demo `playground/demos/<ten>.tsx` và khai báo trong `playground/registry.ts` → viết test trong `src/components/__tests__/` → `npm run skill:refs` để cập nhật danh mục của skill (`npm run check` báo lỗi nếu quên).
 
 > Class Tailwind phải được viết **nguyên văn** trong code (không ghép chuỗi kiểu `` `bg-${tone}` ``) để Tailwind quét được. Giá trị động dùng CSS variable (xem `src/lib/responsive.ts`).
 
@@ -554,7 +597,12 @@ scripts/           # build-css.mjs, dev-lib.mjs (build khi sửa), prepare.mjs (
 
 ## Phát hành
 
-Mỗi đợt app cần bản mới: chạy `npm run check`, cập nhật CHANGELOG, đánh tag rồi push (`git tag v0.3.0 && git push --tags`). App cài theo tag, `prepare` tự build khi cài.
+Mỗi đợt app cần bản mới:
+
+1. `npm run skill:refs` nếu API công khai đổi (danh mục của skill sinh lại từ mã nguồn).
+2. Xem lại `skills/momi-ui/SKILL.md`: quy ước, những chỗ dễ sai hay cách cài có đổi không. Ví dụ trong `skills/momi-ui/examples/` được typecheck nên API đổi mà quên sửa thì bước 3 báo lỗi.
+3. `npm run check` (typecheck cả ví dụ của skill, lint, format, kiểm tra danh mục còn mới, test).
+4. Cập nhật CHANGELOG, đánh tag rồi push (`git tag v0.3.1 && git push --tags`). App cài theo tag, `prepare` tự build khi cài.
 
 Khi đưa lên npm:
 

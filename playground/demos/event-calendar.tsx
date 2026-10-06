@@ -156,11 +156,11 @@ export default function EventCalendarDemo() {
           renderEvent={(event, { variant, timeLabel }) =>
             variant === 'agenda' ? (
               <>
-                <span className="w-32 shrink-0 text-muted-foreground tabular-nums sm:w-40">
+                <span className="basis-full text-xs text-muted-foreground tabular-nums @md/agenda:w-40 @md/agenda:shrink-0 @md/agenda:basis-auto @md/agenda:text-sm">
                   {timeLabel}
                 </span>
                 <span aria-hidden className="size-2 shrink-0 rounded-full bg-(--event-color)" />
-                <span className="truncate font-medium">{event.title}</span>
+                <span className="min-w-0 flex-1 truncate font-medium">{event.title}</span>
                 <Avatar size="xs" name="Linh Tran" className="ms-auto" />
               </>
             ) : (

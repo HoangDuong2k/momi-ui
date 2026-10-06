@@ -76,3 +76,23 @@ export const atMinutes = (day: Date, minutes: number) =>
 /** "2026-10-05": a stable key for a calendar day. */
 export const dayKey = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+/**
+ * Weekday labels short enough for a day column, indexed by `getDay()`: the locale's narrow names
+ * when they tell all seven days apart ("T2"…"CN" in Vietnamese), else the short names cut to two
+ * characters when those still do ("Mo", "Tu"), else the short names as they are.
+ */
+export function weekdayColumnLabels(days: Date[], locale: string | undefined) {
+  const names = (weekday: 'narrow' | 'short') => {
+    const format = new Intl.DateTimeFormat(locale, { weekday })
+    return days.map((day) => format.format(day))
+  }
+  const distinct = (labels: string[]) => new Set(labels).size === labels.length
+  const short = names('short')
+  const narrow = names('narrow')
+  const cut = short.map((name) => Array.from(name).slice(0, 2).join(''))
+  const labels = distinct(narrow) ? narrow : distinct(cut) ? cut : short
+  const byDay: string[] = []
+  days.forEach((day, i) => (byDay[day.getDay()] = labels[i]))
+  return byDay
+}

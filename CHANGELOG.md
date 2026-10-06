@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.1 — 2026-10-06
+
+### Added
+
+- **Agent skill** shipped in the package (`skills/momi-ui/`): setup, conventions, pitfalls, type-checked example screens and a component reference generated from the source. `npx momi-ui link-skill` links it into a project for Claude Code, Codex, Copilot and Cursor; it always matches the installed version.
+- **useShortcut(shortcut, callback, options)**: shortcuts matched exactly as written, including single keys such as `N` or `?`, ignored while typing in a field (unless they use Ctrl/⌘/Alt), on handled keys and on key repeat; `enabled`, `whileTyping`, `repeat`, `preventDefault`.
+- **ToggleGroup** inside a `FormField` takes the field's label, description, error and disabled state, like `RadioGroup`.
+
+### Fixed
+
+- Calendar and date pickers: weekday headers were cut to two letters, so Vietnamese showed "Th" for six days (and Arabic, Hebrew, Thai broke the same way). Headers now use the locale's narrow names when they tell the days apart ("T2"…"CN"), otherwise two letters as before.
+- EventCalendar week and day views fit narrow containers: day headers stack, the hour column and its labels slim down, events keep less space on the right. Month headers use the same short weekday names when narrow.
+- EventCalendar agenda: long titles are cut with "…" instead of pushing the row out; in a narrow calendar the time sits on its own line. Rows follow the calendar's width, not the window's.
+- Combobox (multiple): the search clears after picking an option, so the next search starts afresh.
+
 ## 0.3.0 — 2026-10-05
 
 ### Added

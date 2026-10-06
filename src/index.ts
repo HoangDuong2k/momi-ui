@@ -8,9 +8,11 @@ export {
   matchesShortcut,
   parseShortcut,
   usePlatform,
+  useShortcut,
   type Platform,
   type Shortcut,
   type ShortcutOptions,
+  type UseShortcutOptions,
 } from './lib/shortcut'
 
 // Theme

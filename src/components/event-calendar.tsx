@@ -1100,16 +1100,20 @@ function AgendaView({
     )
   }
   return (
-    <div data-slot="event-calendar-agenda" className="min-h-0 flex-1 overflow-y-auto">
+    <div
+      data-slot="event-calendar-agenda"
+      // Sized by the calendar, not the window: rows adapt to a narrow panel on a wide screen.
+      className="@container/agenda min-h-0 flex-1 overflow-y-auto"
+    >
       {groups.map(({ day, items }) => {
         const today = isSameDay(day, ctx.today)
         return (
           <section
             key={dayKey(day)}
             aria-label={dayLabel(day)}
-            className="flex gap-3 border-b px-3 py-2.5 last:border-b-0 sm:gap-5 sm:px-4"
+            className="flex gap-3 border-b px-3 py-2.5 last:border-b-0 @md/agenda:gap-5 @md/agenda:px-4"
           >
-            <div aria-hidden className="w-12 shrink-0 pt-1 sm:w-16">
+            <div aria-hidden className="w-12 shrink-0 pt-1 @md/agenda:w-16">
               <div
                 className={cn(
                   'text-2xl leading-none font-semibold tabular-nums',
@@ -1122,7 +1126,7 @@ function AgendaView({
                 {formats.weekdayShort.format(day)}, {formats.monthShort.format(day)}
               </div>
             </div>
-            <ul className="grid min-w-0 flex-1 content-start gap-0.5">
+            <ul className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)] content-start gap-0.5">
               {items.map((event) => (
                 <li key={event.id}>
                   <EventChip

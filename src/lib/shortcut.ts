@@ -234,3 +234,56 @@ const subscribe = () => () => {}
 export function usePlatform(): Platform {
   return React.useSyncExternalStore(subscribe, detectPlatform, () => 'unknown')
 }
+
+export interface UseShortcutOptions {
+  /** @default true */
+  enabled?: boolean
+  /**
+   * Also fire while focus is in a text field, select or editable element. Defaults to `false` for
+   * keys without Ctrl, ⌘ or Alt (so typing "n" in a field doesn't trigger "N"), `true` otherwise.
+   */
+  whileTyping?: boolean
+  /** Fire again while the key is held down. @default false */
+  repeat?: boolean
+  /** @default true */
+  preventDefault?: boolean
+}
+
+const isTyping = (target: EventTarget | null) =>
+  target instanceof HTMLElement &&
+  (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))
+
+/**
+ * Run `callback` when a keyboard shortcut is pressed anywhere in the page. The shortcut is taken
+ * exactly as written — `'n'` is the N key alone, `'mod+k'` is ⌘K on Apple devices and Ctrl+K
+ * elsewhere, `{ mac, default }` picks per platform; pass an array for several. Keys already
+ * handled by something else (a menu, a dialog's Escape) are ignored.
+ */
+export function useShortcut(
+  shortcut: Shortcut | Shortcut[],
+  callback: (event: KeyboardEvent) => void,
+  { enabled = true, whileTyping, repeat = false, preventDefault = true }: UseShortcutOptions = {},
+) {
+  const latest = React.useRef(callback)
+  React.useEffect(() => {
+    latest.current = callback
+  })
+  const key = JSON.stringify(shortcut)
+  React.useEffect(() => {
+    if (!enabled) return
+    const shortcuts = JSON.parse(key) as Shortcut | Shortcut[]
+    const list = Array.isArray(shortcuts) ? shortcuts : [shortcuts]
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || (event.repeat && !repeat) || event.isComposing) return
+      const hit = list.find((s) => matchesShortcut(event, s))
+      if (hit === undefined) return
+      const parsed = parseShortcut(resolve(hit, detectPlatform()))
+      const modified = parsed.mod || parsed.ctrl || parsed.meta || parsed.alt
+      if (!(whileTyping ?? modified) && isTyping(event.target)) return
+      if (preventDefault) event.preventDefault()
+      latest.current(event)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [key, enabled, whileTyping, repeat, preventDefault])
+}

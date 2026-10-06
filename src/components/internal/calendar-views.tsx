@@ -1,6 +1,14 @@
 import * as React from 'react'
 import { cn } from '../../lib/cn'
-import { addDays, dayKey, isSameDay, isSameMonth, minutesOfDay, startOfDay } from '../../lib/date'
+import {
+  addDays,
+  dayKey,
+  isSameDay,
+  isSameMonth,
+  minutesOfDay,
+  startOfDay,
+  weekdayColumnLabels,
+} from '../../lib/date'
 import type { Tone } from '../../lib/tones'
 import { Popover, PopoverContent, PopoverTrigger } from '../popover'
 import { useCalendarContext, type CalendarEvent, type EventRenderContext } from './calendar-context'
@@ -56,7 +64,8 @@ const chipVariant: Record<EventRenderContext['variant'], string> = {
   dot: 'h-5 rounded-[5px] px-1.5 text-foreground hover:bg-accent',
   block:
     'flex-col items-stretch gap-0 rounded-md border-s-[3px] border-(color:--event-color) bg-(color:--event-color)/15 px-1.5 py-0.5 text-(color:--event-text) shadow-[0_0_0_1px_var(--color-background)] hover:bg-(color:--event-color)/25 dark:bg-(color:--event-color)/25 dark:hover:bg-(color:--event-color)/35',
-  agenda: 'min-h-8 rounded-md px-2 py-1.5 text-sm text-foreground hover:bg-accent',
+  agenda:
+    'min-h-8 flex-wrap gap-y-0.5 rounded-md px-2 py-1.5 text-sm text-foreground hover:bg-accent @md/agenda:flex-nowrap',
 }
 
 export function EventChip({
@@ -119,11 +128,11 @@ export function EventChip({
   } else if (variant === 'agenda') {
     content = (
       <>
-        <span className="w-32 shrink-0 text-muted-foreground tabular-nums sm:w-40">
+        <span className="basis-full text-xs text-muted-foreground tabular-nums @md/agenda:w-40 @md/agenda:shrink-0 @md/agenda:basis-auto @md/agenda:text-sm">
           {timeLabel}
         </span>
         <span aria-hidden className="size-2 shrink-0 rounded-full bg-(color:--event-color)" />
-        <span className="truncate">{event.title}</span>
+        <span className="min-w-0 flex-1 truncate">{event.title}</span>
       </>
     )
   } else {
@@ -472,6 +481,7 @@ export function MonthView({
 
   const slots = maxEventsPerDay ?? measured ?? 3
   const weekdayFormat = new Intl.DateTimeFormat(ctx.locale, { weekday: 'short' })
+  const narrowWeekdays = weekdayColumnLabels(weeks[0], ctx.locale)
 
   const onCellKeyDown = (event: React.KeyboardEvent<HTMLElement>, day: Date) => {
     if (event.target !== event.currentTarget) return
@@ -526,7 +536,7 @@ export function MonthView({
             aria-label={new Intl.DateTimeFormat(ctx.locale, { weekday: 'long' }).format(day)}
             className="px-2 py-1.5 text-xs font-medium text-muted-foreground"
           >
-            {weekdayFormat.format(day)}
+            {narrow ? narrowWeekdays[day.getDay()] : weekdayFormat.format(day)}
           </div>
         ))}
       </div>
@@ -579,6 +589,9 @@ interface TimeGridViewProps {
   hourLabel: (hour: number) => string
 }
 
+/** Day columns narrower than this (px) stack their headers and slim the hour gutter. */
+const NARROW_COLUMN = 80
+
 export function TimeGridView({
   days,
   events,
@@ -590,6 +603,21 @@ export function TimeGridView({
 }: TimeGridViewProps) {
   const ctx = useCalendarContext()
   const { hourHeight, dayStartHour, dayEndHour } = ctx
+  const rootRef = React.useRef<HTMLDivElement>(null)
+  const [narrow, setNarrow] = React.useState(false)
+  React.useLayoutEffect(() => {
+    const el = rootRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const update = () => {
+      const width = el.getBoundingClientRect().width
+      if (width > 0) setNarrow((width - 56) / days.length < NARROW_COLUMN)
+    }
+    update()
+    const observer = new ResizeObserver(update)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [days.length])
+  const gutter = narrow ? 'w-10' : 'w-14'
   const hours = dayEndHour - dayStartHour
   const gridStart = dayStartHour * 60
   const gridEnd = dayEndHour * 60
@@ -605,25 +633,32 @@ export function TimeGridView({
   const allDay = layoutRow(spanning, days, ctx.dragId)
   const allDayLanes = visibleLaneCount(allDay.lanes, maxAllDayEvents, false)
   const weekdayFormat = new Intl.DateTimeFormat(ctx.locale, { weekday: 'short' })
+  const narrowWeekdays = weekdayColumnLabels(days, ctx.locale)
   const selection = ctx.selection?.kind === 'time' ? ctx.selection : null
   const y = (minutes: number) => ((minutes - gridStart) / 60) * hourHeight
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div ref={rootRef} data-narrow={narrow || undefined} className="flex min-h-0 flex-1 flex-col">
       {/* Day headers and the all-day lane; the stable gutter keeps columns aligned with the grid. */}
       <div className="flex shrink-0 [scrollbar-gutter:stable] overflow-hidden border-b">
-        <div className="w-14 shrink-0" />
+        <div className={cn(gutter, 'shrink-0')} />
         <div className="grid flex-1" style={columns}>
           {days.map((day) => {
             const today = isSameDay(day, ctx.today)
             const inner = (
               <>
-                <span className="text-xs font-medium text-muted-foreground">
-                  {weekdayFormat.format(day)}
+                <span
+                  className={cn(
+                    'font-medium text-muted-foreground',
+                    narrow ? 'text-[11px] leading-4' : 'text-xs',
+                  )}
+                >
+                  {narrow ? narrowWeekdays[day.getDay()] : weekdayFormat.format(day)}
                 </span>
                 <span
                   className={cn(
-                    'inline-flex size-7 items-center justify-center rounded-full text-base font-semibold tabular-nums',
+                    'inline-flex items-center justify-center rounded-full font-semibold tabular-nums',
+                    narrow ? 'size-6 text-sm' : 'size-7 text-base',
                     today && 'bg-primary text-primary-foreground',
                   )}
                 >
@@ -638,7 +673,10 @@ export function TimeGridView({
                 aria-label={dayLabel(day)}
                 aria-current={today ? 'date' : undefined}
                 onClick={() => ctx.showDay?.(day)}
-                className="flex items-center justify-center gap-1.5 border-s py-1.5 transition-colors outline-none hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-inset"
+                className={cn(
+                  'flex min-w-0 items-center justify-center border-s transition-colors outline-none hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-inset',
+                  narrow ? 'flex-col py-1' : 'gap-1.5 py-1.5',
+                )}
               >
                 {inner}
               </button>
@@ -647,7 +685,10 @@ export function TimeGridView({
                 key={dayKey(day)}
                 aria-label={dayLabel(day)}
                 aria-current={today ? 'date' : undefined}
-                className="flex items-center justify-center gap-1.5 border-s py-1.5"
+                className={cn(
+                  'flex min-w-0 items-center justify-center border-s',
+                  narrow ? 'flex-col py-1' : 'gap-1.5 py-1.5',
+                )}
               >
                 {inner}
               </div>
@@ -656,7 +697,13 @@ export function TimeGridView({
         </div>
       </div>
       <div className="flex shrink-0 [scrollbar-gutter:stable] overflow-hidden border-b">
-        <div className="flex w-14 shrink-0 items-start justify-end pe-2 pt-1 text-[11px] leading-4 text-muted-foreground">
+        <div
+          className={cn(
+            'flex shrink-0 items-start justify-end pt-1 text-end text-muted-foreground',
+            gutter,
+            narrow ? 'pe-1 text-[10px] leading-3' : 'pe-2 text-[11px] leading-4',
+          )}
+        >
           {ctx.t.allDay}
         </div>
         <DayRow
@@ -679,11 +726,14 @@ export function TimeGridView({
         className="relative min-h-0 flex-1 [scrollbar-gutter:stable] overflow-y-auto"
       >
         <div className="relative flex" style={{ height: hours * hourHeight }}>
-          <div aria-hidden className="relative w-14 shrink-0">
+          <div aria-hidden className={cn('relative shrink-0', gutter)}>
             {Array.from({ length: hours - 1 }, (_, i) => dayStartHour + i + 1).map((hour) => (
               <span
                 key={hour}
-                className="absolute end-2 -translate-y-1/2 text-[11px] leading-none text-muted-foreground tabular-nums"
+                className={cn(
+                  'absolute -translate-y-1/2 leading-none whitespace-nowrap text-muted-foreground tabular-nums',
+                  narrow ? 'end-1 text-[10px]' : 'end-2 text-[11px]',
+                )}
                 style={{ top: (hour - dayStartHour) * hourHeight }}
               >
                 {hourLabel(hour)}
@@ -746,7 +796,8 @@ export function TimeGridView({
                           top: y(top),
                           height,
                           insetInlineStart: `calc(${(segment.column / segment.columns) * 100}% + 1px)`,
-                          width: `calc(${(segment.span / segment.columns) * 100}% - ${last ? 8 : 2}px)`,
+                          // Leave room on the right to click empty time — less in narrow columns.
+                          width: `calc(${(segment.span / segment.columns) * 100}% - ${last && !narrow ? 8 : 2}px)`,
                         }}
                       />
                     )

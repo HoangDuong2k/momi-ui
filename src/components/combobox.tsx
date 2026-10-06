@@ -167,6 +167,8 @@ export function Combobox(props: ComboboxProps) {
   const toggle = (value: string) => {
     if (props.multiple) {
       setMany(many.includes(value) ? many.filter((v) => v !== value) : [...many, value])
+      // Start the next search afresh instead of appending to the text that found this one.
+      setQuery('')
     } else {
       setSingle(value === single ? null : value)
       setOpen(false)

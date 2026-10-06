@@ -495,6 +495,7 @@ export function CommandDialog({
 /**
  * Run `callback` on a shortcut. A single key (default `'k'`) means ⌘ or Ctrl + that key; anything
  * else uses the `formatShortcut` syntax, e.g. `'mod+shift+p'` or `{ mac: 'mod+shift+z', default: 'mod+y' }`.
+ * For keys without a modifier, such as `N` or `?`, use `useShortcut`.
  */
 export function useCommandShortcut(callback: () => void, shortcut: Shortcut = 'k') {
   const latest = React.useRef(callback)

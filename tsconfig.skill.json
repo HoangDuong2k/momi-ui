@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.skill.tsbuildinfo",
+    "noEmit": true,
+    // The skill's examples import 'momi-ui' like an app does; check them against the source.
+    "paths": { "momi-ui": ["./src/index.ts"] }
+  },
+  "include": ["skills/**/*.tsx", "src/vite-env.d.ts"]
+}

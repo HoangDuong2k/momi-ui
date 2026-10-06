@@ -13,6 +13,7 @@ import {
   startOfDay,
   startOfMonth,
   startOfWeek,
+  weekdayColumnLabels,
   type WeekStart,
 } from '../lib/date'
 import { ChevronLeftIcon, ChevronRightIcon } from '../lib/icons'
@@ -134,10 +135,6 @@ export function Calendar(props: CalendarProps) {
     () => new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }),
     [locale],
   )
-  const weekdayFormat = React.useMemo(
-    () => new Intl.DateTimeFormat(locale, { weekday: 'short' }),
-    [locale],
-  )
   const dayLabelFormat = React.useMemo(
     () =>
       new Intl.DateTimeFormat(locale, {
@@ -152,6 +149,10 @@ export function Calendar(props: CalendarProps) {
     const start = startOfWeek(new Date(2024, 0, 7), weekStartsOn)
     return Array.from({ length: 7 }, (_, i) => addDays(start, i))
   }, [weekStartsOn])
+  const weekdayLabels = React.useMemo(
+    () => weekdayColumnLabels(weekdays, locale),
+    [weekdays, locale],
+  )
 
   // Move DOM focus to the focused day after keyboard navigation.
   React.useEffect(() => {
@@ -267,7 +268,7 @@ export function Calendar(props: CalendarProps) {
                         abbr={new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(w)}
                         className="size-9 text-xs font-normal text-muted-foreground"
                       >
-                        {weekdayFormat.format(w).slice(0, 2)}
+                        {weekdayLabels[w.getDay()]}
                       </th>
                     ))}
                   </tr>

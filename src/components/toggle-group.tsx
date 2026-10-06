@@ -2,10 +2,12 @@ import { cva } from 'class-variance-authority'
 import { ToggleGroup as ToggleGroupPrimitive, Toolbar as ToolbarPrimitive } from 'radix-ui'
 import * as React from 'react'
 import { cn } from '../lib/cn'
+import { joinIds } from '../lib/ids'
 import type { Shortcut } from '../lib/shortcut'
 import { useControllableState } from '../lib/use-controllable-state'
 import type { ButtonSize } from './button'
 import { useDefaultSize } from './density-provider'
+import { useFormField } from './form-field'
 import { Tooltip } from './tooltip'
 
 export type ToggleGroupVariant = 'ghost' | 'outline' | 'segmented'
@@ -109,6 +111,7 @@ interface ToggleGroupBaseProps {
   children?: React.ReactNode
   'aria-label'?: string
   'aria-labelledby'?: string
+  'aria-describedby'?: string
   id?: string
 }
 
@@ -145,6 +148,10 @@ export function ToggleGroup(props: ToggleGroupProps) {
     ...rest
   } = props
   const toolbar = React.useContext(ToolbarScopeContext)
+  // Inside a FormField (not a toolbar), the field's label, description, error and disabled state
+  // apply to the group, as they do for RadioGroup.
+  const formField = useFormField()
+  const field = toolbar ? null : formField
   const densitySize = useDefaultSize(sizeProp, { comfortable: 'md', compact: 'xs' })
   const size = sizeProp ?? toolbar?.size ?? densitySize
   const isSingle = props.type === 'single'
@@ -168,11 +175,12 @@ export function ToggleGroup(props: ToggleGroupProps) {
     'data-slot': 'toggle-group',
     'data-variant': variant,
     'data-size': size,
-    disabled: rest.disabled,
+    disabled: rest.disabled ?? (field?.disabled || undefined),
     dir: rest.dir,
-    id: rest.id,
+    id: rest.id ?? field?.id,
     'aria-label': rest['aria-label'],
-    'aria-labelledby': rest['aria-labelledby'],
+    'aria-labelledby': rest['aria-labelledby'] ?? (rest['aria-label'] ? undefined : field?.labelId),
+    'aria-describedby': joinIds(rest['aria-describedby'], field?.descriptionId, field?.errorId),
     className: cn(
       'inline-flex w-fit items-center data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch',
       groupVariants[variant],
