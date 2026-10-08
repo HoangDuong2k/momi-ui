@@ -15,15 +15,23 @@ Search this file (e.g. for `EventCalendar` or `onValueCommit`) instead of readin
 - blocks/browser-frame: BrowserFrame, BrowserFrameProps
 - blocks/changelog: Changelog, changelogAnchor, ChangelogChange, ChangelogChangeType, ChangelogProps, ChangelogRelease
 - blocks/cta: Cta, CtaProps
+- blocks/dust-motes: DustMotes, DustMotesProps
 - blocks/faq: Faq, FaqItem, FaqProps
 - blocks/features: FeatureGrid, FeatureSplit, FeatureGridProps, FeatureItem, FeatureSplitProps
+- blocks/fireflies: Fireflies, FirefliesProps
 - blocks/footer: Footer, FooterColumn, FooterLink, FooterProps
+- blocks/halftone-image: HalftoneImage, HalftoneImageProps
 - blocks/hero: Hero, HeroBadge, HeroBadgeProps, HeroProps
+- blocks/internal/effect-media: MediaFit
+- blocks/light-beams: LightBeams, LightBeamsProps
 - blocks/logo-cloud: LogoCloud, LogoCloudProps, LogoItem
 - blocks/marquee: Marquee, MarqueeProps
 - blocks/navbar: Navbar, NavbarLink, NavbarProps
 - blocks/newsletter: NewsletterForm, NewsletterFormProps
 - blocks/number-ticker: NumberTicker, NumberTickerProps
+- blocks/particle-image: ParticleImage, ParticleImageProps
+- blocks/particle-wave: ParticleWave, ParticleWaveProps
+- blocks/pixel-trail: PixelTrail, PixelTrailProps
 - blocks/pricing: BillingToggle, PricingCard, PricingComparison, PricingTable, Billing, BillingToggleProps, PricingCardProps, PricingComparisonProps, PricingComparisonSection, PricingFeature, PricingPlan, PricingTableProps
 - blocks/reveal: Reveal, useInView, RevealProps, UseInViewOptions
 - blocks/section-header: SectionHeader, SectionHeaderProps
@@ -281,6 +289,32 @@ Also takes the props of the HTML element.
 
 Types: `CtaProps`
 
+## blocks/dust-motes
+
+### DustMotes
+
+Dust drifting through a beam of light — glinting where the light catches it, faint elsewhere. The beam turns slowly towards the pointer and moving the pointer stirs the dust. A 2-D canvas background: place it inside a `relative` (and `isolate`) parent. Pauses off screen; still with reduced motion.
+
+| Prop | Type | Notes |
+| --- | --- | --- |
+| `color?` | `string` | Dust caught in the light. Any CSS color or theme variable. Default: '#ffd59a' |
+| `ambientColor?` | `string` | Dust outside the light. Default: '#9fb2bd' |
+| `beam?` | `boolean` | Draw the beam of light. Without it, dust drifts evenly lit. Default: true |
+| `beamColor?` | `string` | Default: the dust color |
+| `source?` | `{ x?: number; y?: number }` | Where the light comes from, as fractions of the box (may lie outside it). Default: { x: 0.12, y: -0.08 } |
+| `aim?` | `{ x?: number; y?: number }` | Where the beam points when the pointer is away, as fractions of the box. Default: { x: 0.55, y: 1 } |
+| `spread?` | `number` | Half-angle of the beam, in degrees. Default: 17 |
+| `followPointer?` | `boolean` | The beam turns towards the pointer. Default: true |
+| `count?` | `number` | Number of motes (fewer on narrow screens). Default: 240 |
+| `size?` | `number` | Default: 1 |
+| `speed?` | `number` | Default: 1 |
+| `interactive?` | `boolean` | The pointer stirs the dust (and the beam follows it, with `followPointer`). Default: true |
+| `blend?` | `'auto' \| 'add' \| 'normal'` | `add` for dark backgrounds, `normal` for light ones, `auto` picks and follows the theme. Default: 'auto' |
+
+Also takes the props of the HTML element.
+
+Types: `DustMotesProps`
+
 ## blocks/faq
 
 ### Faq
@@ -350,6 +384,26 @@ Also takes the props of the HTML element.
 
 Types: `FeatureGridProps`, `FeatureSplitProps`
 
+## blocks/fireflies
+
+### Fireflies
+
+Glowing specks that drift and blink slowly, fading out at the edges, and come over curious when the pointer is near. A 2-D canvas background: place it inside a `relative` (and `isolate`) parent. It pauses off screen, drops to 30 fps on slow devices and shows a still frame with reduced motion.
+
+| Prop | Type | Notes |
+| --- | --- | --- |
+| `colors?` | `string[]` | One swarm per color, each at its own depth (the first is nearest). Any CSS color, including theme variables. Default: ['#62d0ff', '#b48cff'] |
+| `count?` | `number` | Flies per swarm (halved on narrow screens). Default: 16 |
+| `size?` | `number` | Default: 1 |
+| `speed?` | `number` | Default: 1 |
+| `opacity?` | `number` | Peak opacity. Default: 0.7 |
+| `interactive?` | `boolean` | Flies drift over to the pointer and circle it; swarms shift with it for depth. Default: true |
+| `blend?` | `'auto' \| 'add' \| 'normal'` | `add` for dark backgrounds, `normal` for light ones, `auto` picks and follows the theme. Default: 'auto' |
+
+Also takes the props of the HTML element.
+
+Types: `FirefliesProps`
+
 ## blocks/footer
 
 ### Footer
@@ -386,6 +440,33 @@ Also takes the props of the HTML element.
 
 Types: `FooterProps`
 
+## blocks/halftone-image
+
+### HalftoneImage
+
+An image (or a line of text) drawn as a halftone grid of dots, sized by its tones; dots around the pointer take the accent color and grow. WebGL, with a still 2-D fallback. Fills its parent like a background; give the parent a size.
+
+| Prop | Type | Notes |
+| --- | --- | --- |
+| `src?` | `string` | The image to draw as dots (same-origin, or served with CORS headers). |
+| `text?` | `string` | A line of text to draw as dots instead of an image. |
+| `font?` | `string` | CSS font (weight and family, no size) of `text`. Default: '600 system-ui, sans-serif' |
+| `alt?` | `string` | Accessible description. Without it the effect is decorative (hidden from screen readers). |
+| `cellSize?` | `number` | Distance between dot centers, in px. Default: 10 |
+| `shape?` | `'circle' \| 'square'` | Default: 'circle' |
+| `color?` | `string` | Dot color. Any CSS color or theme variable. Default: 'currentColor' |
+| `accent?` | `string` | Color the dots take around the pointer. Default: 'var(--primary)' |
+| `dots?` | `'auto' \| 'dark' \| 'light'` | Which parts of the image get the big dots: `dark` ones (ink on paper), `light` ones (light on a dark screen), or `auto` from the background behind the effect. Default: 'auto' |
+| `fit?` | `MediaFit` | Default: 'contain' |
+| `radius?` | `number` | Radius of the pointer's spotlight, in px. Default: 140 |
+| `grow?` | `number` | How much dots grow in the spotlight. Default: 0.6 |
+| `shimmer?` | `boolean` | A slow shimmer across the dots. Default: true |
+| `interactive?` | `boolean` | Default: true |
+
+Also takes the props of the HTML element.
+
+Types: `HalftoneImageProps`
+
 ## blocks/hero
 
 ### Hero
@@ -419,6 +500,33 @@ Pill-shaped announcement link for the hero eyebrow.
 Also takes the props of the HTML element.
 
 Types: `HeroBadgeProps`, `HeroProps`
+
+## blocks/internal/effect-media
+
+### type MediaFit
+
+```ts
+type MediaFit = 'contain' | 'cover'
+```
+
+## blocks/light-beams
+
+### LightBeams
+
+Soft beams of light drifting slowly across a section, like stage light through haze. No pointer interaction. Drawn by a shader at half resolution; pauses off screen; still with reduced motion; static gradients without WebGL. Place it inside a `relative` (and `isolate`) parent.
+
+| Prop | Type | Notes |
+| --- | --- | --- |
+| `colors?` | `string[]` | Beam colors, used in turn. Any CSS color or theme variable. Default: ['#3b6cff', '#7c4dff', '#22b8ff'] |
+| `count?` | `number` | Number of beams (up to 6). Default: 5 |
+| `angle?` | `number` | Direction of the beams, in degrees from vertical. Default: 25 |
+| `speed?` | `number` | Default: 1 |
+| `intensity?` | `number` | Default: 1 |
+| `blend?` | `'auto' \| 'add' \| 'normal'` | `add` for dark backgrounds, `normal` for light ones, `auto` picks and follows the theme. Default: 'auto' |
+
+Also takes the props of the HTML element.
+
+Types: `LightBeamsProps`
 
 ## blocks/logo-cloud
 
@@ -532,6 +640,83 @@ Counts up to `value` when scrolled into view. Screen readers get the final value
 Also takes the props of the HTML element.
 
 Types: `NumberTickerProps`
+
+## blocks/particle-image
+
+### ParticleImage
+
+An image (or a line of text) built from thousands of particles with relief, that turns gently towards the pointer like a sculpture; particles by the pointer drift aside and a press sends a ripple. WebGL, with a still 2-D fallback. Fills its parent; give the parent a size.
+
+| Prop | Type | Notes |
+| --- | --- | --- |
+| `src?` | `string` | The image to build from particles (same-origin, or served with CORS headers). |
+| `text?` | `string` | A line of text to build from particles instead of an image. |
+| `font?` | `string` | CSS font (weight and family, no size) of `text`. Default: '700 system-ui, sans-serif' |
+| `alt?` | `string` | Accessible description. Without it the effect is decorative (hidden from screen readers). |
+| `colors?` | `string[]` | Colors from dim to bright parts. Any CSS color or theme variable. Default: ['#6f8fff', '#ffffff'] |
+| `imageColors?` | `boolean` | Use the image's own colors instead of `colors`. Default: false |
+| `spacing?` | `number` | Distance between sampled particles, in px (smaller = more particles). Default: 2.5 |
+| `size?` | `number` | Particle size, in px. Default: 1.6 |
+| `depth?` | `number` | Relief: brighter parts stand out towards the viewer. 0 = flat. Default: 1 |
+| `tilt?` | `number` | Largest turn towards the pointer, in degrees. 0 = no turning. Default: 18 |
+| `scatter?` | `number` | Radius around the pointer where particles drift aside, in px. Default: 60 |
+| `fit?` | `MediaFit` | Default: 'contain' |
+| `intro?` | `boolean` | Gather from a cloud when first shown. Default: true |
+| `interactive?` | `boolean` | Turning, drifting aside and ripples on press. Default: true |
+| `blend?` | `'auto' \| 'add' \| 'normal'` | `add` for dark backgrounds, `normal` for light ones, `auto` picks and follows the theme. Default: 'auto' |
+
+Also takes the props of the HTML element.
+
+Types: `ParticleImageProps`
+
+## blocks/particle-wave
+
+### ParticleWave
+
+A ribbon of thousands of glowing particles that curves, twists and ripples slowly — a hero background drawn with WebGL. Place it inside a `relative` (and `isolate`) parent. It pauses off screen, drops its glow on slow devices, uses fewer particles on narrow screens and shows a still frame with reduced motion. Without WebGL only the backdrop is drawn.
+
+| Prop | Type | Notes |
+| --- | --- | --- |
+| `colors?` | `string[]` | Colors of the wave's ends and middle. Any CSS color, including theme variables (`'var(--primary)'`). One color tints the whole wave. Default: ['#62d0ff', '#b48cff'] |
+| `shape?` | `'smile' \| 'arch' \| 'flat'` | `smile`: lowest in the middle, ends rising; `arch`: the opposite; `flat`. Default: 'smile' |
+| `anchor?` | `React.RefObject<HTMLElement \| null>` | Put the middle of the wave just below this element (e.g. the hero's text block) and size it to follow the element. Without it, the wave is placed with `origin`. |
+| `anchorOffset?` | `number` | Gap between the anchor's bottom edge and the middle of the wave, in px. Default: 84 |
+| `origin?` | `{ x?: number; y?: number }` | Middle of the wave, as fractions of the effect's box. Default: { x: 0.5, y: 0.7 } |
+| `scale?` | `number` | Size of the curve and the band. Default: 1 |
+| `thickness?` | `number` | Default: 1 |
+| `twist?` | `number` | How much the band twists. Default: 1 |
+| `speed?` | `number` | Default: 1 |
+| `density?` | `number` | Particle count multiplier (halved on narrow screens). Default: 1 |
+| `glow?` | `boolean` | Soft halo around the particles and a glow at the centre. Dropped on slow devices. Default: true |
+| `backdrop?` | `boolean` | Rays and faint rings behind the wave. Default: true |
+| `interactive?` | `boolean` | Particles part around the pointer; a press sends a ripple along the band. Default: true |
+| `blend?` | `'auto' \| 'add' \| 'normal'` | `add`: light adds up, for dark backgrounds; `normal`: for light backgrounds; `auto` picks from the background behind the effect, and follows theme changes. Default: 'auto' |
+
+Also takes the props of the HTML element.
+
+Types: `ParticleWaveProps`
+
+## blocks/pixel-trail
+
+### PixelTrail
+
+An image that breaks into vivid pixel blocks along the pointer's path, fading back after a moment — or, without an image, a trail of pixel blocks in `colors`. 2-D canvas; draws nothing extra while there is no trail. Fills its parent; give the parent a size.
+
+| Prop | Type | Notes |
+| --- | --- | --- |
+| `src?` | `string` | Image shown underneath and broken into pixels along the pointer's path. |
+| `alt?` | `string` | Accessible description of the image. Without it the effect is decorative. |
+| `fit?` | `MediaFit` | Default: 'cover' |
+| `cellSize?` | `number` | Size of a pixel block, in px (blocks where the trail is strongest are twice as big). Default: 24 |
+| `brush?` | `number` | Radius of the trail, in blocks. Default: 2.2 |
+| `fade?` | `number` | How long the trail takes to fade, in ms. Default: 900 |
+| `boost?` | `number` | How much the block colors are saturated and brightened. Default: 1.3 |
+| `colors?` | `string[]` | Heat ramp of the trail, from fading to fresh: blocks glow through these colors as they fade. Default: ['#3d5afe', '#22d3ee', '#a3e635', '#fde68a'] |
+| `imageMix?` | `number` | How much of the image's own color shows in the blocks (0..1). Default: 0.35 |
+
+Also takes the props of the HTML element.
+
+Types: `PixelTrailProps`
 
 ## blocks/pricing
 

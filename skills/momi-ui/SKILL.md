@@ -34,7 +34,7 @@ momi-ui is a general-purpose React 19 component library on Tailwind CSS v4 and R
   @import './legacy.css' layer(legacy);
   ```
 - **Providers** near the root (see `examples/app-root.tsx`): `ThemeProvider`, `LocaleProvider`, optional `TooltipProvider`, and one `<Toaster />` if anything calls `toast()`. `ThemeScript` in `<head>` avoids a light flash in dark mode for server-rendered pages. In Astro, each island is its own React root: put providers inside the island.
-- **Installing.** Apps pin a git tag (`"momi-ui": "github:HoangDuong2k/momi-ui#v0.3.1"`) or use `file:../momi-ui` while developing both. With Vite, set `resolve.dedupe: ['react', 'react-dom']`. npm 11 may warn that momi-ui's `prepare` script is not approved: the package is already built when installed from git, so the warning is harmless (`npm install-scripts approve momi-ui` silences it).
+- **Installing.** Apps pin a git tag (`"momi-ui": "github:HoangDuong2k/momi-ui#v0.4.0"`) or use `file:../momi-ui` while developing both. With Vite, set `resolve.dedupe: ['react', 'react-dom']`. npm 11 may warn that momi-ui's `prepare` script is not approved: the package is already built when installed from git, so the warning is harmless (`npm install-scripts approve momi-ui` silences it).
 
 ## Conventions every component follows
 
@@ -58,6 +58,7 @@ Knowing these lets you guess most APIs correctly — then confirm in the referen
 - **EventCalendar `end` is exclusive** (iCalendar style): an all-day event on the 5th–7th ends at midnight on the 8th. The calendar never stores events — update your list in `onEventChange`, create in `onSelectRange`, load in `onRangeChange`. Expand repeating events yourself and mark generated ones `editable: false`. Give it a height (`className="h-[640px]"` or `h-full`).
 - **Kanban value is `Record<columnId, T[]>`**, items need `id` (or `getItemId`); use `onValueChange` for the whole board and `onCardMove` to save one move.
 - **`DateTimePicker` value is `{ date, time }`** with `time` as `"HH:mm"` or `null` for all day — not a single `Date`.
+- **Animated backgrounds** (`ParticleWave`, `Fireflies`, `LightBeams`, `DustMotes`, `BackgroundPattern`) are decorative layers: put them first inside a `relative isolate` parent so they sit behind the content, and pass brand colors through `colors` (theme variables work). **Image effects** (`ParticleImage`, `HalftoneImage`, `PixelTrail`) fill their parent, so give it a size; their `src` must be same-origin or CORS-enabled, and they need `alt` when the image carries meaning. All of them pause off screen, handle reduced motion and light/dark backgrounds — don't wrap them in your own visibility or motion logic.
 - **Toasts:** call `toast()`, `toast.success()`, `toast.promise()` anywhere; mount `<Toaster />` once.
 - **Keyboard shortcuts:** `useShortcut('n', fn)` for app shortcuts (single keys are ignored while the user types in a field), `formatShortcut` / `<Kbd keys>` / the `shortcut` prop of `Tooltip` and menu items to show them. `useCommandShortcut(fn, 'k')` treats a single key as ⌘K / Ctrl+K.
 

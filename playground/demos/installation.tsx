@@ -20,7 +20,7 @@ npm run dev:lib   # rebuilds JS, types and CSS on every change`}
           <strong>CI and releases</strong> — install a git tag; <Code>prepare</Code> builds it on
           install:
         </Text>
-        <CodeBlock code={`"momi-ui": "github:HoangDuong2k/momi-ui#v0.3.1"`} />
+        <CodeBlock code={`"momi-ui": "github:HoangDuong2k/momi-ui#v0.4.0"`} />
         <Text size="sm" tone="muted">
           Peer dependencies: <Code>react</Code> and <Code>react-dom</Code> 19+. With{' '}
           <Code>file:</Code>, add{' '}

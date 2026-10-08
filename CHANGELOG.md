@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.0 — 2026-10-08
+
+### Added
+
+- **ParticleWave**: a WebGL ribbon of thousands of glowing particles that curves (`smile` · `arch` · `flat`), twists and ripples, anchored below an element (`anchor`) or placed with `origin`; particles part around the pointer and a press sends a ripple. `colors` take any CSS color including theme variables; `scale`, `thickness`, `twist`, `speed`, `density`, `glow`, `backdrop`.
+- **Fireflies**: drifting, blinking specks, one swarm per color at its own depth, curious about the pointer, with parallax.
+- **ParticleImage**: an image (or text) built from thousands of particles with relief that turns gently towards the pointer like a sculpture; particles by the cursor drift aside, a press sends a ripple, and they gather from a cloud when first shown.
+- **HalftoneImage**: an image (or text) as a halftone grid of dots sized by its tones; dots around the pointer take the accent color and grow.
+- **PixelTrail**: an image that breaks into vivid pixel blocks along the pointer's path (glowing through a heat ramp as they fade), or a pixel trail on its own.
+- **LightBeams**: soft beams of light drifting slowly, no pointer needed (shader at half resolution).
+- **DustMotes**: dust drifting through a lamp beam that turns towards the pointer; the pointer stirs the dust.
+- All effects pause off screen and in hidden tabs, cap at 60 fps and drop to 30 fps (and lose the glow) on slow devices, use fewer particles on narrow screens, show a still frame with reduced motion (also when the setting changes live), switch between additive and normal blending from the background behind them (`blend="auto"`) and follow theme changes. New playground page "Particle Effects".
+
 ## 0.3.1 — 2026-10-06
 
 ### Added

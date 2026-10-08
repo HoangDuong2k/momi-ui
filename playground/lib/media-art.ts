@@ -89,7 +89,56 @@ function bokeh() {
   )
 }
 
+/** A shaded head-and-shoulders bust on a transparent background (for halftone and particle demos). */
+function bust() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1000" height="1000">
+<defs>
+<radialGradient id="head" cx="42%" cy="36%" r="68%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.45" stop-color="#b9b9b9"/><stop offset="0.85" stop-color="#4a4a4a"/><stop offset="1" stop-color="#1c1c1c"/></radialGradient>
+<linearGradient id="neck" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a3a3a"/><stop offset="0.45" stop-color="#9a9a9a"/><stop offset="1" stop-color="#2a2a2a"/></linearGradient>
+<radialGradient id="body" cx="45%" cy="10%" r="90%"><stop offset="0" stop-color="#c8c8c8"/><stop offset="0.5" stop-color="#6c6c6c"/><stop offset="1" stop-color="#1a1a1a"/></radialGradient>
+<filter id="s"><feGaussianBlur stdDeviation="14"/></filter>
+<linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0.72" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<mask id="m"><rect width="1000" height="1000" fill="url(#fade)"/></mask>
+</defs>
+<g mask="url(#m)">
+<path d="M130 1000 C150 800 300 720 420 690 L580 690 C700 720 850 800 870 1000 Z" fill="url(#body)"/>
+<path d="M415 560 L585 560 L600 720 C540 760 460 760 400 720 Z" fill="url(#neck)"/>
+<ellipse cx="500" cy="395" rx="185" ry="235" fill="url(#head)"/>
+<g filter="url(#s)">
+<ellipse cx="430" cy="380" rx="48" ry="26" fill="#2a2a2a" opacity="0.75"/>
+<ellipse cx="575" cy="380" rx="48" ry="26" fill="#1e1e1e" opacity="0.8"/>
+<ellipse cx="505" cy="455" rx="26" ry="70" fill="#ffffff" opacity="0.9"/>
+<ellipse cx="415" cy="470" rx="45" ry="38" fill="#ffffff" opacity="0.45"/>
+<ellipse cx="505" cy="545" rx="58" ry="16" fill="#2a2a2a" opacity="0.6"/>
+<ellipse cx="610" cy="470" rx="38" ry="60" fill="#111" opacity="0.35"/>
+<ellipse cx="470" cy="250" rx="110" ry="55" fill="#ffffff" opacity="0.55"/>
+</g>
+</g>
+</svg>`
+  return toDataUri(svg)
+}
+
+/** A night landscape: stars, layered mountains, warm lights (for the pixel trail demo). */
+function nightscape() {
+  const rand = seeded(11)
+  const stars = Array.from({ length: 220 }, () => {
+    const r = rand() * 1.8 + 0.4
+    return `<circle cx="${rand() * W}" cy="${rand() * H * 0.55}" r="${r}" fill="#e8f0ff" opacity="${0.3 + rand() * 0.7}"/>`
+  }).join('')
+  const lights = Array.from({ length: 40 }, () => {
+    const x = 200 + rand() * 1200
+    const y = 720 + rand() * 120
+    return `<circle cx="${x}" cy="${y}" r="${2 + rand() * 3}" fill="#ffd27a" opacity="${0.5 + rand() * 0.5}"/>`
+  }).join('')
+  return frame(
+    '<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#050b24"/><stop offset="0.55" stop-color="#173b8f"/><stop offset="0.8" stop-color="#3a5fc4"/><stop offset="1" stop-color="#0b1330"/></linearGradient><radialGradient id="glow" cx="50%" cy="78%" r="45%"><stop offset="0" stop-color="#ffb35c" stop-opacity="0.55"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></radialGradient>',
+    `<rect width="${W}" height="${H}" fill="url(#sky)"/>${stars}<rect width="${W}" height="${H}" fill="url(#glow)"/><path d="M0 640 L180 520 L330 600 L520 450 L700 580 L880 470 L1080 600 L1260 500 L1450 590 L1600 540 L1600 1000 L0 1000 Z" fill="#14244f"/><path d="M0 740 L220 640 L420 720 L640 620 L860 730 L1080 650 L1300 730 L1600 660 L1600 1000 L0 1000 Z" fill="#0b1636"/><g filter="url(#soft)">${lights}</g>${lights}<path d="M0 860 C300 820 500 880 800 850 C1100 820 1300 880 1600 850 L1600 1000 L0 1000 Z" fill="#050a1c"/><path d="M60 1000 L60 600 C70 520 120 470 150 420 M150 420 C190 380 230 360 280 350" stroke="#05081a" stroke-width="22" fill="none"/>`,
+  )
+}
+
 export const artworks = {
+  bust: bust(),
+  nightscape: nightscape(),
   particles: particles(),
   lightLeaks: lightLeaks(),
   vinyl: vinyl(),

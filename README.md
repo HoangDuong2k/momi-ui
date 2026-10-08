@@ -3,7 +3,7 @@
 Thư viện component React theo phong cách **Modern Minimal**, xây trên **Tailwind CSS v4** và **Radix UI**:
 nhiều khoảng trắng, typography rõ ràng, một màu accent, bo góc vừa phải, bóng đổ nhẹ, hỗ trợ dark mode.
 
-> Trạng thái: **v0.3.1**: ngoài component nền tảng, overlay, DataTable, landing blocks và input nâng cao, đã có Kanban, lịch sự kiện (EventCalendar), DateTimePicker, đa ngôn ngữ, mật độ nhỏ gọn, bộ component cho app desktop và nhúng trong một khung (PortalProvider). Xem [Lộ trình](#lộ-trình) và [CHANGELOG](CHANGELOG.md).
+> Trạng thái: **v0.4.0**: ngoài component nền tảng, overlay, DataTable, landing blocks và input nâng cao, đã có Kanban, lịch sự kiện (EventCalendar), DateTimePicker, đa ngôn ngữ, mật độ nhỏ gọn, bộ component cho app desktop, nhúng trong một khung (PortalProvider), hiệu ứng chuyển động cho landing page và skill cho AI agent. Xem [Lộ trình](#lộ-trình) và [CHANGELOG](CHANGELOG.md).
 
 ## Chạy playground
 
@@ -48,7 +48,7 @@ cd ../momi-ui && npm run dev:lib   # vite build --watch + tsc --watch + build CS
 **Khi app merge lên main / chạy CI** — cài từ git, ghim theo tag:
 
 ```jsonc
-"dependencies": { "momi-ui": "github:HoangDuong2k/momi-ui#v0.3.1" }
+"dependencies": { "momi-ui": "github:HoangDuong2k/momi-ui#v0.4.0" }
 ```
 
 Repo không chứa `dist/`, nên script `prepare` tự build khi cài từ git (cần Node ≥ 20.19 hoặc ≥ 22.12). Khi `dist/` đã có (cài `file:` với `dev:lib`), `prepare` bỏ qua để `npm install` của app không build lại mỗi lần; đặt `MOMI_FORCE_BUILD=1` nếu muốn build lại. Mỗi đợt app merge cần một tag mới của momi-ui.
@@ -521,20 +521,22 @@ Không cần `DropdownMenuTrigger`. Menu mở sang phải con trỏ như menu ch
 
 Ghép bằng `Section` + `Container` + block. Block dùng chung token với component nên trang marketing luôn khớp với sản phẩm.
 
-| Block                                                                    | Ghi chú                                                                                                            |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| `AnnouncementBar`, `Navbar`                                              | Navbar có menu mobile, biến thể `blur` · `solid` · `transparent`                                                   |
-| `Hero`, `HeroBadge`, `BrowserFrame`                                      | Layout `centered` / `split`, nền `grid` · `dots` · `glow` · `gradient`                                             |
-| `LogoCloud`, `Marquee`                                                   | Lưới hoặc chạy vô tận, dừng khi hover / reduced motion                                                             |
-| `SectionHeader`, `FeatureGrid`, `FeatureSplit`, `BentoGrid`, `BentoCard` | Tính năng dạng lưới, xen kẽ ảnh, bento                                                                             |
-| `Stats`, `NumberTicker`, `Steps`                                         | Số đếm lên khi cuộn tới, các bước "how it works"                                                                   |
-| `TestimonialGrid`, `TestimonialCard`, `FeaturedTestimonial`              | Masonry, trích dẫn nổi bật                                                                                         |
-| `PricingTable`, `PricingCard`, `BillingToggle`, `PricingComparison`      | Bảng giá theo tháng/năm, ma trận so sánh                                                                           |
-| `Faq`, `Cta`, `NewsletterForm`, `TeamGrid`, `Footer`                     | CTA `primary` tự đảo màu nút bên trong                                                                             |
-| `BackgroundPattern`, `Reveal`, `useInView`                               | Hiệu ứng nền, hiện dần khi cuộn (nội dung vẫn hiện khi không có JavaScript)                                        |
-| `AppWindowFrame`                                                         | Khung cửa sổ app desktop `macos` · `windows` · `minimal`, có `tilt` (nghiêng 3D, thẳng lại khi rê chuột) và `glow` |
-| `VideoPlayer`                                                            | Chỉ tải khi sắp cuộn tới, tự phát không tiếng khi thấy, dừng khi khuất; giảm chuyển động thì chờ bấm phát          |
-| `Changelog`                                                              | Danh sách phiên bản mới nhất ở trên, nhãn Mới / Cải thiện / Sửa lỗi, link neo `#v0.2.0`                            |
+| Block                                                                    | Ghi chú                                                                                                                                    |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `AnnouncementBar`, `Navbar`                                              | Navbar có menu mobile, biến thể `blur` · `solid` · `transparent`                                                                           |
+| `Hero`, `HeroBadge`, `BrowserFrame`                                      | Layout `centered` / `split`, nền `grid` · `dots` · `glow` · `gradient`                                                                     |
+| `LogoCloud`, `Marquee`                                                   | Lưới hoặc chạy vô tận, dừng khi hover / reduced motion                                                                                     |
+| `SectionHeader`, `FeatureGrid`, `FeatureSplit`, `BentoGrid`, `BentoCard` | Tính năng dạng lưới, xen kẽ ảnh, bento                                                                                                     |
+| `Stats`, `NumberTicker`, `Steps`                                         | Số đếm lên khi cuộn tới, các bước "how it works"                                                                                           |
+| `TestimonialGrid`, `TestimonialCard`, `FeaturedTestimonial`              | Masonry, trích dẫn nổi bật                                                                                                                 |
+| `PricingTable`, `PricingCard`, `BillingToggle`, `PricingComparison`      | Bảng giá theo tháng/năm, ma trận so sánh                                                                                                   |
+| `Faq`, `Cta`, `NewsletterForm`, `TeamGrid`, `Footer`                     | CTA `primary` tự đảo màu nút bên trong                                                                                                     |
+| `BackgroundPattern`, `Reveal`, `useInView`                               | Hiệu ứng nền, hiện dần khi cuộn (nội dung vẫn hiện khi không có JavaScript)                                                                |
+| `ParticleWave`, `Fireflies`, `LightBeams`, `DustMotes`                   | Nền chuyển động bằng canvas: dải hạt WebGL, đom đóm, dải ánh sáng trôi, bụi trong luồng đèn (xem "Hiệu ứng chuyển động")                   |
+| `ParticleImage`, `HalftoneImage`, `PixelTrail`                           | Ảnh (hoặc chữ) phản ứng theo con trỏ: tượng hạt quay theo chuột, chân dung chấm halftone có đèn rọi, ảnh vỡ thành điểm ảnh dọc đường chuột |
+| `AppWindowFrame`                                                         | Khung cửa sổ app desktop `macos` · `windows` · `minimal`, có `tilt` (nghiêng 3D, thẳng lại khi rê chuột) và `glow`                         |
+| `VideoPlayer`                                                            | Chỉ tải khi sắp cuộn tới, tự phát không tiếng khi thấy, dừng khi khuất; giảm chuyển động thì chờ bấm phát                                  |
+| `Changelog`                                                              | Danh sách phiên bản mới nhất ở trên, nhãn Mới / Cải thiện / Sửa lỗi, link neo `#v0.2.0`                                                    |
 
 ```tsx
 <Hero
@@ -551,6 +553,58 @@ Ghép bằng `Section` + `Container` + block. Block dùng chung token với comp
   </Container>
 </Section>
 ```
+
+### Hiệu ứng chuyển động
+
+Hai nhóm: **lớp nền** (`ParticleWave`, `Fireflies`, `LightBeams`, `DustMotes`) đặt trong khung cha `relative isolate`, nằm sau nội dung; **ảnh tương tác** (`ParticleImage`, `HalftoneImage`, `PixelTrail`) lấp đầy khung cha (cho khung cha kích thước), nhận `src` (ảnh cùng nguồn hoặc có header CORS, vì phải đọc điểm ảnh) hoặc `text`, và `alt` khi ảnh mang nội dung (không có `alt` thì ẩn khỏi trình đọc màn hình).
+
+| Hiệu ứng        | Tương tác                                                                                                                                                     | Thuộc tính chính                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `ParticleImage` | Cả khối hạt **quay nhẹ theo con trỏ** như tượng có chiều sâu (vùng sáng nổi lên), hạt sát con trỏ tản ra, bấm thì gợn sóng; lần đầu hạt bay tụ lại thành hình | `tilt` (độ quay tối đa), `depth`, `spacing`, `size`, `colors` hoặc `imageColors`, `scatter`, `intro`    |
+| `HalftoneImage` | Chấm quanh con trỏ đổi sang màu nhấn và to lên; gợn sáng nhẹ khi đứng yên                                                                                     | `cellSize`, `shape`, `color`, `accent`, `dots` (`dark` · `light` · `auto`), `radius`, `grow`, `shimmer` |
+| `PixelTrail`    | Ảnh vỡ thành khối điểm ảnh rực màu dọc đường con trỏ rồi mờ dần (không có ảnh thì thành vệt điểm ảnh)                                                         | `cellSize`, `brush`, `fade`, `colors` (dải màu từ lúc tắt tới lúc mới), `imageMix`, `boost`             |
+| `LightBeams`    | Không cần chuột: các dải sáng mềm trôi chậm như đèn sân khấu qua sương                                                                                        | `colors`, `count`, `angle`, `speed`, `intensity`                                                        |
+| `DustMotes`     | Bụi lơ lửng, lấp lánh khi lọt vào luồng sáng; luồng sáng xoay dần theo con trỏ, rê chuột thì khuấy bụi                                                        | `color`, `ambientColor`, `beam`, `beamColor`, `source`, `aim`, `spread`, `followPointer`, `count`       |
+
+```tsx
+<div className="h-96">
+  <ParticleImage src="/portrait.png" alt="Chân dung" tilt={18} />
+</div>
+
+<section className="relative isolate overflow-hidden">
+  <DustMotes color="#ffcf8f" ambientColor="var(--primary)" source={{ x: 0.1, y: -0.1 }} />
+  …
+</section>
+```
+
+#### Sóng hạt và đom đóm
+
+`ParticleWave` (dải hàng nghìn hạt sáng cong như nụ cười, xoắn chậm như dải lụa, vẽ bằng WebGL) và `Fireflies` (đom đóm lúc sáng lúc tắt, mỗi màu một bầy ở một độ sâu) là lớp nền trang trí: đặt trong khung cha `relative isolate`, phần tử nằm sau nội dung.
+
+```tsx
+function Hero() {
+  const copy = useRef<HTMLDivElement>(null)
+  return (
+    <section className="relative isolate overflow-hidden">
+      <Fireflies />
+      {/* Giữa dải sóng nằm ngay dưới khối chữ, tự theo kích thước của nó */}
+      <ParticleWave anchor={copy} colors={['var(--info)', 'var(--primary)']} />
+      <div ref={copy}>…</div>
+    </section>
+  )
+}
+```
+
+| Thuộc tính                 | Cách dùng                                                                                                                                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Màu                        | `colors`: màu CSS bất kỳ, kể cả biến theme (`var(--primary)`, oklch). `ParticleWave`: màu hai đầu và giữa dải; `Fireflies`: mỗi màu một bầy                                                      |
+| Nền sáng / tối             | `blend="auto"` (mặc định) tự nhận nền phía sau: nền tối thì ánh sáng cộng dồn (lõi trắng rực), nền sáng thì vẽ thường với lõi đậm hơn; đổi theme là đổi theo. Ép bằng `blend="add"` / `"normal"` |
+| Vị trí (`ParticleWave`)    | `anchor` (giữa dải nằm dưới phần tử đó, `anchorOffset` px) hoặc `origin={{ x, y }}` (tỉ lệ khung)                                                                                                |
+| Hình dáng (`ParticleWave`) | `shape` `smile` · `arch` · `flat`, `scale`, `thickness`, `twist`, `speed`, `density`; `glow` (quầng sáng), `backdrop` (tia toả, vòng tròn mảnh)                                                  |
+| Đom đóm                    | `count` (mỗi bầy), `size`, `speed`, `opacity`                                                                                                                                                    |
+| Tương tác                  | `interactive` (mặc định bật): hạt dạt ra quanh con trỏ, bấm thì gợn sóng lan trên dải; đom đóm tò mò bay lại lượn quanh con trỏ, các bầy lệch theo con trỏ như có chiều sâu                      |
+
+Nhẹ máy: chỉ vẽ khi đang thấy trên màn hình và tab đang mở, tối đa 60 khung hình/giây, máy vẽ không kịp thì tự hạ xuống 30 khung hình/giây và bỏ quầng sáng, màn hình hẹp dùng ít hạt hơn, độ phân giải canvas tối đa 2×. Người bật _giảm chuyển động_ chỉ thấy một khung hình đứng yên, không tương tác (đổi cài đặt khi đang mở trang cũng theo ngay). Máy không có WebGL vẫn còn quầng sáng và các vòng tròn. Cả hai chỉ chạy trên trình duyệt: trong Astro, nạp bằng `client:idle`.
 
 ### Quy ước API
 
@@ -593,6 +647,7 @@ skills/momi-ui/    # skill cho agent: SKILL.md, examples/ (được typecheck), 
 - [x] **Phase 4** — Nâng cao: Combobox, Command, Calendar/DatePicker, Slider, OTP, FileUpload; trang Installation, CI, LICENSE, CHANGELOG, sẵn sàng publish
 - [x] **Phase 5** — Kanban, đa ngôn ngữ; cho app desktop: cài từ `file:` / git tag, cỡ xs + `DensityProvider`, ColorPicker, NumberField, Slider `resetValue` / `origin`, Resizable, SortableList, ScrollArea, menu mở tại tọa độ, Toolbar / ToggleGroup, phím tắt theo hệ điều hành, theme desktop (`forcedTheme`, token bề mặt); cho landing: AppWindowFrame, VideoPlayer, Lightbox, ThemeScript, Changelog, hướng dẫn Astro / Next.js
 - [x] **Phase 6** — Nhúng trong một khung (`PortalProvider`), `EventCalendar` (tháng / tuần / ngày / danh sách, kéo thả), `DateTimePicker` và các panel, Combobox tạo mục mới, Drawer không modal, Kanban cột chia đều, `suspendTransitions`
+- [x] **Phase 7** — Skill cho AI agent (`npx momi-ui link-skill`), `useShortcut`; hiệu ứng cho landing page: `ParticleWave`, `Fireflies`, `ParticleImage`, `HalftoneImage`, `PixelTrail`, `LightBeams`, `DustMotes`
 - [ ] **Sau này** — kéo nhiều hàng cùng lúc trong SortableList, pointer lock cho NumberField, so sánh trước / sau (ComparisonSlider), phát hành lên npm
 
 ## Phát hành
@@ -602,7 +657,7 @@ Mỗi đợt app cần bản mới:
 1. `npm run skill:refs` nếu API công khai đổi (danh mục của skill sinh lại từ mã nguồn).
 2. Xem lại `skills/momi-ui/SKILL.md`: quy ước, những chỗ dễ sai hay cách cài có đổi không. Ví dụ trong `skills/momi-ui/examples/` được typecheck nên API đổi mà quên sửa thì bước 3 báo lỗi.
 3. `npm run check` (typecheck cả ví dụ của skill, lint, format, kiểm tra danh mục còn mới, test).
-4. Cập nhật CHANGELOG, đánh tag rồi push (`git tag v0.3.1 && git push --tags`). App cài theo tag, `prepare` tự build khi cài.
+4. Cập nhật CHANGELOG, đánh tag rồi push (`git tag v0.4.0 && git push --tags`). App cài theo tag, `prepare` tự build khi cài.
 
 Khi đưa lên npm:
 

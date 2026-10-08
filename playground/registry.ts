@@ -59,6 +59,9 @@ import ColorPickerDemo from './demos/color-picker'
 import NumberFieldDemo from './demos/number-field'
 import CtaDemo from './demos/cta'
 import EffectsDemo from './demos/effects'
+import ParticleEffectsDemo from './demos/particle-effects'
+import ImageEffectsDemo from './demos/image-effects'
+import AmbientEffectsDemo from './demos/ambient-effects'
 import FaqDemo from './demos/faq'
 import FeaturesDemo from './demos/features'
 import FooterDemo from './demos/footer'
@@ -765,6 +768,39 @@ export const demos: DemoEntry[] = [
     isNew: true,
     wide: true,
     component: EffectsDemo,
+  },
+  {
+    id: 'particle-effects',
+    title: 'Particle Effects',
+    group: 'Landing blocks',
+    description:
+      'Canvas backgrounds for hero sections: a WebGL ribbon of particles and drifting fireflies that react to the pointer, pause off screen and respect reduced motion.',
+    imports: ['ParticleWave', 'Fireflies'],
+    isNew: true,
+    wide: true,
+    component: ParticleEffectsDemo,
+  },
+  {
+    id: 'image-effects',
+    title: 'Image Effects',
+    group: 'Landing blocks',
+    description:
+      'Images that answer the pointer: a halftone portrait with a spotlight, a particle sculpture that turns to follow the cursor, and a photo that breaks into pixels along its path.',
+    imports: ['HalftoneImage', 'ParticleImage', 'PixelTrail', 'LightBeams'],
+    isNew: true,
+    wide: true,
+    component: ImageEffectsDemo,
+  },
+  {
+    id: 'ambient-effects',
+    title: 'Ambient Effects',
+    group: 'Landing blocks',
+    description:
+      'Atmosphere for hero sections: drifting beams of light, and dust floating through a lamp beam that turns towards the pointer.',
+    imports: ['LightBeams', 'DustMotes'],
+    isNew: true,
+    wide: true,
+    component: AmbientEffectsDemo,
   },
   {
     id: 'media',
