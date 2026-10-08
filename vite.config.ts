@@ -24,6 +24,9 @@ export default defineConfig(({ command, mode }) => {
   const isLibraryBuild = command === 'build' && mode !== 'playground'
 
   return {
+    // The static playground uses relative URLs, so it works under any path (GitHub Pages serves it
+    // at /momi-ui/); pages are routed by the URL hash.
+    base: command === 'build' && mode === 'playground' ? './' : '/',
     plugins: [react(), tailwindcss()],
     // The playground shows the package version (playground/env.d.ts declares it).
     define: { __MOMI_VERSION__: JSON.stringify(pkg.version) },

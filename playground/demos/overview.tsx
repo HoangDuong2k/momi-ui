@@ -103,7 +103,7 @@ function MiniHero() {
       <div className="pointer-events-none absolute inset-0 bg-radial from-transparent to-background/90" />
       <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-6">
         <Badge variant="outline" dot tone="success">
-          momi-ui 0.1 · all phases complete
+          momi-ui {__MOMI_VERSION__} · motion effects for landing pages
         </Badge>
         <Heading as="h2" size="display">
           Build calm interfaces, faster.

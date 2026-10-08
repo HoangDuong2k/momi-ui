@@ -4,6 +4,8 @@ Thư viện component React theo phong cách **Modern Minimal**, xây trên **Ta
 nhiều khoảng trắng, typography rõ ràng, một màu accent, bo góc vừa phải, bóng đổ nhẹ, hỗ trợ dark mode.
 
 > Trạng thái: **v0.4.0**: ngoài component nền tảng, overlay, DataTable, landing blocks và input nâng cao, đã có Kanban, lịch sự kiện (EventCalendar), DateTimePicker, đa ngôn ngữ, mật độ nhỏ gọn, bộ component cho app desktop, nhúng trong một khung (PortalProvider), hiệu ứng chuyển động cho landing page và skill cho AI agent. Xem [Lộ trình](#lộ-trình) và [CHANGELOG](CHANGELOG.md).
+>
+> **Xem trực tiếp mọi component:** https://hoangduong2k.github.io/momi-ui/
 
 ## Chạy playground
 
@@ -52,6 +54,8 @@ cd ../momi-ui && npm run dev:lib   # vite build --watch + tsc --watch + build CS
 ```
 
 Repo không chứa `dist/`, nên script `prepare` tự build khi cài từ git (cần Node ≥ 20.19 hoặc ≥ 22.12). Khi `dist/` đã có (cài `file:` với `dev:lib`), `prepare` bỏ qua để `npm install` của app không build lại mỗi lần; đặt `MOMI_FORCE_BUILD=1` nếu muốn build lại. Mỗi đợt app merge cần một tag mới của momi-ui.
+
+**npm 11 trở lên** cảnh báo script `prepare` của momi-ui chưa được cho phép (`allowScripts`). Hiện chỉ là cảnh báo, nhưng nên đồng ý để sau này npm có chặn thì `dist/` vẫn được build: chạy `npm install-scripts approve momi-ui`, lệnh ghi vào `allowScripts` trong `package.json` của app. Quyền này gắn với đúng commit của tag đang cài, nên **chạy lại sau mỗi lần nâng momi-ui**.
 
 **Dự án đã dùng Tailwind CSS v4** (khuyên dùng) — thêm vào file CSS chính:
 

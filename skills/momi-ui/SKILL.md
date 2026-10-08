@@ -34,7 +34,7 @@ momi-ui is a general-purpose React 19 component library on Tailwind CSS v4 and R
   @import './legacy.css' layer(legacy);
   ```
 - **Providers** near the root (see `examples/app-root.tsx`): `ThemeProvider`, `LocaleProvider`, optional `TooltipProvider`, and one `<Toaster />` if anything calls `toast()`. `ThemeScript` in `<head>` avoids a light flash in dark mode for server-rendered pages. In Astro, each island is its own React root: put providers inside the island.
-- **Installing.** Apps pin a git tag (`"momi-ui": "github:HoangDuong2k/momi-ui#v0.4.0"`) or use `file:../momi-ui` while developing both. With Vite, set `resolve.dedupe: ['react', 'react-dom']`. npm 11 may warn that momi-ui's `prepare` script is not approved: the package is already built when installed from git, so the warning is harmless (`npm install-scripts approve momi-ui` silences it).
+- **Installing.** Apps pin a git tag (`"momi-ui": "github:HoangDuong2k/momi-ui#v0.4.0"`) or use `file:../momi-ui` while developing both. With Vite, set `resolve.dedupe: ['react', 'react-dom']`. npm 11+ warns that momi-ui's `prepare` script (the build that runs when installing from git) is not approved: run `npm install-scripts approve momi-ui` so it keeps working if npm starts enforcing this. The approval is pinned to the installed commit, so approve again after every upgrade.
 
 ## Conventions every component follows
 
